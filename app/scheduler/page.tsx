@@ -1,11 +1,70 @@
+"use client";
+
 import React, { useMemo, useState } from "react";
 
-const clinics = ["Main Clinic", "North Branch", "South Branch"];
-const resources = ["Room 1", "Room 2", "CT Scanner", "Ultrasound"];
-const modalities = ["All", "CT", "Ultrasound", "Consult", "Review"];
-const slotViewOptions = ["All", "Available", "Booked", "Blocked"];
+type Clinic = "Main Clinic" | "North Branch" | "South Branch";
+type Resource = "Room 1" | "Room 2" | "CT Scanner" | "Ultrasound";
+type Modality = "All" | "CT" | "Ultrasound" | "Consult" | "Review";
+type SlotView = "All" | "Available" | "Booked" | "Blocked";
+type DayKey = "mon" | "tue" | "wed" | "thu" | "fri";
+type StaffRole = "Receptionist" | "Technical Staff" | "Radiologist" | "Admin";
+type AppointmentStatus = "Booked";
 
-const days = [
+type Day = {
+  key: DayKey;
+  label: string;
+};
+
+type ResourceMapping = {
+  clinic: Clinic;
+  room: Resource;
+  machine: string;
+  modality: Exclude<Modality, "All">;
+};
+
+type StaffMember = {
+  id: number;
+  name: string;
+  role: StaffRole;
+  clinic: Clinic;
+  assignedClinics: Clinic[];
+  day: DayKey;
+  shift: string;
+  available: boolean;
+  capabilities: string;
+};
+
+type Appointment = {
+  id: number;
+  day: DayKey;
+  time: string;
+  clinic: Clinic;
+  resource: Resource;
+  patient: string;
+  type: string;
+  status: AppointmentStatus;
+  staff: string;
+  clinician: string;
+};
+
+type BlockedSlot = {
+  day: DayKey;
+  time: string;
+  clinic: Clinic;
+  resource: Resource;
+};
+
+type SlotData =
+  | { state: "booked"; data: Appointment }
+  | { state: "blocked"; data: BlockedSlot }
+  | { state: "available"; data: null };
+
+const clinics: Clinic[] = ["Main Clinic", "North Branch", "South Branch"];
+const resources: Resource[] = ["Room 1", "Room 2", "CT Scanner", "Ultrasound"];
+const modalities: Modality[] = ["All", "CT", "Ultrasound", "Consult", "Review"];
+const slotViewOptions: SlotView[] = ["All", "Available", "Booked", "Blocked"];
+
+const days: Day[] = [
   { key: "mon", label: "Mon 18" },
   { key: "tue", label: "Tue 19" },
   { key: "wed", label: "Wed 20" },
@@ -34,7 +93,7 @@ const timeSlots = [
   "16:30",
 ];
 
-const resourceMapping = [
+const resourceMapping: ResourceMapping[] = [
   {
     clinic: "Main Clinic",
     room: "Room 1",
@@ -73,7 +132,7 @@ const resourceMapping = [
   },
 ];
 
-const initialStaffRoster = [
+const initialStaffRoster: StaffMember[] = [
   {
     id: 1,
     name: "Sarah Miles",
@@ -142,7 +201,7 @@ const initialStaffRoster = [
   },
 ];
 
-const initialAppointments = [
+const initialAppointments: Appointment[] = [
   {
     id: 1,
     day: "mon",
@@ -205,7 +264,7 @@ const initialAppointments = [
   },
 ];
 
-const blockedSlots = [
+const blockedSlots: BlockedSlot[] = [
   { day: "mon", time: "12:00", clinic: "Main Clinic", resource: "Room 1" },
   { day: "tue", time: "14:00", clinic: "North Branch", resource: "Ultrasound" },
   { day: "wed", time: "10:00", clinic: "South Branch", resource: "Room 2" },
@@ -213,28 +272,77 @@ const blockedSlots = [
   { day: "fri", time: "16:00", clinic: "Main Clinic", resource: "Room 1" },
 ];
 
-export default function App() {
-  const [appointments, setAppointments] = useState(initialAppointments);
-  const [staffRoster, setStaffRoster] = useState(initialStaffRoster);
-  const [selectedClinic, setSelectedClinic] = useState("Main Clinic");
-  const [selectedResource, setSelectedResource] = useState("All");
-  const [selectedModality, setSelectedModality] = useState("All");
-  const [selectedDay, setSelectedDay] = useState("mon");
-  const [selectedSlotView, setSelectedSlotView] = useState("All");
+export default function SchedulerPage() {
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  const [appointments, setAppointments] =
+    useState<Appointment[]>(initialAppointments);
+  const [staffRoster, setStaffRoster] =
+    useState<StaffMember[]>(initialStaffRoster);
+  const [selectedClinic, setSelectedClinic] =
+    useState<Clinic>("Main Clinic");
+  const [selectedResource, setSelectedResource] =
+    useState<Resource | "All">("All");
+  const [selectedModality, setSelectedModality] =
+    useState<Modality>("All");
+  const [selectedDay, setSelectedDay] = useState<DayKey>("mon");
+  const [selectedSlotView, setSelectedSlotView] =
+    useState<SlotView>("All");
   const [search, setSearch] = useState("");
-  const [selectedAppointmentId, setSelectedAppointmentId] = useState(1);
-  const [rescheduleDay, setRescheduleDay] = useState("thu");
+  const [selectedAppointmentId, setSelectedAppointmentId] =
+    useState<number>(1);
+  const [rescheduleDay, setRescheduleDay] = useState<DayKey>("thu");
   const [rescheduleTime, setRescheduleTime] = useState("14:00");
-  const [rescheduleResource, setRescheduleResource] = useState("Room 2");
+  const [rescheduleResource, setRescheduleResource] =
+    useState<Resource>("Room 2");
   const [message, setMessage] = useState("");
 
   const [staffName, setStaffName] = useState("");
-  const [staffRole, setStaffRole] = useState("Receptionist");
-  const [staffClinic, setStaffClinic] = useState("Main Clinic");
-  const [staffDay, setStaffDay] = useState("mon");
+  const [staffRole, setStaffRole] = useState<StaffRole>("Receptionist");
+  const [staffClinic, setStaffClinic] = useState<Clinic>("Main Clinic");
+  const [staffDay, setStaffDay] = useState<DayKey>("mon");
   const [staffShift, setStaffShift] = useState("08:00 - 16:00");
   const [staffCapabilities, setStaffCapabilities] = useState("");
   const [staffMessage, setStaffMessage] = useState("");
+
+  const theme = {
+    pageBg: isDarkMode ? "#111315" : "#f2f3f5",
+    mainBg: isDarkMode ? "#111315" : "#f2f3f5",
+    sidebarBg: isDarkMode ? "#141618" : "#f3f4f6",
+    panelBg: isDarkMode ? "#17191d" : "#ffffff",
+    topbarBg: isDarkMode ? "#1b1d20" : "#f8f9fb",
+    headerBg: isDarkMode ? "#1b1e22" : "#ffffff",
+    subBg: isDarkMode ? "#1b1e22" : "#dfe3e8",
+    inputBg: isDarkMode ? "#101215" : "#ffffff",
+    text: isDarkMode ? "#ffffff" : "#111111",
+    textStrong: isDarkMode ? "#ffffff" : "#111111",
+    textSoft: isDarkMode ? "rgba(255,255,255,0.82)" : "#374151",
+    textMuted: isDarkMode ? "rgba(255,255,255,0.58)" : "#6b7280",
+    textFaint: isDarkMode ? "rgba(255,255,255,0.45)" : "#9ca3af",
+    border: isDarkMode ? "rgba(255,255,255,0.08)" : "#d1d5db",
+    emptyBg: isDarkMode ? "#121417" : "#f8fafc",
+    navBg: isDarkMode ? "#17191d" : "#e5e7eb",
+    navText: isDarkMode ? "rgba(255,255,255,0.55)" : "#4b5563",
+    navActiveBg: isDarkMode ? "#1b1e22" : "#111827",
+    navActiveText: isDarkMode ? "#ffffff" : "#ffffff",
+    secondaryBtnBg: isDarkMode ? "#252a31" : "#e5e7eb",
+    secondaryBtnText: isDarkMode ? "#ffffff" : "#111111",
+    pillBg: isDarkMode ? "#1f2c3b" : "#dbeafe",
+    pillText: isDarkMode ? "#56a8ff" : "#1d4ed8",
+    badgeBg: isDarkMode ? "rgba(86,168,255,0.14)" : "#dbeafe",
+    badgeText: isDarkMode ? "#56a8ff" : "#1d4ed8",
+    mappingBg: isDarkMode ? "rgba(155,107,255,0.16)" : "#ede9fe",
+    mappingText: isDarkMode ? "#c7a7ff" : "#6d28d9",
+    slotAvailableBg: isDarkMode ? "rgba(45,143,82,0.08)" : "#dfece6",
+    slotBookedBg: isDarkMode ? "rgba(86,168,255,0.12)" : "#dbe4f0",
+    slotBlockedBg: isDarkMode ? "rgba(210,77,87,0.12)" : "#eedddd",
+    slotMutedBg: isDarkMode ? "#15171a" : "#eef2f7",
+    tabBg: isDarkMode ? "#252a31" : "#e5e7eb",
+    tabText: isDarkMode ? "rgba(255,255,255,0.75)" : "#374151",
+    timeColBg: isDarkMode ? "#17191d" : "#ffffff",
+    metricBg: isDarkMode ? "#17191d" : "#ffffff",
+    calendarBg: isDarkMode ? "#17191d" : "#ffffff",
+  };
 
   const filteredAppointments = useMemo(() => {
     return appointments.filter((item) => {
@@ -246,6 +354,7 @@ export default function App() {
       const text =
         `${item.patient} ${item.type} ${item.resource} ${item.clinic} ${item.clinician} ${item.staff}`.toLowerCase();
       const searchMatch = text.includes(search.toLowerCase());
+
       return clinicMatch && resourceMatch && modalityMatch && searchMatch;
     });
   }, [
@@ -284,7 +393,7 @@ export default function App() {
   }, [filteredAppointments, visibleBlockedSlots, selectedDay]);
 
   const selectedAppointment =
-    appointments.find((item) => item.id === selectedAppointmentId) ||
+    appointments.find((item) => item.id === selectedAppointmentId) ??
     appointments[0];
 
   const rosterForDay = useMemo(() => {
@@ -300,7 +409,7 @@ export default function App() {
     return resourceMapping.filter((item) => item.clinic === selectedClinic);
   }, [selectedClinic]);
 
-  const getSlotData = (day, time) => {
+  const getSlotData = (day: DayKey, time: string): SlotData => {
     const booked = filteredAppointments.find(
       (item) => item.day === day && item.time === time
     );
@@ -314,13 +423,13 @@ export default function App() {
     return { state: "available", data: null };
   };
 
-  const shouldShowSlot = (state) => {
+  const shouldShowSlot = (state: SlotData["state"]) => {
     if (selectedSlotView === "All") return true;
     return selectedSlotView.toLowerCase() === state;
   };
 
   const detectedConflicts = useMemo(() => {
-    const conflicts = [];
+    const conflicts: string[] = [];
 
     appointments.forEach((appointment, index) => {
       appointments.slice(index + 1).forEach((other) => {
@@ -331,29 +440,17 @@ export default function App() {
         ) {
           if (appointment.resource === other.resource) {
             conflicts.push(
-              `Room/Machine conflict: ${
-                appointment.resource
-              } is double-booked on ${appointment.day.toUpperCase()} at ${
-                appointment.time
-              }.`
+              `Room/Machine conflict: ${appointment.resource} is double-booked on ${appointment.day.toUpperCase()} at ${appointment.time}.`
             );
           }
           if (appointment.staff === other.staff) {
             conflicts.push(
-              `Staff conflict: ${
-                appointment.staff
-              } is allocated to overlapping bookings on ${appointment.day.toUpperCase()} at ${
-                appointment.time
-              }.`
+              `Staff conflict: ${appointment.staff} is allocated to overlapping bookings on ${appointment.day.toUpperCase()} at ${appointment.time}.`
             );
           }
           if (appointment.clinician === other.clinician) {
             conflicts.push(
-              `Clinician conflict: ${
-                appointment.clinician
-              } has overlapping bookings on ${appointment.day.toUpperCase()} at ${
-                appointment.time
-              }.`
+              `Clinician conflict: ${appointment.clinician} has overlapping bookings on ${appointment.day.toUpperCase()} at ${appointment.time}.`
             );
           }
         }
@@ -364,7 +461,7 @@ export default function App() {
   }, [appointments]);
 
   const intelligentAlerts = useMemo(() => {
-    const alerts = [];
+    const alerts: string[] = [];
 
     days.forEach((day) => {
       const dayItems = appointments
@@ -378,9 +475,7 @@ export default function App() {
         const currentIndex = timeSlots.indexOf(dayItems[i].time);
         if (currentIndex - prevIndex >= 4) {
           alerts.push(
-            `Idle gap alert: ${selectedClinic} has a long scheduling gap on ${
-              day.label
-            } between ${dayItems[i - 1].time} and ${dayItems[i].time}.`
+            `Idle gap alert: ${selectedClinic} has a long scheduling gap on ${day.label} between ${dayItems[i - 1].time} and ${dayItems[i].time}.`
           );
         }
       }
@@ -388,11 +483,7 @@ export default function App() {
 
     if (rosterForDay.length <= 1 && dayAppointments.length > 2) {
       alerts.push(
-        `Staff efficiency alert: Only ${
-          rosterForDay.length
-        } staff member is rostered for ${
-          days.find((d) => d.key === selectedDay)?.label
-        } with ${dayAppointments.length} appointments.`
+        `Staff efficiency alert: Only ${rosterForDay.length} staff member is rostered for ${days.find((d) => d.key === selectedDay)?.label} with ${dayAppointments.length} appointments.`
       );
     }
 
@@ -481,7 +572,7 @@ export default function App() {
     setSelectedDay("mon");
   };
 
-  const handleRegisterStaff = (e) => {
+  const handleRegisterStaff = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStaffMessage("");
 
@@ -490,7 +581,7 @@ export default function App() {
       return;
     }
 
-    const newStaff = {
+    const newStaff: StaffMember = {
       id: Date.now(),
       name: staffName.trim(),
       role: staffRole,
@@ -512,23 +603,84 @@ export default function App() {
     setStaffMessage("Staff profile registered successfully.");
   };
 
+  const themedSecondaryButton: React.CSSProperties = {
+    ...styles.secondaryButton,
+    background: theme.secondaryBtnBg,
+    color: theme.secondaryBtnText,
+    border: `1px solid ${theme.border}`,
+  };
+
   return (
-    <div style={styles.page}>
-      <div style={styles.topbar}>
+    <div
+      style={{
+        ...styles.page,
+        background: theme.pageBg,
+        color: theme.text,
+      }}
+    >
+      <div
+        style={{
+          ...styles.topbar,
+          background: theme.topbarBg,
+          borderBottom: `1px solid ${theme.border}`,
+          color: theme.text,
+        }}
+      >
         <div style={styles.topbarLeft}>
           <img src="/logo.jpg" alt="EsyRIS logo" style={styles.headerLogo} />
-          <div style={styles.brand}>EsyRIS</div>
-          <div style={styles.topbarText}>Scheduler / Roster Module</div>
+          <div style={{ ...styles.brand, color: theme.textStrong }}>EsyRIS</div>
+          <div style={{ ...styles.topbarText, color: theme.textMuted }}>
+            Scheduler / Roster Module
+          </div>
         </div>
 
         <div style={styles.topbarRight}>
-          <button style={styles.topActionButton} onClick={handleToday}>
+          <button type="button" style={themedSecondaryButton} onClick={handleToday}>
             Today
           </button>
-          <button style={styles.topActionButton}>New Booking</button>
-          <button style={styles.topActionButton}>Reschedule</button>
-          <div style={styles.topInfoPill}>Clinic: {selectedClinic}</div>
-          <div style={styles.topInfoPill}>
+          <button type="button" style={themedSecondaryButton}>
+            New Booking
+          </button>
+          <button type="button" style={themedSecondaryButton}>
+            Reschedule
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsDarkMode((prev) => !prev)}
+            style={{
+              height: 34,
+              padding: "0 14px",
+              borderRadius: 20,
+              border: `1px solid ${theme.border}`,
+              background: isDarkMode ? "#252a31" : "#e5e7eb",
+              color: isDarkMode ? "#ffffff" : "#111111",
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            {isDarkMode ? "🌙 Dark" : "☀️ Light"}
+          </button>
+
+          <div
+            style={{
+              ...styles.topInfoPill,
+              background: theme.pillBg,
+              color: theme.pillText,
+              border: `1px solid ${theme.border}`,
+            }}
+          >
+            Clinic: {selectedClinic}
+          </div>
+          <div
+            style={{
+              ...styles.topInfoPill,
+              background: theme.pillBg,
+              color: theme.pillText,
+              border: `1px solid ${theme.border}`,
+            }}
+          >
             Slots: {dayStats.available} Available
           </div>
           <div style={styles.userPill}>Scheduler</div>
@@ -536,24 +688,44 @@ export default function App() {
       </div>
 
       <div style={styles.layout}>
-        <aside style={styles.sidebar}>
-          <div style={styles.sidebarHeader}>
+        <aside
+          style={{
+            ...styles.sidebar,
+            background: theme.sidebarBg,
+            borderRight: `1px solid ${theme.border}`,
+          }}
+        >
+          <div
+            style={{
+              ...styles.sidebarHeader,
+              borderBottom: `1px solid ${theme.border}`,
+            }}
+          >
             <div style={styles.sidebarTitle}>SCHEDULING</div>
-            <div style={styles.sidebarSub}>
+            <div style={{ ...styles.sidebarSub, color: theme.textMuted }}>
               Calendar, roster, mapping, and conflict management
             </div>
           </div>
 
           <div style={styles.filterSection}>
-            <div style={styles.filterLabel}>Clinic</div>
+            <div style={{ ...styles.filterLabel, color: theme.textStrong }}>Clinic</div>
             {clinics.map((clinic) => (
               <div
                 key={clinic}
                 onClick={() => setSelectedClinic(clinic)}
                 style={
                   selectedClinic === clinic
-                    ? styles.navItemActive
-                    : styles.navItem
+                    ? {
+                        ...styles.navItemActive,
+                        background: theme.navActiveBg,
+                        color: theme.navActiveText,
+                        border: `1px solid ${theme.border}`,
+                      }
+                    : {
+                        ...styles.navItem,
+                        background: theme.navBg,
+                        color: theme.navText,
+                      }
                 }
               >
                 {clinic}
@@ -562,11 +734,18 @@ export default function App() {
           </div>
 
           <div style={styles.filterSection}>
-            <div style={styles.filterLabel}>Room / Machine</div>
+            <div style={{ ...styles.filterLabel, color: theme.textStrong }}>
+              Room / Machine
+            </div>
             <select
               value={selectedResource}
-              onChange={(e) => setSelectedResource(e.target.value)}
-              style={styles.select}
+              onChange={(e) => setSelectedResource(e.target.value as Resource | "All")}
+              style={{
+                ...styles.select,
+                background: theme.inputBg,
+                color: theme.textStrong,
+                border: `1px solid ${theme.border}`,
+              }}
             >
               <option value="All">All Resources</option>
               {resources.map((resource) => (
@@ -578,11 +757,16 @@ export default function App() {
           </div>
 
           <div style={styles.filterSection}>
-            <div style={styles.filterLabel}>Modality</div>
+            <div style={{ ...styles.filterLabel, color: theme.textStrong }}>Modality</div>
             <select
               value={selectedModality}
-              onChange={(e) => setSelectedModality(e.target.value)}
-              style={styles.select}
+              onChange={(e) => setSelectedModality(e.target.value as Modality)}
+              style={{
+                ...styles.select,
+                background: theme.inputBg,
+                color: theme.textStrong,
+                border: `1px solid ${theme.border}`,
+              }}
             >
               {modalities.map((item) => (
                 <option key={item} value={item}>
@@ -593,11 +777,18 @@ export default function App() {
           </div>
 
           <div style={styles.filterSection}>
-            <div style={styles.filterLabel}>Slot Display</div>
+            <div style={{ ...styles.filterLabel, color: theme.textStrong }}>
+              Slot Display
+            </div>
             <select
               value={selectedSlotView}
-              onChange={(e) => setSelectedSlotView(e.target.value)}
-              style={styles.select}
+              onChange={(e) => setSelectedSlotView(e.target.value as SlotView)}
+              style={{
+                ...styles.select,
+                background: theme.inputBg,
+                color: theme.textStrong,
+                border: `1px solid ${theme.border}`,
+              }}
             >
               {slotViewOptions.map((item) => (
                 <option key={item} value={item}>
@@ -608,56 +799,85 @@ export default function App() {
           </div>
 
           <div style={styles.filterSection}>
-            <div style={styles.filterLabel}>Search</div>
+            <div style={{ ...styles.filterLabel, color: theme.textStrong }}>Search</div>
             <input
-              style={styles.input}
+              style={{
+                ...styles.input,
+                background: theme.inputBg,
+                color: theme.textStrong,
+                border: `1px solid ${theme.border}`,
+              }}
               placeholder="Search patient, staff or resource..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
 
-          <div style={styles.infoBox}>
+          <div
+            style={{
+              ...styles.infoBox,
+              background: theme.panelBg,
+              border: `1px solid ${theme.border}`,
+            }}
+          >
             <div style={styles.infoTitle}>Access Rule</div>
-            <div style={styles.infoText}>
+            <div style={{ ...styles.infoText, color: theme.textMuted }}>
               Reception staff can access calendars across clinics while
               remaining assigned to at least one clinic.
             </div>
           </div>
 
-          <div style={styles.statusCard}>
-            <div style={styles.statusTitle}>Legend</div>
+          <div
+            style={{
+              ...styles.statusCard,
+              background: theme.panelBg,
+              border: `1px solid ${theme.border}`,
+            }}
+          >
+            <div style={{ ...styles.statusTitle, color: theme.textSoft }}>Legend</div>
 
-            <div style={styles.statusRow}>
+            <div style={{ ...styles.statusRow, color: theme.textMuted }}>
               <span style={styles.dotGreen} />
               <span>Available Slot</span>
             </div>
 
-            <div style={styles.statusRow}>
+            <div style={{ ...styles.statusRow, color: theme.textMuted }}>
               <span style={styles.dotBlue} />
               <span>Booked Appointment</span>
             </div>
 
-            <div style={styles.statusRow}>
+            <div style={{ ...styles.statusRow, color: theme.textMuted }}>
               <span style={styles.dotRed} />
               <span>Blocked / Conflict</span>
             </div>
 
-            <div style={styles.statusRow}>
+            <div style={{ ...styles.statusRow, color: theme.textMuted }}>
               <span style={styles.dotPurple} />
               <span>Roster / Mapping Info</span>
             </div>
           </div>
         </aside>
 
-        <main style={styles.main}>
-          <div style={styles.headerPanel}>
+        <main
+          style={{
+            ...styles.main,
+            background: theme.mainBg,
+            color: theme.text,
+          }}
+        >
+          <div
+            style={{
+              ...styles.headerPanel,
+              background: theme.headerBg,
+              border: `1px solid ${theme.border}`,
+            }}
+          >
             <div>
               <div style={styles.kicker}>SCHEDULING & RESOURCE MANAGEMENT</div>
-              <h1 style={styles.pageTitle}>
+              <h1 style={{ ...styles.pageTitle, color: theme.textStrong }}>
                 Appointment Calendar and Allocation
               </h1>
-              <p style={styles.pageSub}>
+              <p style={{ ...styles.pageSub, color: theme.textMuted }}>
                 Calendar-based scheduling with appointment calendar slots,
                 rescheduling, clinic-room-machine mapping, staff availability,
                 staff registration, conflict detection, and intelligent alerts.
@@ -665,38 +885,60 @@ export default function App() {
             </div>
 
             <div style={styles.headerActions}>
-              <button style={styles.secondaryButton}>Export</button>
-              <button style={styles.primaryButton}>Quick Book</button>
+              <button type="button" style={themedSecondaryButton}>
+                Export
+              </button>
+              <button type="button" style={styles.primaryButton}>
+                Quick Book
+              </button>
             </div>
           </div>
 
           <div style={styles.metricsRow}>
-            <div style={styles.metricCard}>
-              <div style={styles.metricLabel}>Clinic</div>
-              <div style={styles.metricValueSmall}>{selectedClinic}</div>
-            </div>
-            <div style={styles.metricCard}>
-              <div style={styles.metricLabel}>Available</div>
-              <div style={styles.metricValue}>{dayStats.available}</div>
-            </div>
-            <div style={styles.metricCard}>
-              <div style={styles.metricLabel}>Booked</div>
-              <div style={styles.metricValue}>{dayStats.booked}</div>
-            </div>
-            <div style={styles.metricCard}>
-              <div style={styles.metricLabel}>Rostered Staff</div>
-              <div style={styles.metricValue}>{rosterForDay.length}</div>
-            </div>
+            {[
+              { label: "Clinic", value: selectedClinic, small: true },
+              { label: "Available", value: String(dayStats.available) },
+              { label: "Booked", value: String(dayStats.booked) },
+              { label: "Rostered Staff", value: String(rosterForDay.length) },
+            ].map((item) => (
+              <div
+                key={item.label}
+                style={{
+                  ...styles.metricCard,
+                  background: theme.metricBg,
+                  border: `1px solid ${theme.border}`,
+                }}
+              >
+                <div style={{ ...styles.metricLabel, color: theme.textMuted }}>
+                  {item.label}
+                </div>
+                <div
+                  style={
+                    item.small
+                      ? { ...styles.metricValueSmall, color: theme.textStrong }
+                      : { ...styles.metricValue, color: theme.textStrong }
+                  }
+                >
+                  {item.value}
+                </div>
+              </div>
+            ))}
           </div>
 
           {(detectedConflicts.length > 0 || intelligentAlerts.length > 0) && (
             <div style={styles.alertGrid}>
-              <section style={styles.alertPanel}>
-                <div style={styles.alertTitle}>Resource Conflict Detection</div>
+              <section
+                style={{
+                  ...styles.alertPanel,
+                  background: theme.panelBg,
+                  border: `1px solid ${theme.border}`,
+                }}
+              >
+                <div style={{ ...styles.alertTitle, color: theme.textStrong }}>
+                  Resource Conflict Detection
+                </div>
                 {detectedConflicts.length === 0 ? (
-                  <div style={styles.alertOk}>
-                    No active conflicts detected.
-                  </div>
+                  <div style={styles.alertOk}>No active conflicts detected.</div>
                 ) : (
                   detectedConflicts.map((alert, index) => (
                     <div key={index} style={styles.alertError}>
@@ -706,8 +948,14 @@ export default function App() {
                 )}
               </section>
 
-              <section style={styles.alertPanel}>
-                <div style={styles.alertTitle}>
+              <section
+                style={{
+                  ...styles.alertPanel,
+                  background: theme.panelBg,
+                  border: `1px solid ${theme.border}`,
+                }}
+              >
+                <div style={{ ...styles.alertTitle, color: theme.textStrong }}>
                   Intelligent Scheduling Alerts
                 </div>
                 {intelligentAlerts.length === 0 ? (
@@ -725,26 +973,50 @@ export default function App() {
             </div>
           )}
 
-          <div style={styles.calendarPanel}>
-            <div style={styles.calendarHeader}>
+          <div
+            style={{
+              ...styles.calendarPanel,
+              background: theme.calendarBg,
+              border: `1px solid ${theme.border}`,
+            }}
+          >
+            <div
+              style={{
+                ...styles.calendarHeader,
+                borderBottom: `1px solid ${theme.border}`,
+              }}
+            >
               <div>
-                <div style={styles.panelTitle}>Appointment Calendar</div>
-                <div style={styles.panelSub}>
+                <div style={{ ...styles.panelTitle, color: theme.textStrong }}>
+                  Appointment Calendar
+                </div>
+                <div style={{ ...styles.panelSub, color: theme.textMuted }}>
                   Calendar visibility across clinics, modalities, rooms, and
                   slot states with filters.
                 </div>
               </div>
             </div>
 
-            <div style={styles.dayTabs}>
+            <div
+              style={{
+                ...styles.dayTabs,
+                borderBottom: `1px solid ${theme.border}`,
+              }}
+            >
               {days.map((day) => (
                 <button
                   key={day.key}
+                  type="button"
                   onClick={() => setSelectedDay(day.key)}
                   style={
                     selectedDay === day.key
                       ? styles.dayTabActive
-                      : styles.dayTab
+                      : {
+                          ...styles.dayTab,
+                          background: theme.tabBg,
+                          color: theme.tabText,
+                          border: `1px solid ${theme.border}`,
+                        }
                   }
                 >
                   {day.label}
@@ -754,16 +1026,45 @@ export default function App() {
 
             <div style={styles.calendarGridWrap}>
               <div style={styles.calendarGrid}>
-                <div style={styles.gridHeaderTime}>Time</div>
+                <div
+                  style={{
+                    ...styles.gridHeaderTime,
+                    background: theme.subBg,
+                    borderBottom: `1px solid ${theme.border}`,
+                    borderRight: `1px solid ${theme.border}`,
+                    color: theme.textSoft,
+                  }}
+                >
+                  Time
+                </div>
                 {days.map((day) => (
-                  <div key={day.key} style={styles.gridHeaderDay}>
+                  <div
+                    key={day.key}
+                    style={{
+                      ...styles.gridHeaderDay,
+                      background: theme.subBg,
+                      borderBottom: `1px solid ${theme.border}`,
+                      borderRight: `1px solid ${theme.border}`,
+                      color: theme.textSoft,
+                    }}
+                  >
                     {day.label}
                   </div>
                 ))}
 
                 {timeSlots.map((time) => (
                   <React.Fragment key={time}>
-                    <div style={styles.timeCell}>{time}</div>
+                    <div
+                      style={{
+                        ...styles.timeCell,
+                        background: theme.timeColBg,
+                        borderBottom: `1px solid ${theme.border}`,
+                        borderRight: `1px solid ${theme.border}`,
+                        color: theme.textMuted,
+                      }}
+                    >
+                      {time}
+                    </div>
 
                     {days.map((day) => {
                       const slot = getSlotData(day.key, time);
@@ -772,9 +1073,22 @@ export default function App() {
                         return (
                           <div
                             key={`${day.key}-${time}`}
-                            style={{ ...styles.slotCell, ...styles.slotMuted }}
+                            style={{
+                              ...styles.slotCell,
+                              background: theme.slotMutedBg,
+                              borderBottom: `1px solid ${theme.border}`,
+                              borderRight: `1px solid ${theme.border}`,
+                              opacity: 0.7,
+                            }}
                           >
-                            <div style={styles.slotMeta}>Filtered</div>
+                            <div
+                              style={{
+                                ...styles.slotMeta,
+                                color: theme.textFaint,
+                              }}
+                            >
+                              Filtered
+                            </div>
                           </div>
                         );
                       }
@@ -785,19 +1099,36 @@ export default function App() {
                             key={`${day.key}-${time}`}
                             style={{
                               ...styles.slotCell,
-                              ...styles.slotBooked,
+                              background: theme.slotBookedBg,
+                              borderBottom: `1px solid ${theme.border}`,
+                              borderRight: `1px solid ${theme.border}`,
                               ...(selectedDay === day.key
                                 ? styles.slotSelectedOutline
                                 : {}),
                             }}
                           >
-                            <div style={styles.slotTitle}>
+                            <div
+                              style={{
+                                ...styles.slotTitle,
+                                color: theme.textStrong,
+                              }}
+                            >
                               {slot.data.patient}
                             </div>
-                            <div style={styles.slotMeta}>
+                            <div
+                              style={{
+                                ...styles.slotMeta,
+                                color: theme.textMuted,
+                              }}
+                            >
                               {slot.data.type} • {slot.data.resource}
                             </div>
-                            <div style={styles.slotMetaSmall}>
+                            <div
+                              style={{
+                                ...styles.slotMetaSmall,
+                                color: theme.textFaint,
+                              }}
+                            >
                               {slot.data.clinician}
                             </div>
                           </div>
@@ -810,14 +1141,28 @@ export default function App() {
                             key={`${day.key}-${time}`}
                             style={{
                               ...styles.slotCell,
-                              ...styles.slotBlocked,
+                              background: theme.slotBlockedBg,
+                              borderBottom: `1px solid ${theme.border}`,
+                              borderRight: `1px solid ${theme.border}`,
                               ...(selectedDay === day.key
                                 ? styles.slotSelectedOutline
                                 : {}),
                             }}
                           >
-                            <div style={styles.slotTitle}>Blocked</div>
-                            <div style={styles.slotMeta}>
+                            <div
+                              style={{
+                                ...styles.slotTitle,
+                                color: theme.textStrong,
+                              }}
+                            >
+                              Blocked
+                            </div>
+                            <div
+                              style={{
+                                ...styles.slotMeta,
+                                color: theme.textMuted,
+                              }}
+                            >
                               {slot.data.resource}
                             </div>
                           </div>
@@ -829,14 +1174,28 @@ export default function App() {
                           key={`${day.key}-${time}`}
                           style={{
                             ...styles.slotCell,
-                            ...styles.slotAvailable,
+                            background: theme.slotAvailableBg,
+                            borderBottom: `1px solid ${theme.border}`,
+                            borderRight: `1px solid ${theme.border}`,
                             ...(selectedDay === day.key
                               ? styles.slotSelectedOutline
                               : {}),
                           }}
                         >
-                          <div style={styles.slotTitle}>Available</div>
-                          <div style={styles.slotMeta}>
+                          <div
+                            style={{
+                              ...styles.slotTitle,
+                              color: theme.textStrong,
+                            }}
+                          >
+                            Available
+                          </div>
+                          <div
+                            style={{
+                              ...styles.slotMeta,
+                              color: theme.textMuted,
+                            }}
+                          >
                             {selectedResource === "All"
                               ? "Open Slot"
                               : selectedResource}
@@ -851,20 +1210,35 @@ export default function App() {
           </div>
 
           <div style={styles.bottomGrid}>
-            <section style={styles.panel}>
-              <div style={styles.panelTitle}>Appointment Rescheduling</div>
-              <div style={styles.panelSub}>
+            <section
+              style={{
+                ...styles.panel,
+                background: theme.panelBg,
+                border: `1px solid ${theme.border}`,
+              }}
+            >
+              <div style={{ ...styles.panelTitle, color: theme.textStrong }}>
+                Appointment Rescheduling
+              </div>
+              <div style={{ ...styles.panelSub, color: theme.textMuted }}>
                 Reschedule while maintaining resource and staff availability.
               </div>
 
               <div style={{ marginTop: 14 }}>
-                <div style={styles.filterLabel}>Select Appointment</div>
+                <div style={{ ...styles.filterLabel, color: theme.textStrong }}>
+                  Select Appointment
+                </div>
                 <select
                   value={selectedAppointmentId}
                   onChange={(e) =>
                     setSelectedAppointmentId(Number(e.target.value))
                   }
-                  style={styles.select}
+                  style={{
+                    ...styles.select,
+                    background: theme.inputBg,
+                    color: theme.textStrong,
+                    border: `1px solid ${theme.border}`,
+                  }}
                 >
                   {appointments
                     .filter((item) => item.clinic === selectedClinic)
@@ -879,11 +1253,18 @@ export default function App() {
 
               <div style={styles.rescheduleGrid}>
                 <div>
-                  <div style={styles.filterLabel}>New Day</div>
+                  <div style={{ ...styles.filterLabel, color: theme.textStrong }}>
+                    New Day
+                  </div>
                   <select
                     value={rescheduleDay}
-                    onChange={(e) => setRescheduleDay(e.target.value)}
-                    style={styles.select}
+                    onChange={(e) => setRescheduleDay(e.target.value as DayKey)}
+                    style={{
+                      ...styles.select,
+                      background: theme.inputBg,
+                      color: theme.textStrong,
+                      border: `1px solid ${theme.border}`,
+                    }}
                   >
                     {days.map((day) => (
                       <option key={day.key} value={day.key}>
@@ -894,11 +1275,18 @@ export default function App() {
                 </div>
 
                 <div>
-                  <div style={styles.filterLabel}>New Time</div>
+                  <div style={{ ...styles.filterLabel, color: theme.textStrong }}>
+                    New Time
+                  </div>
                   <select
                     value={rescheduleTime}
                     onChange={(e) => setRescheduleTime(e.target.value)}
-                    style={styles.select}
+                    style={{
+                      ...styles.select,
+                      background: theme.inputBg,
+                      color: theme.textStrong,
+                      border: `1px solid ${theme.border}`,
+                    }}
                   >
                     {timeSlots.map((time) => (
                       <option key={time} value={time}>
@@ -909,11 +1297,20 @@ export default function App() {
                 </div>
 
                 <div>
-                  <div style={styles.filterLabel}>Resource</div>
+                  <div style={{ ...styles.filterLabel, color: theme.textStrong }}>
+                    Resource
+                  </div>
                   <select
                     value={rescheduleResource}
-                    onChange={(e) => setRescheduleResource(e.target.value)}
-                    style={styles.select}
+                    onChange={(e) =>
+                      setRescheduleResource(e.target.value as Resource)
+                    }
+                    style={{
+                      ...styles.select,
+                      background: theme.inputBg,
+                      color: theme.textStrong,
+                      border: `1px solid ${theme.border}`,
+                    }}
                   >
                     {resources.map((resource) => (
                       <option key={resource} value={resource}>
@@ -924,12 +1321,18 @@ export default function App() {
                 </div>
               </div>
 
-              <div style={styles.summaryBox}>
-                <div style={styles.summaryRow}>
+              <div
+                style={{
+                  ...styles.summaryBox,
+                  background: theme.emptyBg,
+                  border: `1px solid ${theme.border}`,
+                }}
+              >
+                <div style={{ ...styles.summaryRow, color: theme.textStrong }}>
                   <span>Selected Patient</span>
                   <strong>{selectedAppointment?.patient || "-"}</strong>
                 </div>
-                <div style={styles.summaryRow}>
+                <div style={{ ...styles.summaryRow, color: theme.textStrong }}>
                   <span>Current Slot</span>
                   <strong>
                     {selectedAppointment
@@ -939,7 +1342,7 @@ export default function App() {
                       : "-"}
                   </strong>
                 </div>
-                <div style={styles.summaryRow}>
+                <div style={{ ...styles.summaryRow, color: theme.textStrong }}>
                   <span>Conflict Check</span>
                   <strong>
                     {canReschedule ? "Clear" : "Conflict Detected"}
@@ -948,8 +1351,11 @@ export default function App() {
               </div>
 
               <div style={styles.formActions}>
-                <button style={styles.secondaryButton}>Cancel</button>
+                <button type="button" style={themedSecondaryButton}>
+                  Cancel
+                </button>
                 <button
+                  type="button"
                   style={
                     canReschedule ? styles.primaryButton : styles.disabledButton
                   }
@@ -962,31 +1368,66 @@ export default function App() {
               {message ? <div style={styles.message}>{message}</div> : null}
             </section>
 
-            <section style={styles.panel}>
-              <div style={styles.panelTitle}>Staff Availability & Roster</div>
-              <div style={styles.panelSub}>
+            <section
+              style={{
+                ...styles.panel,
+                background: theme.panelBg,
+                border: `1px solid ${theme.border}`,
+              }}
+            >
+              <div style={{ ...styles.panelTitle, color: theme.textStrong }}>
+                Staff Availability & Roster
+              </div>
+              <div style={{ ...styles.panelSub, color: theme.textMuted }}>
                 Staff assigned to the selected clinic/day with access
                 visibility.
               </div>
 
               <div style={{ marginTop: 14 }}>
                 {rosterForDay.length === 0 ? (
-                  <div style={styles.emptyState}>
+                  <div
+                    style={{
+                      ...styles.emptyState,
+                      background: theme.emptyBg,
+                      color: theme.textMuted,
+                    }}
+                  >
                     No staff rostered for this day.
                   </div>
                 ) : (
                   rosterForDay.map((staff) => (
-                    <div key={staff.id} style={styles.listRow}>
+                    <div
+                      key={staff.id}
+                      style={{
+                        ...styles.listRow,
+                        borderBottom: `1px solid ${theme.border}`,
+                      }}
+                    >
                       <div>
-                        <div style={styles.listTitle}>{staff.name}</div>
-                        <div style={styles.listMeta}>
+                        <div
+                          style={{ ...styles.listTitle, color: theme.textStrong }}
+                        >
+                          {staff.name}
+                        </div>
+                        <div style={{ ...styles.listMeta, color: theme.textMuted }}>
                           {staff.role} • {staff.shift}
                         </div>
-                        <div style={styles.slotMetaSmall}>
+                        <div
+                          style={{
+                            ...styles.slotMetaSmall,
+                            color: theme.textFaint,
+                          }}
+                        >
                           Access: {staff.assignedClinics.join(", ")}
                         </div>
                       </div>
-                      <div style={styles.badgeBooked}>
+                      <div
+                        style={{
+                          ...styles.badgeBooked,
+                          background: theme.badgeBg,
+                          color: theme.badgeText,
+                        }}
+                      >
                         {staff.available ? "Available" : "Unavailable"}
                       </div>
                     </div>
@@ -997,49 +1438,107 @@ export default function App() {
           </div>
 
           <div style={styles.bottomGrid}>
-            <section style={styles.panel}>
-              <div style={styles.panelTitle}>Clinic-Room-Machine Mapping</div>
-              <div style={styles.panelSub}>
+            <section
+              style={{
+                ...styles.panel,
+                background: theme.panelBg,
+                border: `1px solid ${theme.border}`,
+              }}
+            >
+              <div style={{ ...styles.panelTitle, color: theme.textStrong }}>
+                Clinic-Room-Machine Mapping
+              </div>
+              <div style={{ ...styles.panelSub, color: theme.textMuted }}>
                 Mapping configuration used for scheduling logic.
               </div>
 
               <div style={{ marginTop: 14 }}>
                 {mappingForClinic.map((mapItem, index) => (
-                  <div key={index} style={styles.listRow}>
+                  <div
+                    key={index}
+                    style={{
+                      ...styles.listRow,
+                      borderBottom: `1px solid ${theme.border}`,
+                    }}
+                  >
                     <div>
-                      <div style={styles.listTitle}>{mapItem.room}</div>
-                      <div style={styles.listMeta}>
+                      <div
+                        style={{ ...styles.listTitle, color: theme.textStrong }}
+                      >
+                        {mapItem.room}
+                      </div>
+                      <div style={{ ...styles.listMeta, color: theme.textMuted }}>
                         {mapItem.machine} • {mapItem.modality}
                       </div>
                     </div>
-                    <div style={styles.mappingBadge}>{mapItem.modality}</div>
+                    <div
+                      style={{
+                        ...styles.mappingBadge,
+                        background: theme.mappingBg,
+                        color: theme.mappingText,
+                      }}
+                    >
+                      {mapItem.modality}
+                    </div>
                   </div>
                 ))}
               </div>
             </section>
 
-            <section style={styles.panel}>
-              <div style={styles.panelTitle}>Selected Day Appointments</div>
-              <div style={styles.panelSub}>
+            <section
+              style={{
+                ...styles.panel,
+                background: theme.panelBg,
+                border: `1px solid ${theme.border}`,
+              }}
+            >
+              <div style={{ ...styles.panelTitle, color: theme.textStrong }}>
+                Selected Day Appointments
+              </div>
+              <div style={{ ...styles.panelSub, color: theme.textMuted }}>
                 {days.find((d) => d.key === selectedDay)?.label} •{" "}
                 {selectedClinic}
               </div>
 
               <div style={{ marginTop: 14 }}>
                 {dayAppointments.length === 0 ? (
-                  <div style={styles.emptyState}>
+                  <div
+                    style={{
+                      ...styles.emptyState,
+                      background: theme.emptyBg,
+                      color: theme.textMuted,
+                    }}
+                  >
                     No appointments for this selection.
                   </div>
                 ) : (
                   dayAppointments.map((item) => (
-                    <div key={item.id} style={styles.listRow}>
+                    <div
+                      key={item.id}
+                      style={{
+                        ...styles.listRow,
+                        borderBottom: `1px solid ${theme.border}`,
+                      }}
+                    >
                       <div>
-                        <div style={styles.listTitle}>{item.patient}</div>
-                        <div style={styles.listMeta}>
+                        <div
+                          style={{ ...styles.listTitle, color: theme.textStrong }}
+                        >
+                          {item.patient}
+                        </div>
+                        <div style={{ ...styles.listMeta, color: theme.textMuted }}>
                           {item.time} • {item.type} • {item.clinician}
                         </div>
                       </div>
-                      <div style={styles.badgeBooked}>{item.resource}</div>
+                      <div
+                        style={{
+                          ...styles.badgeBooked,
+                          background: theme.badgeBg,
+                          color: theme.badgeText,
+                        }}
+                      >
+                        {item.resource}
+                      </div>
                     </div>
                   ))
                 )}
@@ -1048,9 +1547,17 @@ export default function App() {
           </div>
 
           <div style={styles.bottomGrid}>
-            <section style={styles.panel}>
-              <div style={styles.panelTitle}>Staff Registration</div>
-              <div style={styles.panelSub}>
+            <section
+              style={{
+                ...styles.panel,
+                background: theme.panelBg,
+                border: `1px solid ${theme.border}`,
+              }}
+            >
+              <div style={{ ...styles.panelTitle, color: theme.textStrong }}>
+                Staff Registration
+              </div>
+              <div style={{ ...styles.panelSub, color: theme.textMuted }}>
                 Register staff profiles with role, location, day, and
                 capabilities.
               </div>
@@ -1058,34 +1565,56 @@ export default function App() {
               <form onSubmit={handleRegisterStaff} style={{ marginTop: 14 }}>
                 <div style={styles.staffGrid}>
                   <input
-                    style={styles.input}
+                    style={{
+                      ...styles.input,
+                      background: theme.inputBg,
+                      color: theme.textStrong,
+                      border: `1px solid ${theme.border}`,
+                    }}
                     placeholder="Staff Name"
                     value={staffName}
                     onChange={(e) => setStaffName(e.target.value)}
                   />
                   <select
-                    style={styles.select}
+                    style={{
+                      ...styles.select,
+                      background: theme.inputBg,
+                      color: theme.textStrong,
+                      border: `1px solid ${theme.border}`,
+                    }}
                     value={staffRole}
-                    onChange={(e) => setStaffRole(e.target.value)}
+                    onChange={(e) => setStaffRole(e.target.value as StaffRole)}
                   >
-                    <option>Receptionist</option>
-                    <option>Technical Staff</option>
-                    <option>Radiologist</option>
-                    <option>Admin</option>
+                    <option value="Receptionist">Receptionist</option>
+                    <option value="Technical Staff">Technical Staff</option>
+                    <option value="Radiologist">Radiologist</option>
+                    <option value="Admin">Admin</option>
                   </select>
                   <select
-                    style={styles.select}
+                    style={{
+                      ...styles.select,
+                      background: theme.inputBg,
+                      color: theme.textStrong,
+                      border: `1px solid ${theme.border}`,
+                    }}
                     value={staffClinic}
-                    onChange={(e) => setStaffClinic(e.target.value)}
+                    onChange={(e) => setStaffClinic(e.target.value as Clinic)}
                   >
                     {clinics.map((clinic) => (
-                      <option key={clinic}>{clinic}</option>
+                      <option key={clinic} value={clinic}>
+                        {clinic}
+                      </option>
                     ))}
                   </select>
                   <select
-                    style={styles.select}
+                    style={{
+                      ...styles.select,
+                      background: theme.inputBg,
+                      color: theme.textStrong,
+                      border: `1px solid ${theme.border}`,
+                    }}
                     value={staffDay}
-                    onChange={(e) => setStaffDay(e.target.value)}
+                    onChange={(e) => setStaffDay(e.target.value as DayKey)}
                   >
                     {days.map((day) => (
                       <option key={day.key} value={day.key}>
@@ -1094,13 +1623,23 @@ export default function App() {
                     ))}
                   </select>
                   <input
-                    style={styles.input}
+                    style={{
+                      ...styles.input,
+                      background: theme.inputBg,
+                      color: theme.textStrong,
+                      border: `1px solid ${theme.border}`,
+                    }}
                     placeholder="Shift"
                     value={staffShift}
                     onChange={(e) => setStaffShift(e.target.value)}
                   />
                   <input
-                    style={styles.input}
+                    style={{
+                      ...styles.input,
+                      background: theme.inputBg,
+                      color: theme.textStrong,
+                      border: `1px solid ${theme.border}`,
+                    }}
                     placeholder="Capabilities"
                     value={staffCapabilities}
                     onChange={(e) => setStaffCapabilities(e.target.value)}
@@ -1119,32 +1658,46 @@ export default function App() {
               ) : null}
             </section>
 
-            <section style={styles.panel}>
-              <div style={styles.panelTitle}>Calendar Filter Summary</div>
-              <div style={styles.panelSub}>
+            <section
+              style={{
+                ...styles.panel,
+                background: theme.panelBg,
+                border: `1px solid ${theme.border}`,
+              }}
+            >
+              <div style={{ ...styles.panelTitle, color: theme.textStrong }}>
+                Calendar Filter Summary
+              </div>
+              <div style={{ ...styles.panelSub, color: theme.textMuted }}>
                 Active filters applied to the appointment calendar view.
               </div>
 
-              <div style={styles.summaryBox}>
-                <div style={styles.summaryRow}>
+              <div
+                style={{
+                  ...styles.summaryBox,
+                  background: theme.emptyBg,
+                  border: `1px solid ${theme.border}`,
+                }}
+              >
+                <div style={{ ...styles.summaryRow, color: theme.textStrong }}>
                   <span>Clinic</span>
                   <strong>{selectedClinic}</strong>
                 </div>
-                <div style={styles.summaryRow}>
+                <div style={{ ...styles.summaryRow, color: theme.textStrong }}>
                   <span>Resource</span>
                   <strong>{selectedResource}</strong>
                 </div>
-                <div style={styles.summaryRow}>
+                <div style={{ ...styles.summaryRow, color: theme.textStrong }}>
                   <span>Modality</span>
                   <strong>{selectedModality}</strong>
                 </div>
-                <div style={styles.summaryRow}>
+                <div style={{ ...styles.summaryRow, color: theme.textStrong }}>
                   <span>Day</span>
                   <strong>
                     {days.find((d) => d.key === selectedDay)?.label}
                   </strong>
                 </div>
-                <div style={styles.summaryRow}>
+                <div style={{ ...styles.summaryRow, color: theme.textStrong }}>
                   <span>Slot View</span>
                   <strong>{selectedSlotView}</strong>
                 </div>
@@ -1157,7 +1710,7 @@ export default function App() {
   );
 }
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: "100vh",
     background: "#111315",
@@ -1674,23 +2227,6 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-  },
-
-  slotAvailable: {
-    background: "rgba(45,143,82,0.08)",
-  },
-
-  slotBooked: {
-    background: "rgba(86,168,255,0.12)",
-  },
-
-  slotBlocked: {
-    background: "rgba(210,77,87,0.12)",
-  },
-
-  slotMuted: {
-    background: "#15171a",
-    opacity: 0.45,
   },
 
   slotSelectedOutline: {
