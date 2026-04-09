@@ -163,7 +163,7 @@ export default function PatientRegistrationPage() {
     ) {
       setStatusMessage({
         type: "error",
-        text: "Please complete all required fields."
+        text: "Please complete required fields."
       });
       return;
     }
@@ -187,8 +187,8 @@ export default function PatientRegistrationPage() {
       type: "success",
       text:
         formData.notification.sendConfirmation
-          ? `Patient registration saved. Patient ID ${patientId} created and appointment notification queued.`
-          : `Patient registration saved. Patient ID ${patientId} created.`
+          ? `Saved. Patient ID ${patientId} created and notification queued.`
+          : `Saved. Patient ID ${patientId} created.`
     });
   };
 
@@ -201,445 +201,442 @@ export default function PatientRegistrationPage() {
 
   return (
     <div style={styles.page}>
-      <div style={styles.topbar}>
-        <div style={styles.topbarLeft}>
-          <img src="/logo.jpg" alt="EsyRIS logo" style={styles.headerLogo} />
-          <div style={styles.brand}>EsyRIS</div>
-          <div style={styles.topbarText}>Patient Registration</div>
+      <div style={styles.topStrip}>
+        <div style={styles.topStripText}>
+          PATIENT REGISTRATION • MEDICARE {formData.medicare.verificationStatus.toUpperCase()} • NOTIFICATION {formData.notification.method.toUpperCase()}
         </div>
-
-        <div style={styles.topbarRight}>
-          <div style={styles.topInfoPill}>New Registration</div>
-          <div style={verificationTone}>
-            Medicare: {formData.medicare.verificationStatus}
-          </div>
-          <div style={styles.topInfoPill}>
-            Notification: {formData.notification.method}
-          </div>
-          <div style={styles.userPill}>Registration Form</div>
-        </div>
+        <button style={styles.collapseButton}>⌄</button>
       </div>
 
-      <div style={styles.layout}>
-        <aside style={styles.sidebar}>
-          <div style={styles.sidebarHeader}>
-            <div style={styles.sidebarTitle}>ONBOARDING</div>
-            <div style={styles.sidebarSub}>
-              Patient details, referral, study, and notification setup
-            </div>
-          </div>
-
-          <div style={styles.statusCard}>
-            <div style={styles.statusTitle}>Workflow</div>
-            <div style={styles.statusRow}>
-              <span style={styles.dotBlue} />
-              <span>Patient profile creation</span>
-            </div>
-            <div style={styles.statusRow}>
-              <span style={styles.dotGreen} />
-              <span>Referral and Medicare capture</span>
-            </div>
-            <div style={styles.statusRow}>
-              <span style={styles.dotPurple} />
-              <span>Test and machine selection</span>
-            </div>
-            <div style={styles.statusRow}>
-              <span style={styles.dotRed} />
-              <span>Notification and time slot step</span>
-            </div>
-          </div>
-
-          <div style={styles.infoBox}>
-            <div style={styles.infoTitle}>Generated Patient ID</div>
-            <div style={styles.infoText}>
-              {savedPatientId || "Will be generated after save"}
-            </div>
-          </div>
-        </aside>
-
-        <main style={styles.main}>
-          {statusMessage ? (
-            <div
-              style={{
-                ...styles.messageBanner,
-                background:
-                  statusMessage.type === "success"
-                    ? "rgba(45,143,82,0.16)"
-                    : "rgba(210,77,87,0.16)",
-                color:
-                  statusMessage.type === "success" ? "#7fd19a" : "#f08b8b",
-                border:
-                  statusMessage.type === "success"
-                    ? "1px solid rgba(45,143,82,0.32)"
-                    : "1px solid rgba(210,77,87,0.32)"
-              }}
-            >
-              {statusMessage.text}
-            </div>
-          ) : null}
-
-          <div style={styles.headerPanel}>
+      <div style={styles.appShell}>
+        <div style={styles.titleBar}>
+          <div style={styles.titleLeft}>
+            <img src="/logo.jpg" alt="EsyRIS logo" style={styles.logo} />
             <div>
-              <div style={styles.kicker}>PATIENT REGISTRATION / ONBOARDING</div>
-              <h1 style={styles.pageTitle}>New Patient Registration</h1>
-              <p style={styles.pageSub}>
-                Create a new patient record, capture referral and Medicare
-                details, assign examination type, and prepare for booking.
-              </p>
-            </div>
-
-            <div style={styles.headerActions}>
-              <button style={styles.secondaryButton}>Reset</button>
-              <button style={styles.primaryButton} onClick={handleSave}>
-                Save Registration
-              </button>
+              <div style={styles.eyebrow}>PATIENT ONBOARDING</div>
+              <div style={styles.title}>Compact Patient Registration</div>
             </div>
           </div>
 
-          <div style={styles.metricsRow}>
-            <div style={styles.metricCard}>
-              <div style={styles.metricLabel}>Patient ID</div>
-              <div style={styles.metricValueSmall}>
-                {savedPatientId || "Pending"}
-              </div>
+          <div style={styles.titleActions}>
+            <div style={styles.topInfoPill}>ID: {savedPatientId || "Pending"}</div>
+            <div style={verificationTone}>
+              Medicare: {formData.medicare.verificationStatus}
             </div>
-            <div style={styles.metricCard}>
-              <div style={styles.metricLabel}>Medicare</div>
-              <div style={styles.metricValueSmall}>
-                {formData.medicare.verificationStatus}
-              </div>
-            </div>
-            <div style={styles.metricCard}>
-              <div style={styles.metricLabel}>Modality</div>
-              <div style={styles.metricValueSmall}>
-                {formData.test.selectedModality
-                  ? modalities.find((m) => m.id === formData.test.selectedModality)
-                      ?.name
-                  : "Not Selected"}
-              </div>
-            </div>
-            <div style={styles.metricCard}>
-              <div style={styles.metricLabel}>Notification</div>
-              <div style={styles.metricValueSmall}>
-                {formData.notification.method}
-              </div>
+            <button style={styles.ghostButton}>Reset</button>
+            <button style={styles.primaryButton} onClick={handleSave}>
+              Save
+            </button>
+          </div>
+        </div>
+
+        {statusMessage ? (
+          <div
+            style={{
+              ...styles.messageBanner,
+              background:
+                statusMessage.type === "success"
+                  ? "rgba(45,143,82,0.14)"
+                  : "rgba(210,77,87,0.14)",
+              color:
+                statusMessage.type === "success" ? "#7fd19a" : "#f08b8b",
+              border:
+                statusMessage.type === "success"
+                  ? "1px solid rgba(45,143,82,0.28)"
+                  : "1px solid rgba(210,77,87,0.28)"
+            }}
+          >
+            {statusMessage.text}
+          </div>
+        ) : null}
+
+        <div style={styles.metricsRow}>
+          <div style={styles.metricCard}>
+            <div style={styles.metricLabel}>Patient ID</div>
+            <div style={styles.metricValueSmall}>{savedPatientId || "Pending"}</div>
+          </div>
+          <div style={styles.metricCard}>
+            <div style={styles.metricLabel}>Medicare</div>
+            <div style={styles.metricValueSmall}>{formData.medicare.verificationStatus}</div>
+          </div>
+          <div style={styles.metricCard}>
+            <div style={styles.metricLabel}>Modality</div>
+            <div style={styles.metricValueSmall}>
+              {formData.test.selectedModality
+                ? modalities.find((m) => m.id === formData.test.selectedModality)?.name
+                : "Not Selected"}
             </div>
           </div>
+          <div style={styles.metricCard}>
+            <div style={styles.metricLabel}>Notification</div>
+            <div style={styles.metricValueSmall}>{formData.notification.method}</div>
+          </div>
+        </div>
 
-          <div style={styles.panel}>
-            <div style={styles.panelHeader}>
+        <div style={styles.mainGrid}>
+          <section style={styles.leftRail}>
+            <div style={styles.panelHeaderRow}>
               <div>
-                <div style={styles.panelTitle}>Medicare Details</div>
-                <div style={styles.panelSub}>
-                  Capture Medicare card and verification status.
+                <div style={styles.panelTitle}>Workflow</div>
+                <div style={styles.panelSub}>Compact registration steps</div>
+              </div>
+            </div>
+
+            <div style={styles.statusCard}>
+              <div style={styles.statusRow}>
+                <span style={styles.dotBlue} />
+                <span>Patient details</span>
+              </div>
+              <div style={styles.statusRow}>
+                <span style={styles.dotGreen} />
+                <span>Medicare capture</span>
+              </div>
+              <div style={styles.statusRow}>
+                <span style={styles.dotPurple} />
+                <span>Study setup</span>
+              </div>
+              <div style={styles.statusRow}>
+                <span style={styles.dotRed} />
+                <span>Notification + slot</span>
+              </div>
+            </div>
+
+            <div style={styles.infoBox}>
+              <div style={styles.infoTitle}>Generated Patient ID</div>
+              <div style={styles.infoText}>
+                {savedPatientId || "Generated after save"}
+              </div>
+            </div>
+
+            <div style={styles.summaryPanel}>
+              <div style={styles.summaryTitle}>Quick Summary</div>
+              <div style={styles.summaryRowMini}>
+                <span>Name</span>
+                <strong>
+                  {formData.patient.firstName || "-"} {formData.patient.lastName || ""}
+                </strong>
+              </div>
+              <div style={styles.summaryRowMini}>
+                <span>Test</span>
+                <strong>{formData.test.selectedTest || "-"}</strong>
+              </div>
+              <div style={styles.summaryRowMini}>
+                <span>Form Link</span>
+                <strong>{formData.notification.includeFormLink ? "Yes" : "No"}</strong>
+              </div>
+            </div>
+          </section>
+
+          <section style={styles.centerArea}>
+            <div style={styles.compactStack}>
+              <div style={styles.panelCompact}>
+                <div style={styles.panelHeaderRow}>
+                  <div>
+                    <div style={styles.panelTitle}>Medicare</div>
+                    <div style={styles.panelSub}>Card and verification</div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <div style={styles.formGrid2}>
-              <div>
-                <label style={styles.label}>Medicare Number</label>
-                <input
-                  style={styles.input}
-                  placeholder="Enter 10 digit Medicare number"
-                  value={formData.medicare.medicareNumber}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-                    updateSection("medicare", "medicareNumber", value);
-                  }}
-                />
-              </div>
+                <div style={styles.formGrid2}>
+                  <div>
+                    <label style={styles.label}>Medicare Number</label>
+                    <input
+                      style={styles.input}
+                      placeholder="10 digit number"
+                      value={formData.medicare.medicareNumber}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                        updateSection("medicare", "medicareNumber", value);
+                      }}
+                    />
+                  </div>
 
-              <div>
-                <label style={styles.label}>Expiry Date</label>
-                <input
-                  style={styles.input}
-                  placeholder="MM/YYYY"
-                  value={formData.medicare.expiryDate}
-                  onChange={(e) => handleExpiryDateChange(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div style={styles.panel}>
-            <div style={styles.panelHeader}>
-              <div>
-                <div style={styles.panelTitle}>Patient Details</div>
-                <div style={styles.panelSub}>
-                  Demographics, contact information, and patient identity.
-                </div>
-              </div>
-            </div>
-
-            <div style={styles.formGrid3}>
-              <div>
-                <label style={styles.label}>First Name *</label>
-                <input
-                  style={styles.input}
-                  value={formData.patient.firstName}
-                  onChange={(e) =>
-                    updateSection("patient", "firstName", e.target.value)
-                  }
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Last Name *</label>
-                <input
-                  style={styles.input}
-                  value={formData.patient.lastName}
-                  onChange={(e) =>
-                    updateSection("patient", "lastName", e.target.value)
-                  }
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Date of Birth *</label>
-                <input
-                  type="date"
-                  style={styles.input}
-                  value={formData.patient.dateOfBirth}
-                  onChange={(e) =>
-                    updateSection("patient", "dateOfBirth", e.target.value)
-                  }
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Gender</label>
-                <select
-                  style={styles.select}
-                  value={formData.patient.gender}
-                  onChange={(e) =>
-                    updateSection("patient", "gender", e.target.value)
-                  }
-                >
-                  <option value="">Select</option>
-                  <option>Male</option>
-                  <option>Female</option>
-                  <option>Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label style={styles.label}>Email</label>
-                <input
-                  type="email"
-                  style={styles.input}
-                  value={formData.patient.email}
-                  onChange={(e) =>
-                    updateSection("patient", "email", e.target.value)
-                  }
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Mobile / Contact Number</label>
-                <input
-                  style={styles.input}
-                  value={formData.patient.contactNumber}
-                  onChange={(e) =>
-                    updateSection("patient", "contactNumber", e.target.value)
-                  }
-                />
-              </div>
-
-              <div style={{ gridColumn: "1 / span 2" }}>
-                <label style={styles.label}>Address Line 1</label>
-                <input
-                  style={styles.input}
-                  value={formData.patient.addressLine1}
-                  onChange={(e) =>
-                    updateSection("patient", "addressLine1", e.target.value)
-                  }
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Address Line 2</label>
-                <input
-                  style={styles.input}
-                  value={formData.patient.addressLine2}
-                  onChange={(e) =>
-                    updateSection("patient", "addressLine2", e.target.value)
-                  }
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>State</label>
-                <select
-                  style={styles.select}
-                  value={formData.patient.state}
-                  onChange={(e) =>
-                    updateSection("patient", "state", e.target.value)
-                  }
-                >
-                  <option value="">Select State</option>
-                  {australianStates.map((state) => (
-                    <option key={state}>{state}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label style={styles.label}>Suburb</label>
-                <input
-                  style={styles.input}
-                  value={formData.patient.suburb}
-                  onChange={(e) =>
-                    updateSection("patient", "suburb", e.target.value)
-                  }
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Postcode</label>
-                <input
-                  style={styles.input}
-                  value={formData.patient.postCode}
-                  onChange={(e) =>
-                    updateSection("patient", "postCode", e.target.value)
-                  }
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Contact Person</label>
-                <input
-                  style={styles.input}
-                  value={formData.patient.contactPerson}
-                  onChange={(e) =>
-                    updateSection("patient", "contactPerson", e.target.value)
-                  }
-                />
-              </div>
-            </div>
-          </div>
-
-          <div style={styles.panel}>
-            <div style={styles.panelHeader}>
-              <div>
-                <div style={styles.panelTitle}>Referrer Details</div>
-                <div style={styles.panelSub}>
-                  Referrer identity, urgency, and clinical notes.
-                </div>
-              </div>
-            </div>
-
-            <div style={styles.formGrid3}>
-              <div>
-                <label style={styles.label}>Provider Number</label>
-                <input
-                  style={styles.input}
-                  value={formData.referrer.providerNumber}
-                  onChange={(e) =>
-                    updateSection("referrer", "providerNumber", e.target.value)
-                  }
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Referrer Name</label>
-                <input
-                  style={styles.input}
-                  value={formData.referrer.referrerName}
-                  onChange={(e) =>
-                    updateSection("referrer", "referrerName", e.target.value)
-                  }
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Date Referred</label>
-                <input
-                  type="date"
-                  style={styles.input}
-                  value={formData.referrer.dateReferred}
-                  onChange={(e) =>
-                    updateSection("referrer", "dateReferred", e.target.value)
-                  }
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Referrer Email</label>
-                <input
-                  type="email"
-                  style={styles.input}
-                  value={formData.referrer.referrerEmail}
-                  onChange={(e) =>
-                    updateSection("referrer", "referrerEmail", e.target.value)
-                  }
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Contact Number</label>
-                <input
-                  style={styles.input}
-                  value={formData.referrer.referrerContact}
-                  onChange={(e) =>
-                    updateSection("referrer", "referrerContact", e.target.value)
-                  }
-                />
-              </div>
-
-              <div>
-                <label style={styles.label}>Urgency</label>
-                <select
-                  style={styles.select}
-                  value={formData.referrer.referralUrgency}
-                  onChange={(e) =>
-                    updateSection("referrer", "referralUrgency", e.target.value)
-                  }
-                >
-                  <option value="">Select</option>
-                  <option>Routine</option>
-                  <option>Urgent</option>
-                  <option>Immediate</option>
-                </select>
-              </div>
-
-              <div>
-                <label style={styles.label}>Speciality</label>
-                <input
-                  style={styles.input}
-                  value={formData.referrer.speciality}
-                  onChange={(e) =>
-                    updateSection("referrer", "speciality", e.target.value)
-                  }
-                />
-              </div>
-
-              <div style={{ gridColumn: "1 / span 3" }}>
-                <label style={styles.label}>Clinical Notes</label>
-                <textarea
-                  style={styles.textarea}
-                  rows={4}
-                  value={formData.referrer.clinicalNotes}
-                  onChange={(e) =>
-                    updateSection("referrer", "clinicalNotes", e.target.value)
-                  }
-                />
-              </div>
-            </div>
-          </div>
-
-          <div style={styles.contentGrid}>
-            <section style={styles.panel}>
-              <div style={styles.panelHeader}>
-                <div>
-                  <div style={styles.panelTitle}>Test Details</div>
-                  <div style={styles.panelSub}>
-                    Select modality, examination type, machine allocation, and pre-study form needs.
+                  <div>
+                    <label style={styles.label}>Expiry</label>
+                    <input
+                      style={styles.input}
+                      placeholder="MM/YYYY"
+                      value={formData.medicare.expiryDate}
+                      onChange={(e) => handleExpiryDateChange(e.target.value)}
+                    />
                   </div>
                 </div>
               </div>
 
-              <div style={styles.formGrid2}>
+              <div style={styles.panelCompact}>
+                <div style={styles.panelHeaderRow}>
+                  <div>
+                    <div style={styles.panelTitle}>Patient Details</div>
+                    <div style={styles.panelSub}>Demographics and contact</div>
+                  </div>
+                </div>
+
+                <div style={styles.formGrid4}>
+                  <div>
+                    <label style={styles.label}>First Name *</label>
+                    <input
+                      style={styles.input}
+                      value={formData.patient.firstName}
+                      onChange={(e) =>
+                        updateSection("patient", "firstName", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Last Name *</label>
+                    <input
+                      style={styles.input}
+                      value={formData.patient.lastName}
+                      onChange={(e) =>
+                        updateSection("patient", "lastName", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>DOB *</label>
+                    <input
+                      type="date"
+                      style={styles.input}
+                      value={formData.patient.dateOfBirth}
+                      onChange={(e) =>
+                        updateSection("patient", "dateOfBirth", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Gender</label>
+                    <select
+                      style={styles.select}
+                      value={formData.patient.gender}
+                      onChange={(e) =>
+                        updateSection("patient", "gender", e.target.value)
+                      }
+                    >
+                      <option value="">Select</option>
+                      <option>Male</option>
+                      <option>Female</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Email</label>
+                    <input
+                      type="email"
+                      style={styles.input}
+                      value={formData.patient.email}
+                      onChange={(e) =>
+                        updateSection("patient", "email", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Contact Number</label>
+                    <input
+                      style={styles.input}
+                      value={formData.patient.contactNumber}
+                      onChange={(e) =>
+                        updateSection("patient", "contactNumber", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div style={{ gridColumn: "span 2" }}>
+                    <label style={styles.label}>Address Line 1</label>
+                    <input
+                      style={styles.input}
+                      value={formData.patient.addressLine1}
+                      onChange={(e) =>
+                        updateSection("patient", "addressLine1", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Address Line 2</label>
+                    <input
+                      style={styles.input}
+                      value={formData.patient.addressLine2}
+                      onChange={(e) =>
+                        updateSection("patient", "addressLine2", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>State</label>
+                    <select
+                      style={styles.select}
+                      value={formData.patient.state}
+                      onChange={(e) =>
+                        updateSection("patient", "state", e.target.value)
+                      }
+                    >
+                      <option value="">State</option>
+                      {australianStates.map((state) => (
+                        <option key={state}>{state}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Suburb</label>
+                    <input
+                      style={styles.input}
+                      value={formData.patient.suburb}
+                      onChange={(e) =>
+                        updateSection("patient", "suburb", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Postcode</label>
+                    <input
+                      style={styles.input}
+                      value={formData.patient.postCode}
+                      onChange={(e) =>
+                        updateSection("patient", "postCode", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Contact Person</label>
+                    <input
+                      style={styles.input}
+                      value={formData.patient.contactPerson}
+                      onChange={(e) =>
+                        updateSection("patient", "contactPerson", e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div style={styles.panelCompact}>
+                <div style={styles.panelHeaderRow}>
+                  <div>
+                    <div style={styles.panelTitle}>Referrer Details</div>
+                    <div style={styles.panelSub}>Referrer and clinical note setup</div>
+                  </div>
+                </div>
+
+                <div style={styles.formGrid4}>
+                  <div>
+                    <label style={styles.label}>Provider Number</label>
+                    <input
+                      style={styles.input}
+                      value={formData.referrer.providerNumber}
+                      onChange={(e) =>
+                        updateSection("referrer", "providerNumber", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Referrer Name</label>
+                    <input
+                      style={styles.input}
+                      value={formData.referrer.referrerName}
+                      onChange={(e) =>
+                        updateSection("referrer", "referrerName", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Date Referred</label>
+                    <input
+                      type="date"
+                      style={styles.input}
+                      value={formData.referrer.dateReferred}
+                      onChange={(e) =>
+                        updateSection("referrer", "dateReferred", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Urgency</label>
+                    <select
+                      style={styles.select}
+                      value={formData.referrer.referralUrgency}
+                      onChange={(e) =>
+                        updateSection("referrer", "referralUrgency", e.target.value)
+                      }
+                    >
+                      <option value="">Select</option>
+                      <option>Routine</option>
+                      <option>Urgent</option>
+                      <option>Immediate</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Referrer Email</label>
+                    <input
+                      type="email"
+                      style={styles.input}
+                      value={formData.referrer.referrerEmail}
+                      onChange={(e) =>
+                        updateSection("referrer", "referrerEmail", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Contact Number</label>
+                    <input
+                      style={styles.input}
+                      value={formData.referrer.referrerContact}
+                      onChange={(e) =>
+                        updateSection("referrer", "referrerContact", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Speciality</label>
+                    <input
+                      style={styles.input}
+                      value={formData.referrer.speciality}
+                      onChange={(e) =>
+                        updateSection("referrer", "speciality", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div style={{ gridColumn: "span 4" }}>
+                    <label style={styles.label}>Clinical Notes</label>
+                    <textarea
+                      style={styles.textarea}
+                      rows={2}
+                      value={formData.referrer.clinicalNotes}
+                      onChange={(e) =>
+                        updateSection("referrer", "clinicalNotes", e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section style={styles.rightRail}>
+            <div style={styles.panelCompact}>
+              <div style={styles.panelHeaderRow}>
+                <div>
+                  <div style={styles.panelTitle}>Test Details</div>
+                  <div style={styles.panelSub}>Study and machine setup</div>
+                </div>
+              </div>
+
+              <div style={styles.formGrid1}>
                 <div>
                   <label style={styles.label}>Modality *</label>
                   <select
@@ -651,7 +648,7 @@ export default function PatientRegistrationPage() {
                       updateSection("test", "secondTest", "");
                     }}
                   >
-                    <option value="">Select Modality</option>
+                    <option value="">Select</option>
                     {modalities.map((modality) => (
                       <option key={modality.id} value={modality.id}>
                         {modality.name}
@@ -670,7 +667,7 @@ export default function PatientRegistrationPage() {
                     }
                     disabled={!formData.test.selectedModality}
                   >
-                    <option value="">Select Test</option>
+                    <option value="">Select</option>
                     {filteredTests.map((test) => (
                       <option key={test}>{test}</option>
                     ))}
@@ -678,7 +675,7 @@ export default function PatientRegistrationPage() {
                 </div>
 
                 <div style={styles.toggleBox}>
-                  <div style={styles.toggleLabel}>Multi-Exam Booking</div>
+                  <div style={styles.toggleLabel}>Multi-Exam</div>
                   <button
                     type="button"
                     onClick={() =>
@@ -694,7 +691,7 @@ export default function PatientRegistrationPage() {
                         : styles.toggleInactive
                     }
                   >
-                    {formData.test.multiExamRequired ? "Enabled" : "Disabled"}
+                    {formData.test.multiExamRequired ? "On" : "Off"}
                   </button>
                 </div>
 
@@ -708,7 +705,7 @@ export default function PatientRegistrationPage() {
                     }
                     disabled={!formData.test.multiExamRequired}
                   >
-                    <option value="">Select Second Test</option>
+                    <option value="">Select</option>
                     {availableSecondTests.map((test) => (
                       <option key={test}>{test}</option>
                     ))}
@@ -728,7 +725,7 @@ export default function PatientRegistrationPage() {
                 </div>
 
                 <div style={styles.toggleBox}>
-                  <div style={styles.toggleLabel}>Pre-Study Form Required</div>
+                  <div style={styles.toggleLabel}>Pre-Study Form</div>
                   <button
                     type="button"
                     onClick={() =>
@@ -748,15 +745,13 @@ export default function PatientRegistrationPage() {
                   </button>
                 </div>
               </div>
-            </section>
+            </div>
 
-            <section style={styles.panel}>
-              <div style={styles.panelHeader}>
+            <div style={styles.panelCompact}>
+              <div style={styles.panelHeaderRow}>
                 <div>
                   <div style={styles.panelTitle}>Notification Setup</div>
-                  <div style={styles.panelSub}>
-                    Configure appointment confirmation and preparation notifications.
-                  </div>
+                  <div style={styles.panelSub}>Confirmation and prep messages</div>
                 </div>
               </div>
 
@@ -776,7 +771,7 @@ export default function PatientRegistrationPage() {
                   </select>
                 </div>
 
-                <div style={styles.checkboxRow}>
+                <label style={styles.checkboxRow}>
                   <input
                     type="checkbox"
                     checked={formData.notification.sendConfirmation}
@@ -788,10 +783,10 @@ export default function PatientRegistrationPage() {
                       )
                     }
                   />
-                  <span style={styles.checkboxLabel}>Send appointment confirmation</span>
-                </div>
+                  <span style={styles.checkboxLabel}>Send confirmation</span>
+                </label>
 
-                <div style={styles.checkboxRow}>
+                <label style={styles.checkboxRow}>
                   <input
                     type="checkbox"
                     checked={formData.notification.sendPreparation}
@@ -803,10 +798,10 @@ export default function PatientRegistrationPage() {
                       )
                     }
                   />
-                  <span style={styles.checkboxLabel}>Send preparation instructions</span>
-                </div>
+                  <span style={styles.checkboxLabel}>Send preparation</span>
+                </label>
 
-                <div style={styles.checkboxRow}>
+                <label style={styles.checkboxRow}>
                   <input
                     type="checkbox"
                     checked={formData.notification.includeFormLink}
@@ -818,558 +813,553 @@ export default function PatientRegistrationPage() {
                       )
                     }
                   />
-                  <span style={styles.checkboxLabel}>Include pre-study form link</span>
-                </div>
+                  <span style={styles.checkboxLabel}>Include form link</span>
+                </label>
 
-                <div style={styles.summaryBox}>
-                  <div style={styles.summaryRow}>
-                    <span>Notification Method</span>
+                <div style={styles.summaryBoxCompact}>
+                  <div style={styles.summaryRowMini}>
+                    <span>Method</span>
                     <strong>{formData.notification.method}</strong>
                   </div>
-                  <div style={styles.summaryRow}>
-                    <span>Preparation Message</span>
-                    <strong>
-                      {formData.notification.sendPreparation ? "Yes" : "No"}
-                    </strong>
+                  <div style={styles.summaryRowMini}>
+                    <span>Preparation</span>
+                    <strong>{formData.notification.sendPreparation ? "Yes" : "No"}</strong>
                   </div>
-                  <div style={styles.summaryRow}>
+                  <div style={styles.summaryRowMini}>
                     <span>Form Link</span>
-                    <strong>
-                      {formData.notification.includeFormLink ? "Included" : "Not Included"}
-                    </strong>
+                    <strong>{formData.notification.includeFormLink ? "Included" : "No"}</strong>
                   </div>
                 </div>
-              </div>
-            </section>
-          </div>
-
-          {showTimeSlotCard && (
-            <div style={styles.panel}>
-              <div style={styles.panelHeader}>
-                <div>
-                  <div style={styles.panelTitle}>Time Slot Selection</div>
-                  <div style={styles.panelSub}>
-                    Registration saved. Continue to booking calendar and select a time slot.
-                  </div>
-                </div>
-              </div>
-
-              <div style={styles.timeSlotCard}>
-                <div style={styles.timeSlotText}>
-                  Patient registration is complete. The next step is to assign an appointment slot.
-                </div>
-                <button
-                  style={styles.primaryButton}
-                  onClick={() => alert("Navigate to calendar / time slot page")}
-                >
-                  Select Time Slot
-                </button>
               </div>
             </div>
-          )}
-        </main>
+
+            {showTimeSlotCard && (
+              <div style={styles.panelCompact}>
+                <div style={styles.panelHeaderRow}>
+                  <div>
+                    <div style={styles.panelTitle}>Time Slot Selection</div>
+                    <div style={styles.panelSub}>
+                      Registration saved. Continue to booking.
+                    </div>
+                  </div>
+                </div>
+
+                <div style={styles.timeSlotCard}>
+                  <div style={styles.timeSlotText}>
+                    Registration complete. Next step is assigning an appointment slot.
+                  </div>
+                  <button
+                    style={styles.primaryButton}
+                    onClick={() => alert("Navigate to calendar / time slot page")}
+                  >
+                    Select Slot
+                  </button>
+                </div>
+              </div>
+            )}
+          </section>
+        </div>
       </div>
     </div>
   );
 }
 
-const styles = {
+const styles: Record<string, CSSProperties> = {
   page: {
     minHeight: "100vh",
-    background: "#111315",
+    background: "#030a16",
     color: "#ffffff",
-    fontFamily: "Inter, Segoe UI, Roboto, Arial, sans-serif"
+    fontFamily: "Inter, Segoe UI, Arial, sans-serif",
+    overflowX: "hidden",
+    overflowY: "auto"
   },
 
-  topbar: {
-    height: 52,
-    background: "#1b1d20",
-    borderBottom: "1px solid rgba(255,255,255,0.08)",
+  topStrip: {
+    height: 28,
+    background: "#8d0d46",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "0 18px"
+    padding: "0 8px",
+    position: "sticky",
+    top: 0,
+    zIndex: 20
   },
 
-  topbarLeft: {
+  topStripText: {
+    fontSize: 9,
+    fontWeight: 700,
+    whiteSpace: "nowrap"
+  },
+
+  collapseButton: {
+    height: 20,
+    minWidth: 20,
+    borderRadius: 999,
+    border: "none",
+    background: "#d9d9d9",
+    color: "#222",
+    cursor: "pointer",
+    fontSize: 11,
+    fontWeight: 700,
+    lineHeight: 1
+  },
+
+  appShell: {
+    padding: 8,
+    boxSizing: "border-box"
+  },
+
+  titleBar: {
     display: "flex",
     alignItems: "center",
-    gap: 12
+    justifyContent: "space-between",
+    gap: 10,
+    border: "1px solid rgba(54,112,190,0.28)",
+    borderRadius: 14,
+    background: "#020d1f",
+    padding: "8px 12px",
+    marginBottom: 8,
+    position: "sticky",
+    top: 36,
+    zIndex: 15
   },
 
-  headerLogo: {
-    width: 28,
-    height: 28,
-    objectFit: "cover",
-    borderRadius: 4
-  } as CSSProperties,
-
-  brand: {
-    fontSize: 18,
-    fontWeight: 700
-  },
-
-  topbarText: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.6)"
-  },
-
-  topbarRight: {
+  titleLeft: {
     display: "flex",
     alignItems: "center",
-    gap: 8,
-    flexWrap: "wrap" as const
+    gap: 8
+  },
+
+  logo: {
+    width: 24,
+    height: 24,
+    borderRadius: 5,
+    objectFit: "cover"
+  },
+
+  eyebrow: {
+    fontSize: 9,
+    color: "#1da4ff",
+    fontWeight: 800,
+    letterSpacing: "1.2px"
+  },
+
+  title: {
+    fontSize: 14,
+    fontWeight: 800,
+    marginTop: 1
+  },
+
+  titleActions: {
+    display: "flex",
+    gap: 6,
+    alignItems: "center",
+    flexWrap: "wrap"
+  },
+
+  ghostButton: {
+    height: 26,
+    padding: "0 10px",
+    borderRadius: 9,
+    border: "1px solid rgba(54,112,190,0.32)",
+    background: "#0d1d35",
+    color: "#59b7ff",
+    fontSize: 11,
+    fontWeight: 700,
+    cursor: "pointer"
+  },
+
+  primaryButton: {
+    height: 26,
+    padding: "0 12px",
+    borderRadius: 9,
+    border: "none",
+    background: "#00a96e",
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: 800,
+    cursor: "pointer"
   },
 
   topInfoPill: {
-    height: 34,
-    padding: "0 12px",
-    borderRadius: 6,
-    background: "#1f2c3b",
-    border: "1px solid rgba(86,168,255,0.18)",
-    color: "#56a8ff",
-    fontSize: 12,
+    height: 24,
+    padding: "0 10px",
+    borderRadius: 999,
+    background: "#0d1d35",
+    border: "1px solid rgba(54,112,190,0.28)",
+    color: "#59b7ff",
+    fontSize: 10,
     fontWeight: 700,
     display: "flex",
     alignItems: "center"
   },
 
   topInfoSuccess: {
-    height: 34,
-    padding: "0 12px",
-    borderRadius: 6,
-    background: "rgba(45,143,82,0.18)",
+    height: 24,
+    padding: "0 10px",
+    borderRadius: 999,
+    background: "rgba(45,143,82,0.16)",
     border: "1px solid rgba(45,143,82,0.28)",
     color: "#7fd19a",
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: 700,
     display: "flex",
     alignItems: "center"
   },
 
   topInfoWarning: {
-    height: 34,
-    padding: "0 12px",
-    borderRadius: 6,
-    background: "rgba(196,145,49,0.18)",
+    height: 24,
+    padding: "0 10px",
+    borderRadius: 999,
+    background: "rgba(196,145,49,0.16)",
     border: "1px solid rgba(196,145,49,0.28)",
     color: "#f2cb74",
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: 700,
     display: "flex",
     alignItems: "center"
   },
 
   topInfoDanger: {
-    height: 34,
-    padding: "0 12px",
-    borderRadius: 6,
-    background: "rgba(210,77,87,0.18)",
+    height: 24,
+    padding: "0 10px",
+    borderRadius: 999,
+    background: "rgba(210,77,87,0.16)",
     border: "1px solid rgba(210,77,87,0.28)",
     color: "#f08b8b",
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: 700,
     display: "flex",
     alignItems: "center"
-  },
-
-  userPill: {
-    height: 34,
-    padding: "0 14px",
-    borderRadius: 6,
-    background: "#2d8f52",
-    color: "#ffffff",
-    fontSize: 12,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  layout: {
-    display: "grid",
-    gridTemplateColumns: "240px 1fr",
-    minHeight: "calc(100vh - 52px)"
-  },
-
-  sidebar: {
-    background: "#141618",
-    borderRight: "1px solid rgba(255,255,255,0.08)",
-    padding: 18,
-    display: "flex",
-    flexDirection: "column",
-    gap: 18
-  } as const,
-
-  sidebarHeader: {
-    paddingBottom: 14,
-    borderBottom: "1px solid rgba(255,255,255,0.06)"
-  },
-
-  sidebarTitle: {
-    fontSize: 12,
-    color: "#56a8ff",
-    fontWeight: 700,
-    letterSpacing: "0.9px"
-  },
-
-  sidebarSub: {
-    marginTop: 8,
-    fontSize: 13,
-    color: "rgba(255,255,255,0.56)"
-  },
-
-  statusCard: {
-    background: "#17191d",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 8,
-    padding: 14
-  },
-
-  statusTitle: {
-    fontSize: 12,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.84)",
-    marginBottom: 12,
-    textTransform: "uppercase",
-    letterSpacing: "0.7px"
-  },
-
-  statusRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    fontSize: 13,
-    color: "rgba(255,255,255,0.62)",
-    marginBottom: 10
-  },
-
-  dotBlue: {
-    width: 9,
-    height: 9,
-    borderRadius: "50%",
-    background: "#56a8ff",
-    display: "inline-block"
-  },
-
-  dotGreen: {
-    width: 9,
-    height: 9,
-    borderRadius: "50%",
-    background: "#2d8f52",
-    display: "inline-block"
-  },
-
-  dotPurple: {
-    width: 9,
-    height: 9,
-    borderRadius: "50%",
-    background: "#9b6bff",
-    display: "inline-block"
-  },
-
-  dotRed: {
-    width: 9,
-    height: 9,
-    borderRadius: "50%",
-    background: "#d24d57",
-    display: "inline-block"
-  },
-
-  infoBox: {
-    background: "#17191d",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 8,
-    padding: 14
-  },
-
-  infoTitle: {
-    fontSize: 12,
-    fontWeight: 700,
-    color: "#56a8ff",
-    marginBottom: 8
-  },
-
-  infoText: {
-    fontSize: 13,
-    color: "rgba(255,255,255,0.72)"
-  },
-
-  main: {
-    padding: 20,
-    background: "#111315"
   },
 
   messageBanner: {
-    marginBottom: 16,
-    padding: 14,
-    borderRadius: 8,
-    fontSize: 14,
-    fontWeight: 600
-  },
-
-  headerPanel: {
-    background: "#17191d",
-    border: "1px solid rgba(255,255,255,0.08)",
+    marginBottom: 8,
+    padding: "8px 10px",
     borderRadius: 10,
-    padding: 20,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 20,
-    marginBottom: 18
-  },
-
-  kicker: {
     fontSize: 11,
-    color: "#56a8ff",
-    fontWeight: 700,
-    letterSpacing: "1px",
-    marginBottom: 10
-  },
-
-  pageTitle: {
-    margin: 0,
-    fontSize: 28,
     fontWeight: 700
-  },
-
-  pageSub: {
-    margin: "8px 0 0 0",
-    color: "rgba(255,255,255,0.58)",
-    fontSize: 14,
-    lineHeight: 1.6
-  },
-
-  headerActions: {
-    display: "flex",
-    gap: 10,
-    alignItems: "center"
-  },
-
-  primaryButton: {
-    height: 38,
-    padding: "0 14px",
-    borderRadius: 6,
-    border: "none",
-    background: "#2d8f52",
-    color: "#ffffff",
-    fontWeight: 600,
-    cursor: "pointer"
-  },
-
-  secondaryButton: {
-    height: 38,
-    padding: "0 14px",
-    borderRadius: 6,
-    border: "1px solid rgba(255,255,255,0.08)",
-    background: "#252a31",
-    color: "#ffffff",
-    fontWeight: 600,
-    cursor: "pointer"
   },
 
   metricsRow: {
-    marginBottom: 18,
     display: "grid",
     gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-    gap: 14
-  },
-
-  metricCard: {
-    background: "#17191d",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 8,
-    padding: 16
-  },
-
-  metricLabel: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.56)",
+    gap: 8,
     marginBottom: 8
   },
 
+  metricCard: {
+    border: "1px solid rgba(54,112,190,0.24)",
+    borderRadius: 12,
+    background: "#020d1f",
+    padding: "8px 10px"
+  },
+
+  metricLabel: {
+    fontSize: 9,
+    color: "rgba(255,255,255,0.56)",
+    marginBottom: 3
+  },
+
   metricValueSmall: {
-    fontSize: 18,
-    fontWeight: 700
+    fontSize: 12,
+    fontWeight: 800
   },
 
-  panel: {
-    background: "#17191d",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 10,
-    padding: 18,
-    marginBottom: 18
+  mainGrid: {
+    display: "grid",
+    gridTemplateColumns: "0.72fr 1.9fr 0.95fr",
+    gap: 8,
+    alignItems: "start"
   },
 
-  panelHeader: {
-    marginBottom: 16
+  leftRail: {
+    border: "1px solid rgba(54,112,190,0.24)",
+    borderRadius: 14,
+    background: "#020d1f",
+    padding: 8,
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+    alignSelf: "start",
+    position: "sticky",
+    top: 88
+  },
+
+  centerArea: {
+    minWidth: 0
+  },
+
+  rightRail: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+    minWidth: 0
+  },
+
+  compactStack: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8
+  },
+
+  panelCompact: {
+    border: "1px solid rgba(54,112,190,0.24)",
+    borderRadius: 14,
+    background: "#020d1f",
+    padding: 8
+  },
+
+  panelHeaderRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 6,
+    marginBottom: 6
   },
 
   panelTitle: {
-    fontSize: 18,
-    fontWeight: 700
+    fontSize: 11,
+    fontWeight: 800
   },
 
   panelSub: {
-    marginTop: 6,
-    fontSize: 13,
-    color: "rgba(255,255,255,0.55)"
-  },
-
-  contentGrid: {
-    display: "grid",
-    gridTemplateColumns: "1.25fr 0.75fr",
-    gap: 18
+    fontSize: 9,
+    color: "rgba(255,255,255,0.56)",
+    marginTop: 1
   },
 
   formGrid1: {
     display: "grid",
     gridTemplateColumns: "1fr",
-    gap: 12
+    gap: 6
   },
 
   formGrid2: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
-    gap: 12
+    gap: 6
   },
 
-  formGrid3: {
+  formGrid4: {
     display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr",
-    gap: 12
+    gridTemplateColumns: "1fr 1fr 1fr 1fr",
+    gap: 6
   },
 
   label: {
     display: "block",
-    marginBottom: 6,
-    fontSize: 12,
+    fontSize: 9,
     fontWeight: 700,
-    color: "rgba(255,255,255,0.82)"
+    color: "rgba(255,255,255,0.66)",
+    marginBottom: 3
   },
 
   input: {
     width: "100%",
-    height: 42,
-    background: "#101215",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 6,
-    color: "#ffffff",
-    padding: "0 12px",
-    boxSizing: "border-box" as const,
-    fontSize: 14,
-    outline: "none"
-  } as const,
+    height: 26,
+    borderRadius: 9,
+    border: "1px solid rgba(92,118,166,0.35)",
+    background: "#0d1830",
+    color: "#fff",
+    padding: "0 8px",
+    fontSize: 11,
+    outline: "none",
+    boxSizing: "border-box"
+  },
 
   select: {
     width: "100%",
-    height: 42,
-    background: "#101215",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 6,
-    color: "#ffffff",
-    padding: "0 12px",
-    boxSizing: "border-box" as const,
-    fontSize: 14,
-    outline: "none"
-  } as const,
+    height: 26,
+    borderRadius: 9,
+    border: "1px solid rgba(92,118,166,0.35)",
+    background: "#0d1830",
+    color: "#fff",
+    padding: "0 8px",
+    fontSize: 11,
+    outline: "none",
+    boxSizing: "border-box"
+  },
 
   textarea: {
     width: "100%",
-    minHeight: 100,
-    background: "#101215",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 6,
-    color: "#ffffff",
-    padding: "12px",
-    boxSizing: "border-box" as const,
-    fontSize: 14,
+    minHeight: 52,
+    borderRadius: 9,
+    border: "1px solid rgba(92,118,166,0.35)",
+    background: "#0d1830",
+    color: "#fff",
+    padding: "8px",
+    fontSize: 11,
     outline: "none",
     resize: "vertical",
+    boxSizing: "border-box",
     fontFamily: "inherit"
-  } as const,
+  },
 
   toggleBox: {
-    height: 42,
-    background: "#101215",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 6,
+    height: 26,
+    background: "#0d1830",
+    border: "1px solid rgba(92,118,166,0.35)",
+    borderRadius: 9,
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "0 12px"
+    padding: "0 8px"
   },
 
   toggleLabel: {
-    fontSize: 13,
+    fontSize: 10,
     color: "rgba(255,255,255,0.72)"
   },
 
   toggleActive: {
-    height: 28,
-    padding: "0 10px",
+    height: 20,
+    padding: "0 8px",
     borderRadius: 999,
     border: "none",
-    background: "#2d8f52",
+    background: "#00a96e",
     color: "#fff",
-    fontWeight: 700,
+    fontSize: 9,
+    fontWeight: 800,
     cursor: "pointer"
   },
 
   toggleInactive: {
-    height: 28,
-    padding: "0 10px",
+    height: 20,
+    padding: "0 8px",
     borderRadius: 999,
     border: "none",
     background: "#b53d4a",
     color: "#fff",
-    fontWeight: 700,
+    fontSize: 9,
+    fontWeight: 800,
     cursor: "pointer"
   },
 
   checkboxRow: {
     display: "flex",
     alignItems: "center",
-    gap: 10,
-    fontSize: 14
+    gap: 8,
+    fontSize: 10
   },
 
   checkboxLabel: {
     color: "rgba(255,255,255,0.82)"
   },
 
-  summaryBox: {
-    marginTop: 8,
-    background: "#121417",
-    border: "1px solid rgba(255,255,255,0.06)",
-    borderRadius: 8,
-    padding: 14
+  statusCard: {
+    border: "1px solid rgba(54,112,190,0.18)",
+    borderRadius: 10,
+    background: "#071427",
+    padding: 8
   },
 
-  summaryRow: {
+  statusRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    fontSize: 10,
+    color: "rgba(255,255,255,0.68)",
+    marginBottom: 7
+  },
+
+  dotBlue: {
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    background: "#56a8ff",
+    display: "inline-block"
+  },
+
+  dotGreen: {
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    background: "#2d8f52",
+    display: "inline-block"
+  },
+
+  dotPurple: {
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    background: "#9b6bff",
+    display: "inline-block"
+  },
+
+  dotRed: {
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    background: "#d24d57",
+    display: "inline-block"
+  },
+
+  infoBox: {
+    border: "1px solid rgba(54,112,190,0.18)",
+    borderRadius: 10,
+    background: "#071427",
+    padding: 8
+  },
+
+  infoTitle: {
+    fontSize: 10,
+    fontWeight: 800,
+    color: "#59b7ff",
+    marginBottom: 4
+  },
+
+  infoText: {
+    fontSize: 10,
+    color: "rgba(255,255,255,0.72)"
+  },
+
+  summaryPanel: {
+    border: "1px solid rgba(54,112,190,0.18)",
+    borderRadius: 10,
+    background: "#071427",
+    padding: 8
+  },
+
+  summaryTitle: {
+    fontSize: 10,
+    fontWeight: 800,
+    marginBottom: 4
+  },
+
+  summaryBoxCompact: {
+    border: "1px solid rgba(54,112,190,0.18)",
+    borderRadius: 10,
+    background: "#071427",
+    padding: 8,
+    marginTop: 4
+  },
+
+  summaryRowMini: {
     display: "flex",
     justifyContent: "space-between",
-    gap: 12,
-    padding: "10px 0",
-    borderBottom: "1px solid rgba(255,255,255,0.06)",
-    color: "rgba(255,255,255,0.72)",
-    fontSize: 14
+    gap: 6,
+    padding: "5px 0",
+    borderBottom: "1px solid rgba(54,112,190,0.12)",
+    fontSize: 10,
+    color: "rgba(255,255,255,0.75)"
   },
 
   timeSlotCard: {
     display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 20,
-    background: "#121417",
-    border: "1px solid rgba(255,255,255,0.06)",
-    borderRadius: 8,
-    padding: 18
+    flexDirection: "column",
+    alignItems: "stretch",
+    gap: 8,
+    border: "1px solid rgba(54,112,190,0.18)",
+    borderRadius: 10,
+    background: "#071427",
+    padding: 8
   },
 
   timeSlotText: {
-    fontSize: 14,
+    fontSize: 10,
     color: "rgba(255,255,255,0.72)",
-    lineHeight: 1.6
+    lineHeight: 1.4
   }
 };

@@ -306,7 +306,7 @@ export default function AIAttemptRecommendationPage() {
           );
           if (clinicianBusy) return;
 
-          reasons.push("Resource is available");
+          reasons.push("Resource available");
           reasons.push("Staff and clinician available");
 
           if (preferredTime !== "Any") {
@@ -315,7 +315,7 @@ export default function AIAttemptRecommendationPage() {
             );
             if (diff === 0) {
               score += 15;
-              reasons.push("Matches preferred time exactly");
+              reasons.push("Exact preferred time");
             } else if (diff <= 60) {
               score += 6;
               reasons.push("Close to preferred time");
@@ -330,7 +330,7 @@ export default function AIAttemptRecommendationPage() {
 
           if (dayItems.length === 0) {
             score += 8;
-            reasons.push("Good clinic capacity on this day");
+            reasons.push("Good capacity");
           } else {
             const nearestGap = Math.min(
               ...dayItems.map((a) =>
@@ -340,21 +340,21 @@ export default function AIAttemptRecommendationPage() {
 
             if (nearestGap >= 60 && nearestGap <= 120) {
               score += 10;
-              reasons.push("Efficient slot gap");
+              reasons.push("Efficient gap");
             } else if (nearestGap < 30) {
               score -= 10;
-              reasons.push("Tight slot spacing");
+              reasons.push("Tight spacing");
             }
           }
 
           if (selectedModality === "CT" && resource === "CT Scanner") {
             score += 8;
-            reasons.push("Best-fit machine for CT");
+            reasons.push("Best CT machine");
           }
 
           if (selectedModality === "Ultrasound" && resource === "Ultrasound") {
             score += 8;
-            reasons.push("Best-fit room for ultrasound");
+            reasons.push("Best ultrasound room");
           }
 
           if (
@@ -364,7 +364,7 @@ export default function AIAttemptRecommendationPage() {
             (resource === "Room 1" || resource === "Room 2")
           ) {
             score += 5;
-            reasons.push("Suitable consultation room");
+            reasons.push("Suitable consult room");
           }
 
           list.push({
@@ -411,7 +411,7 @@ export default function AIAttemptRecommendationPage() {
 
     setAppointments((prev) => [newAppointment, ...prev]);
     setMessage(
-      `Recommended slot applied. Booking created for ${patientName} on ${rec.dayLabel} at ${rec.time}. Notification method: ${notificationMethod}.`
+      `Booking created for ${patientName} on ${rec.dayLabel} at ${rec.time}. Notification: ${notificationMethod}.`
     );
     setPatientName("");
     setSelectedRecommendation(null);
@@ -419,275 +419,318 @@ export default function AIAttemptRecommendationPage() {
 
   return (
     <div style={styles.page}>
-      <div style={styles.topbar}>
-        <div style={styles.topbarLeft}>
-          <img src="/logo.jpg" alt="EsyRIS logo" style={styles.headerLogo} />
-          <div style={styles.brand}>EsyRIS</div>
-          <div style={styles.topbarText}>AI Appointment Recommendation</div>
+      <div style={styles.topStrip}>
+        <div style={styles.topStripText}>
+          AI APPOINTMENT • CLINIC {selectedClinic.toUpperCase()} • MODALITY {selectedModality.toUpperCase()} • SUGGESTIONS {recommendations.length}
         </div>
-
-        <div style={styles.topbarRight}>
-          <div style={styles.topInfoPill}>Clinic: {selectedClinic}</div>
-          <div style={styles.topInfoPill}>Modality: {selectedModality}</div>
-          <div style={styles.userPill}>AI Assist</div>
-        </div>
+        <button style={styles.collapseButton}>⌄</button>
       </div>
 
-      <div style={styles.layout}>
-        <aside style={styles.sidebar}>
-          <div style={styles.sidebarHeader}>
-            <div style={styles.sidebarTitle}>AI SCHEDULING</div>
-            <div style={styles.sidebarSub}>
-              Recommendation engine for best appointment slots
-            </div>
-          </div>
-
-          <div style={styles.statusCard}>
-            <div style={styles.statusTitle}>How It Scores</div>
-            <div style={styles.statusRow}>
-              <span style={styles.dotGreen} />
-              <span>Resource availability</span>
-            </div>
-            <div style={styles.statusRow}>
-              <span style={styles.dotBlue} />
-              <span>Staff / clinician availability</span>
-            </div>
-            <div style={styles.statusRow}>
-              <span style={styles.dotPurple} />
-              <span>Efficient schedule gap</span>
-            </div>
-            <div style={styles.statusRow}>
-              <span style={styles.dotRed} />
-              <span>Conflict avoidance</span>
-            </div>
-          </div>
-        </aside>
-
-        <main style={styles.main}>
-          <div style={styles.headerPanel}>
+      <div style={styles.appShell}>
+        <div style={styles.titleBar}>
+          <div style={styles.titleLeft}>
+            <img src="/logo.jpg" alt="EsyRIS logo" style={styles.logo} />
             <div>
-              <div style={styles.kicker}>AI-ASSISTED BOOKING</div>
-              <h1 style={styles.pageTitle}>AI Appointment Recommendation</h1>
-              <p style={styles.pageSub}>
-                Suggests the best appointment slots using exam type, clinic
-                schedule, machine availability, and staff allocation.
-              </p>
-            </div>
-
-            <div style={styles.headerActions}>
-              <button type="button" style={styles.secondaryButton}>
-                Export
-              </button>
-              <button type="button" style={styles.primaryButton}>
-                Review Recommendations
-              </button>
+              <div style={styles.eyebrow}>AI-ASSISTED BOOKING</div>
+              <div style={styles.title}>Compact Appointment Recommendation</div>
             </div>
           </div>
 
-          <div style={styles.contentGrid}>
-            <section style={styles.panel}>
-              <div style={styles.panelHeader}>
-                <div>
-                  <div style={styles.panelTitle}>Booking Inputs</div>
-                  <div style={styles.panelSub}>
-                    Enter booking preference details for AI-assisted slot selection.
-                  </div>
-                </div>
-              </div>
-
-              <div style={styles.formGrid}>
-                <input
-                  style={styles.input}
-                  placeholder="Patient Name"
-                  value={patientName}
-                  onChange={(e) => setPatientName(e.target.value)}
-                />
-
-                <select
-                  style={styles.select}
-                  value={selectedClinic}
-                  onChange={(e) => setSelectedClinic(e.target.value as Clinic)}
-                >
-                  {clinics.map((clinic) => (
-                    <option key={clinic} value={clinic}>
-                      {clinic}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  style={styles.select}
-                  value={selectedModality}
-                  onChange={(e) => setSelectedModality(e.target.value)}
-                >
-                  {modalities.map((modality) => (
-                    <option key={modality} value={modality}>
-                      {modality}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  style={styles.select}
-                  value={preferredDay}
-                  onChange={(e) =>
-                    setPreferredDay(e.target.value as DayKey | "Any")
-                  }
-                >
-                  <option value="Any">Any Day</option>
-                  {days.map((day) => (
-                    <option key={day.key} value={day.key}>
-                      {day.label}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  style={styles.select}
-                  value={preferredTime}
-                  onChange={(e) => setPreferredTime(e.target.value)}
-                >
-                  <option value="Any">Any Time</option>
-                  {timeSlots.map((time) => (
-                    <option key={time} value={time}>
-                      {time}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  style={styles.select}
-                  value={notificationMethod}
-                  onChange={(e) =>
-                    setNotificationMethod(e.target.value as NotificationMethod)
-                  }
-                >
-                  {notificationMethods.map((method) => (
-                    <option key={method} value={method}>
-                      {method}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </section>
-
-            <section style={styles.panel}>
-              <div style={styles.panelHeader}>
-                <div>
-                  <div style={styles.panelTitle}>Recommendation Summary</div>
-                  <div style={styles.panelSub}>
-                    Top ranked AI suggestions based on availability and efficiency.
-                  </div>
-                </div>
-              </div>
-
-              <div style={styles.summaryBox}>
-                <div style={styles.summaryRow}>
-                  <span>Total Suggestions</span>
-                  <strong>{recommendations.length}</strong>
-                </div>
-                <div style={styles.summaryRow}>
-                  <span>Preferred Day</span>
-                  <strong>{preferredDay === "Any" ? "Any Day" : getDayLabel(preferredDay)}</strong>
-                </div>
-                <div style={styles.summaryRow}>
-                  <span>Preferred Time</span>
-                  <strong>{preferredTime}</strong>
-                </div>
-                <div style={styles.summaryRow}>
-                  <span>Notification</span>
-                  <strong>{notificationMethod}</strong>
-                </div>
-              </div>
-            </section>
+          <div style={styles.titleActions}>
+            <div style={styles.topInfoPill}>Clinic: {selectedClinic}</div>
+            <div style={styles.topInfoPill}>Modality: {selectedModality}</div>
+            <div style={styles.topInfoPill}>Notify: {notificationMethod}</div>
+            <button style={styles.ghostButton}>Export</button>
+            <button style={styles.primaryButton}>Review</button>
           </div>
+        </div>
 
-          <section style={{ ...styles.panel, marginTop: 18 }}>
-            <div style={styles.panelHeader}>
+        {message ? <div style={styles.messageBanner}>{message}</div> : null}
+
+        <div style={styles.metricsRow}>
+          <div style={styles.metricCard}>
+            <div style={styles.metricLabel}>Suggestions</div>
+            <div style={styles.metricValueSmall}>{recommendations.length}</div>
+          </div>
+          <div style={styles.metricCard}>
+            <div style={styles.metricLabel}>Clinic</div>
+            <div style={styles.metricValueSmall}>{selectedClinic}</div>
+          </div>
+          <div style={styles.metricCard}>
+            <div style={styles.metricLabel}>Modality</div>
+            <div style={styles.metricValueSmall}>{selectedModality}</div>
+          </div>
+          <div style={styles.metricCard}>
+            <div style={styles.metricLabel}>Bookings</div>
+            <div style={styles.metricValueSmall}>{appointments.length}</div>
+          </div>
+        </div>
+
+        <div style={styles.mainGrid}>
+          <aside style={styles.leftRail}>
+            <div style={styles.panelHeaderRow}>
               <div>
-                <div style={styles.panelTitle}>Recommended Slots</div>
-                <div style={styles.panelSub}>
-                  Best appointment slots ranked by the recommendation engine.
-                </div>
+                <div style={styles.panelTitle}>Scoring Logic</div>
+                <div style={styles.panelSub}>How recommendations are ranked</div>
               </div>
             </div>
 
-            <div style={styles.recommendationList}>
-              {recommendations.length === 0 ? (
-                <div style={styles.emptyState}>No suitable recommendations found.</div>
-              ) : (
-                recommendations.map((rec, index) => (
-                  <div
-                    key={`${rec.id}-${index}`}
-                    style={
-                      selectedRecommendation === rec.id
-                        ? styles.recommendationItemActive
-                        : styles.recommendationItem
-                    }
-                    onClick={() => setSelectedRecommendation(rec.id)}
-                  >
-                    <div style={styles.recommendationTop}>
-                      <div>
-                        <div style={styles.recommendationTitle}>
-                          #{index + 1} • {rec.dayLabel} • {rec.time}
+            <div style={styles.statusCard}>
+              <div style={styles.statusRow}>
+                <span style={styles.dotGreen} />
+                <span>Resource availability</span>
+              </div>
+              <div style={styles.statusRow}>
+                <span style={styles.dotBlue} />
+                <span>Staff / clinician availability</span>
+              </div>
+              <div style={styles.statusRow}>
+                <span style={styles.dotPurple} />
+                <span>Efficient scheduling gap</span>
+              </div>
+              <div style={styles.statusRow}>
+                <span style={styles.dotRed} />
+                <span>Conflict avoidance</span>
+              </div>
+            </div>
+
+            <div style={styles.infoBox}>
+              <div style={styles.infoTitle}>Recommendation Goal</div>
+              <div style={styles.infoText}>
+                Suggest the best slot based on clinic schedule, modality fit,
+                resource availability, and operational efficiency.
+              </div>
+            </div>
+          </aside>
+
+          <section style={styles.centerArea}>
+            <div style={styles.compactStack}>
+              <div style={styles.contentGrid}>
+                <section style={styles.panelCompact}>
+                  <div style={styles.panelHeaderRow}>
+                    <div>
+                      <div style={styles.panelTitle}>Booking Inputs</div>
+                      <div style={styles.panelSub}>
+                        Enter patient and preference details
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={styles.formGrid3}>
+                    <div>
+                      <label style={styles.label}>Patient Name</label>
+                      <input
+                        style={styles.input}
+                        value={patientName}
+                        onChange={(e) => setPatientName(e.target.value)}
+                        placeholder="Patient Name"
+                      />
+                    </div>
+
+                    <div>
+                      <label style={styles.label}>Clinic</label>
+                      <select
+                        style={styles.select}
+                        value={selectedClinic}
+                        onChange={(e) => setSelectedClinic(e.target.value as Clinic)}
+                      >
+                        {clinics.map((clinic) => (
+                          <option key={clinic} value={clinic}>
+                            {clinic}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={styles.label}>Modality</label>
+                      <select
+                        style={styles.select}
+                        value={selectedModality}
+                        onChange={(e) => setSelectedModality(e.target.value)}
+                      >
+                        {modalities.map((modality) => (
+                          <option key={modality} value={modality}>
+                            {modality}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={styles.label}>Preferred Day</label>
+                      <select
+                        style={styles.select}
+                        value={preferredDay}
+                        onChange={(e) =>
+                          setPreferredDay(e.target.value as DayKey | "Any")
+                        }
+                      >
+                        <option value="Any">Any Day</option>
+                        {days.map((day) => (
+                          <option key={day.key} value={day.key}>
+                            {day.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={styles.label}>Preferred Time</label>
+                      <select
+                        style={styles.select}
+                        value={preferredTime}
+                        onChange={(e) => setPreferredTime(e.target.value)}
+                      >
+                        <option value="Any">Any Time</option>
+                        {timeSlots.map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={styles.label}>Notification</label>
+                      <select
+                        style={styles.select}
+                        value={notificationMethod}
+                        onChange={(e) =>
+                          setNotificationMethod(e.target.value as NotificationMethod)
+                        }
+                      >
+                        {notificationMethods.map((method) => (
+                          <option key={method} value={method}>
+                            {method}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </section>
+
+                <section style={styles.panelCompact}>
+                  <div style={styles.panelHeaderRow}>
+                    <div>
+                      <div style={styles.panelTitle}>Recommendation Summary</div>
+                      <div style={styles.panelSub}>Top-level suggestion overview</div>
+                    </div>
+                  </div>
+
+                  <div style={styles.summaryBoxCompact}>
+                    <div style={styles.summaryRowMini}>
+                      <span>Total Suggestions</span>
+                      <strong>{recommendations.length}</strong>
+                    </div>
+                    <div style={styles.summaryRowMini}>
+                      <span>Preferred Day</span>
+                      <strong>
+                        {preferredDay === "Any" ? "Any Day" : getDayLabel(preferredDay)}
+                      </strong>
+                    </div>
+                    <div style={styles.summaryRowMini}>
+                      <span>Preferred Time</span>
+                      <strong>{preferredTime}</strong>
+                    </div>
+                    <div style={styles.summaryRowMini}>
+                      <span>Notification</span>
+                      <strong>{notificationMethod}</strong>
+                    </div>
+                  </div>
+                </section>
+              </div>
+
+              <section style={styles.panelCompact}>
+                <div style={styles.panelHeaderRow}>
+                  <div>
+                    <div style={styles.panelTitle}>Recommended Slots</div>
+                    <div style={styles.panelSub}>
+                      Ranked suggestions from the recommendation engine
+                    </div>
+                  </div>
+                </div>
+
+                <div style={styles.recommendationList}>
+                  {recommendations.length === 0 ? (
+                    <div style={styles.emptyState}>No suitable recommendations found.</div>
+                  ) : (
+                    recommendations.map((rec, index) => (
+                      <div
+                        key={`${rec.id}-${index}`}
+                        style={
+                          selectedRecommendation === rec.id
+                            ? styles.recommendationItemActive
+                            : styles.recommendationItem
+                        }
+                        onClick={() => setSelectedRecommendation(rec.id)}
+                      >
+                        <div style={styles.recommendationTop}>
+                          <div>
+                            <div style={styles.recommendationTitle}>
+                              #{index + 1} • {rec.dayLabel} • {rec.time}
+                            </div>
+                            <div style={styles.recommendationMeta}>
+                              {rec.clinic} • {rec.resource}
+                            </div>
+                            <div style={styles.recommendationMeta}>
+                              Staff: {rec.staff} • Clinician: {rec.clinician}
+                            </div>
+                          </div>
+
+                          <div style={styles.scoreBadge}>Score {rec.score}</div>
                         </div>
-                        <div style={styles.recommendationMeta}>
-                          {rec.clinic} • {rec.resource}
-                        </div>
-                        <div style={styles.recommendationMeta}>
-                          Staff: {rec.staff} • Clinician: {rec.clinician}
+
+                        <div style={styles.reasonWrap}>
+                          {rec.reasons.map((reason, i) => (
+                            <span key={i} style={styles.reasonBadge}>
+                              {reason}
+                            </span>
+                          ))}
                         </div>
                       </div>
-
-                      <div style={styles.scoreBadge}>Score {rec.score}</div>
-                    </div>
-
-                    <div style={styles.reasonWrap}>
-                      {rec.reasons.map((reason, i) => (
-                        <span key={i} style={styles.reasonBadge}>
-                          {reason}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-
-            <div style={styles.formActions}>
-              <button type="button" style={styles.primaryButton} onClick={applyRecommendation}>
-                Apply Recommended Slot
-              </button>
-            </div>
-
-            {message ? <div style={styles.message}>{message}</div> : null}
-          </section>
-
-          <section style={{ ...styles.panel, marginTop: 18 }}>
-            <div style={styles.panelHeader}>
-              <div>
-                <div style={styles.panelTitle}>Existing Bookings</div>
-                <div style={styles.panelSub}>
-                  Current booked appointments used by the AI engine.
+                    ))
+                  )}
                 </div>
-              </div>
-            </div>
 
-            <div style={styles.bookingList}>
-              {appointments.map((item) => (
-                <div key={item.id} style={styles.bookingRow}>
+                <div style={styles.formActions}>
+                  <button
+                    type="button"
+                    style={styles.primaryButton}
+                    onClick={applyRecommendation}
+                  >
+                    Apply Recommended Slot
+                  </button>
+                </div>
+              </section>
+
+              <section style={styles.panelCompact}>
+                <div style={styles.panelHeaderRow}>
                   <div>
-                    <div style={styles.bookingTitle}>{item.patient}</div>
-                    <div style={styles.bookingMeta}>
-                      {getDayLabel(item.day)} • {item.time} • {item.modality}
+                    <div style={styles.panelTitle}>Existing Bookings</div>
+                    <div style={styles.panelSub}>
+                      Current appointments used by the AI engine
                     </div>
                   </div>
-                  <div style={styles.bookingBadge}>{item.resource}</div>
                 </div>
-              ))}
+
+                <div style={styles.bookingList}>
+                  {appointments.map((item) => (
+                    <div key={item.id} style={styles.bookingRow}>
+                      <div>
+                        <div style={styles.bookingTitle}>{item.patient}</div>
+                        <div style={styles.bookingMeta}>
+                          {getDayLabel(item.day)} • {item.time} • {item.modality}
+                        </div>
+                      </div>
+                      <div style={styles.bookingBadge}>{item.resource}</div>
+                    </div>
+                  ))}
+                </div>
+              </section>
             </div>
           </section>
-        </main>
+        </div>
       </div>
     </div>
   );
@@ -696,353 +739,402 @@ export default function AIAttemptRecommendationPage() {
 const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: "100vh",
-    background: "#111315",
+    background: "#030a16",
     color: "#ffffff",
-    fontFamily: "Inter, Segoe UI, Roboto, Arial, sans-serif"
+    fontFamily: "Inter, Segoe UI, Arial, sans-serif",
+    overflowX: "hidden",
+    overflowY: "auto"
   },
 
-  topbar: {
-    height: 52,
-    background: "#1b1d20",
-    borderBottom: "1px solid rgba(255,255,255,0.08)",
+  topStrip: {
+    height: 28,
+    background: "#8d0d46",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "0 18px"
+    padding: "0 8px",
+    position: "sticky",
+    top: 0,
+    zIndex: 20
   },
 
-  topbarLeft: {
+  topStripText: {
+    fontSize: 9,
+    fontWeight: 700,
+    whiteSpace: "nowrap"
+  },
+
+  collapseButton: {
+    height: 20,
+    minWidth: 20,
+    borderRadius: 999,
+    border: "none",
+    background: "#d9d9d9",
+    color: "#222",
+    cursor: "pointer",
+    fontSize: 11,
+    fontWeight: 700,
+    lineHeight: 1
+  },
+
+  appShell: {
+    padding: 8,
+    boxSizing: "border-box"
+  },
+
+  titleBar: {
     display: "flex",
     alignItems: "center",
-    gap: 12
+    justifyContent: "space-between",
+    gap: 10,
+    border: "1px solid rgba(54,112,190,0.28)",
+    borderRadius: 14,
+    background: "#020d1f",
+    padding: "8px 12px",
+    marginBottom: 8,
+    position: "sticky",
+    top: 36,
+    zIndex: 15
   },
 
-  headerLogo: {
-    width: 28,
-    height: 28,
-    objectFit: "cover",
-    borderRadius: 4
-  },
-
-  brand: {
-    fontSize: 18,
-    fontWeight: 700
-  },
-
-  topbarText: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.6)"
-  },
-
-  topbarRight: {
+  titleLeft: {
     display: "flex",
     alignItems: "center",
     gap: 8
   },
 
-  topInfoPill: {
-    height: 34,
+  logo: {
+    width: 24,
+    height: 24,
+    borderRadius: 5,
+    objectFit: "cover"
+  },
+
+  eyebrow: {
+    fontSize: 9,
+    color: "#1da4ff",
+    fontWeight: 800,
+    letterSpacing: "1.2px"
+  },
+
+  title: {
+    fontSize: 14,
+    fontWeight: 800,
+    marginTop: 1
+  },
+
+  titleActions: {
+    display: "flex",
+    gap: 6,
+    alignItems: "center",
+    flexWrap: "wrap"
+  },
+
+  ghostButton: {
+    height: 26,
+    padding: "0 10px",
+    borderRadius: 9,
+    border: "1px solid rgba(54,112,190,0.32)",
+    background: "#0d1d35",
+    color: "#59b7ff",
+    fontSize: 11,
+    fontWeight: 700,
+    cursor: "pointer"
+  },
+
+  primaryButton: {
+    height: 26,
     padding: "0 12px",
-    borderRadius: 6,
-    background: "#1f2c3b",
-    border: "1px solid rgba(86,168,255,0.18)",
-    color: "#56a8ff",
-    fontSize: 12,
+    borderRadius: 9,
+    border: "none",
+    background: "#00a96e",
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: 800,
+    cursor: "pointer"
+  },
+
+  topInfoPill: {
+    height: 24,
+    padding: "0 10px",
+    borderRadius: 999,
+    background: "#0d1d35",
+    border: "1px solid rgba(54,112,190,0.28)",
+    color: "#59b7ff",
+    fontSize: 10,
     fontWeight: 700,
     display: "flex",
     alignItems: "center"
   },
 
-  userPill: {
-    height: 34,
-    padding: "0 14px",
-    borderRadius: 6,
-    background: "#2d8f52",
-    color: "#ffffff",
-    fontSize: 12,
+  messageBanner: {
+    marginBottom: 8,
+    padding: "8px 10px",
+    borderRadius: 10,
+    fontSize: 10,
     fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
+    background: "rgba(45,143,82,0.14)",
+    border: "1px solid rgba(45,143,82,0.28)",
+    color: "#7fd19a"
   },
 
-  layout: {
+  metricsRow: {
     display: "grid",
-    gridTemplateColumns: "240px 1fr",
-    minHeight: "calc(100vh - 52px)"
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+    gap: 8,
+    marginBottom: 8
   },
 
-  sidebar: {
-    background: "#141618",
-    borderRight: "1px solid rgba(255,255,255,0.08)",
-    padding: 18,
+  metricCard: {
+    border: "1px solid rgba(54,112,190,0.24)",
+    borderRadius: 12,
+    background: "#020d1f",
+    padding: "8px 10px"
+  },
+
+  metricLabel: {
+    fontSize: 9,
+    color: "rgba(255,255,255,0.56)",
+    marginBottom: 3
+  },
+
+  metricValueSmall: {
+    fontSize: 12,
+    fontWeight: 800
+  },
+
+  mainGrid: {
+    display: "grid",
+    gridTemplateColumns: "0.75fr 2fr",
+    gap: 8,
+    alignItems: "start"
+  },
+
+  leftRail: {
+    border: "1px solid rgba(54,112,190,0.24)",
+    borderRadius: 14,
+    background: "#020d1f",
+    padding: 8,
     display: "flex",
     flexDirection: "column",
-    gap: 18
+    gap: 8,
+    alignSelf: "start",
+    position: "sticky",
+    top: 88
   },
 
-  sidebarHeader: {
-    paddingBottom: 14,
-    borderBottom: "1px solid rgba(255,255,255,0.06)"
+  centerArea: {
+    minWidth: 0
   },
 
-  sidebarTitle: {
-    fontSize: 12,
-    color: "#56a8ff",
+  compactStack: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8
+  },
+
+  contentGrid: {
+    display: "grid",
+    gridTemplateColumns: "1.2fr 0.8fr",
+    gap: 8
+  },
+
+  panelCompact: {
+    border: "1px solid rgba(54,112,190,0.24)",
+    borderRadius: 14,
+    background: "#020d1f",
+    padding: 8
+  },
+
+  panelHeaderRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 6,
+    marginBottom: 6
+  },
+
+  panelTitle: {
+    fontSize: 11,
+    fontWeight: 800
+  },
+
+  panelSub: {
+    fontSize: 9,
+    color: "rgba(255,255,255,0.56)",
+    marginTop: 1
+  },
+
+  formGrid3: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr 1fr",
+    gap: 6
+  },
+
+  label: {
+    display: "block",
+    fontSize: 9,
     fontWeight: 700,
-    letterSpacing: "0.9px"
+    color: "rgba(255,255,255,0.66)",
+    marginBottom: 3
   },
 
-  sidebarSub: {
-    marginTop: 8,
-    fontSize: 13,
-    color: "rgba(255,255,255,0.56)"
+  input: {
+    width: "100%",
+    height: 26,
+    borderRadius: 9,
+    border: "1px solid rgba(92,118,166,0.35)",
+    background: "#0d1830",
+    color: "#fff",
+    padding: "0 8px",
+    fontSize: 11,
+    outline: "none",
+    boxSizing: "border-box"
+  },
+
+  select: {
+    width: "100%",
+    height: 26,
+    borderRadius: 9,
+    border: "1px solid rgba(92,118,166,0.35)",
+    background: "#0d1830",
+    color: "#fff",
+    padding: "0 8px",
+    fontSize: 11,
+    outline: "none",
+    boxSizing: "border-box"
   },
 
   statusCard: {
-    background: "#17191d",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 8,
-    padding: 14
-  },
-
-  statusTitle: {
-    fontSize: 12,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.84)",
-    marginBottom: 12,
-    textTransform: "uppercase",
-    letterSpacing: "0.7px"
+    border: "1px solid rgba(54,112,190,0.18)",
+    borderRadius: 10,
+    background: "#071427",
+    padding: 8
   },
 
   statusRow: {
     display: "flex",
     alignItems: "center",
-    gap: 10,
-    fontSize: 13,
-    color: "rgba(255,255,255,0.62)",
-    marginBottom: 10
+    gap: 8,
+    fontSize: 10,
+    color: "rgba(255,255,255,0.68)",
+    marginBottom: 7
   },
 
   dotGreen: {
-    width: 9,
-    height: 9,
+    width: 8,
+    height: 8,
     borderRadius: "50%",
     background: "#2d8f52",
     display: "inline-block"
   },
 
   dotBlue: {
-    width: 9,
-    height: 9,
+    width: 8,
+    height: 8,
     borderRadius: "50%",
     background: "#56a8ff",
     display: "inline-block"
   },
 
   dotPurple: {
-    width: 9,
-    height: 9,
+    width: 8,
+    height: 8,
     borderRadius: "50%",
     background: "#9b6bff",
     display: "inline-block"
   },
 
   dotRed: {
-    width: 9,
-    height: 9,
+    width: 8,
+    height: 8,
     borderRadius: "50%",
     background: "#d24d57",
     display: "inline-block"
   },
 
-  main: {
-    padding: 20,
-    background: "#111315"
-  },
-
-  headerPanel: {
-    background: "#17191d",
-    border: "1px solid rgba(255,255,255,0.08)",
+  infoBox: {
+    border: "1px solid rgba(54,112,190,0.18)",
     borderRadius: 10,
-    padding: 20,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 20
+    background: "#071427",
+    padding: 8
   },
 
-  kicker: {
-    fontSize: 11,
-    color: "#56a8ff",
-    fontWeight: 700,
-    letterSpacing: "1px",
-    marginBottom: 10
+  infoTitle: {
+    fontSize: 10,
+    fontWeight: 800,
+    color: "#59b7ff",
+    marginBottom: 4
   },
 
-  pageTitle: {
-    margin: 0,
-    fontSize: 28,
-    fontWeight: 700
-  },
-
-  pageSub: {
-    margin: "8px 0 0 0",
-    color: "rgba(255,255,255,0.58)",
-    fontSize: 14,
-    lineHeight: 1.6
-  },
-
-  headerActions: {
-    display: "flex",
-    gap: 10
-  },
-
-  secondaryButton: {
-    height: 38,
-    padding: "0 14px",
-    borderRadius: 6,
-    border: "1px solid rgba(255,255,255,0.08)",
-    background: "#252a31",
-    color: "#ffffff",
-    fontWeight: 600,
-    cursor: "pointer"
-  },
-
-  primaryButton: {
-    height: 38,
-    padding: "0 14px",
-    borderRadius: 6,
-    border: "none",
-    background: "#2d8f52",
-    color: "#ffffff",
-    fontWeight: 600,
-    cursor: "pointer"
-  },
-
-  contentGrid: {
-    display: "grid",
-    gridTemplateColumns: "1.2fr 0.8fr",
-    gap: 18,
-    marginTop: 18
-  },
-
-  panel: {
-    background: "#17191d",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 10,
-    padding: 18
-  },
-
-  panelHeader: {
-    marginBottom: 16
-  },
-
-  panelTitle: {
-    fontSize: 18,
-    fontWeight: 700
-  },
-
-  panelSub: {
-    marginTop: 6,
-    fontSize: 13,
-    color: "rgba(255,255,255,0.55)"
-  },
-
-  formGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 12
-  },
-
-  input: {
-    width: "100%",
-    height: 42,
-    background: "#101215",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 6,
-    color: "#ffffff",
-    padding: "0 12px",
-    boxSizing: "border-box",
-    outline: "none",
-    fontSize: 14
-  },
-
-  select: {
-    width: "100%",
-    height: 42,
-    background: "#101215",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 6,
-    color: "#ffffff",
-    padding: "0 12px",
-    boxSizing: "border-box",
-    outline: "none",
-    fontSize: 14
-  },
-
-  summaryBox: {
-    marginTop: 16,
-    background: "#121417",
-    border: "1px solid rgba(255,255,255,0.06)",
-    borderRadius: 8,
-    padding: 14
-  },
-
-  summaryRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 12,
-    padding: "10px 0",
-    borderBottom: "1px solid rgba(255,255,255,0.06)",
+  infoText: {
+    fontSize: 10,
     color: "rgba(255,255,255,0.72)",
-    fontSize: 14
+    lineHeight: 1.4
+  },
+
+  summaryBoxCompact: {
+    border: "1px solid rgba(54,112,190,0.18)",
+    borderRadius: 10,
+    background: "#071427",
+    padding: 8
+  },
+
+  summaryRowMini: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: 6,
+    padding: "5px 0",
+    borderBottom: "1px solid rgba(54,112,190,0.12)",
+    fontSize: 10,
+    color: "rgba(255,255,255,0.75)"
   },
 
   recommendationList: {
     display: "flex",
     flexDirection: "column",
-    gap: 12
+    gap: 6
   },
 
   recommendationItem: {
-    padding: 14,
-    borderRadius: 8,
-    background: "#121417",
-    border: "1px solid rgba(255,255,255,0.06)",
+    padding: 8,
+    borderRadius: 10,
+    background: "#071427",
+    border: "1px solid rgba(54,112,190,0.18)",
     cursor: "pointer"
   },
 
   recommendationItemActive: {
-    padding: 14,
-    borderRadius: 8,
-    background: "#1b1e22",
-    border: "1px solid rgba(86,168,255,0.25)",
+    padding: 8,
+    borderRadius: 10,
+    background: "#0b213f",
+    border: "1px solid rgba(26,154,255,0.45)",
     cursor: "pointer"
   },
 
   recommendationTop: {
     display: "flex",
     justifyContent: "space-between",
-    gap: 12
+    gap: 8
   },
 
   recommendationTitle: {
-    fontSize: 15,
-    fontWeight: 700
+    fontSize: 10,
+    fontWeight: 800
   },
 
   recommendationMeta: {
-    marginTop: 4,
-    fontSize: 12,
+    marginTop: 2,
+    fontSize: 9,
     color: "rgba(255,255,255,0.58)"
   },
 
   scoreBadge: {
-    padding: "6px 10px",
+    padding: "3px 8px",
     borderRadius: 999,
     background: "rgba(45,143,82,0.18)",
     color: "#53c27a",
-    fontSize: 12,
+    fontSize: 9,
     fontWeight: 700,
     whiteSpace: "nowrap",
     height: "fit-content"
@@ -1051,73 +1143,67 @@ const styles: Record<string, React.CSSProperties> = {
   reasonWrap: {
     display: "flex",
     flexWrap: "wrap",
-    gap: 8,
-    marginTop: 12
+    gap: 5,
+    marginTop: 6
   },
 
   reasonBadge: {
     display: "inline-block",
-    padding: "6px 10px",
+    padding: "3px 8px",
     borderRadius: 999,
     background: "rgba(86,168,255,0.14)",
     color: "#56a8ff",
-    fontSize: 12,
+    fontSize: 9,
     fontWeight: 600
   },
 
   bookingList: {
     display: "flex",
     flexDirection: "column",
-    gap: 10
+    gap: 5
   },
 
   bookingRow: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: 12,
-    padding: "14px 0",
-    borderBottom: "1px solid rgba(255,255,255,0.06)"
+    gap: 8,
+    padding: "8px 0",
+    borderBottom: "1px solid rgba(54,112,190,0.12)"
   },
 
   bookingTitle: {
-    fontSize: 14,
-    fontWeight: 700
+    fontSize: 10,
+    fontWeight: 800
   },
 
   bookingMeta: {
-    marginTop: 4,
-    fontSize: 12,
+    marginTop: 2,
+    fontSize: 9,
     color: "rgba(255,255,255,0.58)"
   },
 
   bookingBadge: {
     display: "inline-block",
-    padding: "6px 10px",
+    padding: "3px 8px",
     borderRadius: 999,
     background: "rgba(86,168,255,0.14)",
     color: "#56a8ff",
-    fontSize: 12,
+    fontSize: 9,
     fontWeight: 700
   },
 
   emptyState: {
-    padding: 18,
-    borderRadius: 8,
-    background: "#121417",
+    padding: 10,
+    borderRadius: 10,
+    background: "#071427",
     color: "rgba(255,255,255,0.5)",
-    fontSize: 14
+    fontSize: 10
   },
 
   formActions: {
     display: "flex",
     justifyContent: "flex-end",
-    marginTop: 16
-  },
-
-  message: {
-    marginTop: 14,
-    fontSize: 13,
-    color: "#53c27a"
+    marginTop: 8
   }
 };

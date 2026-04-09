@@ -83,7 +83,7 @@ const examSeed: Exam[] = [
     smsRules:
       "Send reminder 24 hours before appointment and arrival instruction 2 hours prior.",
     competencies: ["Radiographer Level 2", "CT Certified"],
-    notes: "Standard lumbar spine protocol with axial and sagittal reformats.",
+    notes: "Standard lumbar spine protocol with axial and sagittal reformats."
   },
   {
     id: 2,
@@ -112,7 +112,7 @@ const examSeed: Exam[] = [
       "Resume diet after scan unless otherwise instructed.",
     smsRules: "Send fasting instruction 24 hours before appointment.",
     competencies: ["Sonographer", "Ultrasound Certified"],
-    notes: "Check hepatobiliary and renal structures.",
+    notes: "Check hepatobiliary and renal structures."
   },
   {
     id: 3,
@@ -142,8 +142,8 @@ const examSeed: Exam[] = [
     smsRules:
       "Send MRI safety checklist and arrival instructions 24 hours before exam.",
     competencies: ["MRI Certified", "Contrast Qualified"],
-    notes: "Review contraindications before scheduling.",
-  },
+    notes: "Review contraindications before scheduling."
+  }
 ];
 
 const modalities: Modality[] = [
@@ -152,7 +152,7 @@ const modalities: Modality[] = [
   "Ultrasound",
   "X-Ray",
   "Mammography",
-  "Nuclear",
+  "Nuclear"
 ];
 
 const contrastOptions: ContrastOption[] = ["Yes", "No"];
@@ -162,7 +162,7 @@ const doctorPresenceTypes: DoctorPresenceType[] = [
   "On-site Radiologist Required",
   "Medical Staff On-site Required",
   "Radiologist On-call Only",
-  "Senior Reviewer Required",
+  "Senior Reviewer Required"
 ];
 
 const competencyOptions: Competency[] = [
@@ -173,7 +173,7 @@ const competencyOptions: Competency[] = [
   "Sonographer",
   "Ultrasound Certified",
   "Contrast Qualified",
-  "Senior Reviewer",
+  "Senior Reviewer"
 ];
 
 type EditableExamField =
@@ -237,7 +237,7 @@ export default function ExaminationConfigurationPage() {
   ) => {
     setForm((prev) => ({
       ...prev,
-      [field]: value,
+      [field]: value
     }));
   };
 
@@ -248,7 +248,7 @@ export default function ExaminationConfigurationPage() {
         ...prev,
         competencies: exists
           ? prev.competencies.filter((item) => item !== value)
-          : [...prev.competencies, value],
+          : [...prev.competencies, value]
       };
     });
   };
@@ -260,7 +260,7 @@ export default function ExaminationConfigurationPage() {
       doctorPresenceType: !prev.doctorPresenceRequired
         ? "On-site Radiologist Required"
         : "Not Required",
-      minimumDoctorsRequired: !prev.doctorPresenceRequired ? 1 : 0,
+      minimumDoctorsRequired: !prev.doctorPresenceRequired ? 1 : 0
     }));
   };
 
@@ -274,270 +274,289 @@ export default function ExaminationConfigurationPage() {
 
   return (
     <div style={styles.page}>
-      <div style={styles.topbar}>
-        <div style={styles.topbarLeft}>
-          <img src="/logo.jpg" alt="EsyRIS logo" style={styles.headerLogo} />
-          <div style={styles.brand}>EsyRIS</div>
-          <div style={styles.topbarText}>Examination Configuration</div>
+      <div style={styles.topStrip}>
+        <div style={styles.topStripText}>
+          EXAM CONFIG • ACTIVE {activeCount} • INACTIVE {inactiveCount} • MODALITIES {modalityCount} • DOCTOR PRESENCE {doctorPresenceCount}
         </div>
-
-        <div style={styles.topbarRight}>
-          <div style={styles.topActionButton}>Master Data</div>
-          <div style={styles.topInfoPill}>Doctor Presence Rules</div>
-          <div style={styles.userPill}>Admin</div>
-        </div>
+        <button style={styles.collapseButton}>⌄</button>
       </div>
 
-      <div style={styles.layout}>
-        <aside style={styles.sidebar}>
-          <div style={styles.sidebarHeader}>
-            <div style={styles.sidebarTitle}>EXAM CONFIG</div>
-            <div style={styles.sidebarSub}>
-              Admin and security examination setup
-            </div>
-          </div>
-
-          <div style={styles.filterSection}>
-            <div style={styles.filterLabel}>Search Examination</div>
-            <input
-              style={styles.input}
-              placeholder="Search exam, code, billing..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-
-          <div style={styles.examList}>
-            {filteredExams.map((exam) => (
-              <div
-                key={exam.id}
-                onClick={() => setSelectedId(exam.id)}
-                style={
-                  exam.id === selectedId
-                    ? styles.examItemActive
-                    : styles.examItem
-                }
-              >
-                <div style={styles.examName}>{exam.examName}</div>
-                <div style={styles.examMeta}>{exam.examCode}</div>
-                <div style={styles.examMeta}>
-                  {exam.modality} • {exam.billingCode}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={styles.statusCard}>
-            <div style={styles.statusTitle}>Overview</div>
-            <div style={styles.statusRow}>
-              <span style={styles.dotGreen} />
-              <span>{activeCount} Active Exams</span>
-            </div>
-            <div style={styles.statusRow}>
-              <span style={styles.dotRed} />
-              <span>{inactiveCount} Inactive Exams</span>
-            </div>
-            <div style={styles.statusRow}>
-              <span style={styles.dotBlue} />
-              <span>{modalityCount} Modalities Used</span>
-            </div>
-            <div style={styles.statusRow}>
-              <span style={styles.dotPurple} />
-              <span>{doctorPresenceCount} Require Doctor Presence</span>
-            </div>
-          </div>
-        </aside>
-
-        <main style={styles.main}>
-          <div style={styles.headerPanel}>
+      <div style={styles.appShell}>
+        <div style={styles.titleBar}>
+          <div style={styles.titleLeft}>
+            <img src="/logo.jpg" alt="EsyRIS logo" style={styles.logo} />
             <div>
-              <div style={styles.kicker}>EXAMINATION ADMINISTRATION</div>
-              <h1 style={styles.pageTitle}>Examination Configuration Screens</h1>
-              <p style={styles.pageSub}>
-                Manage exam types, modality, billing, preparation instructions,
-                equipment requirements, competencies, and doctor presence rules.
-              </p>
-            </div>
-
-            <div style={styles.headerActions}>
-              <button type="button" style={styles.secondaryButton}>
-                Export
-              </button>
-              <button type="button" style={styles.primaryButton}>
-                Save Exam
-              </button>
+              <div style={styles.eyebrow}>EXAMINATION CONFIGURATION</div>
+              <div style={styles.title}>Compact Examination Setup</div>
             </div>
           </div>
 
-          <div style={styles.metricsRow}>
-            <div style={styles.metricCard}>
-              <div style={styles.metricLabel}>Selected Exam</div>
-              <div style={styles.metricValueSmall}>{selectedExam.examCode}</div>
+          <div style={styles.titleActions}>
+            <div style={styles.topInfoPill}>Exam: {selectedExam.examCode}</div>
+            <div style={styles.topInfoPill}>Modality: {selectedExam.modality}</div>
+            <div style={styles.topInfoPill}>
+              Presence: {selectedExam.doctorPresenceRequired ? "Required" : "Not Required"}
             </div>
-            <div style={styles.metricCard}>
-              <div style={styles.metricLabel}>Modality</div>
-              <div style={styles.metricValueSmall}>{selectedExam.modality}</div>
+            <button style={styles.ghostButton}>Export</button>
+            <button style={styles.primaryButton}>Save Exam</button>
+          </div>
+        </div>
+
+        {message ? <div style={styles.messageBanner}>{message}</div> : null}
+
+        <div style={styles.metricsRow}>
+          <div style={styles.metricCard}>
+            <div style={styles.metricLabel}>Selected Exam</div>
+            <div style={styles.metricValueSmall}>{selectedExam.examCode}</div>
+          </div>
+          <div style={styles.metricCard}>
+            <div style={styles.metricLabel}>Modality</div>
+            <div style={styles.metricValueSmall}>{selectedExam.modality}</div>
+          </div>
+          <div style={styles.metricCard}>
+            <div style={styles.metricLabel}>Status</div>
+            <div style={styles.metricValueSmall}>{selectedExam.status}</div>
+          </div>
+          <div style={styles.metricCard}>
+            <div style={styles.metricLabel}>Doctor Presence</div>
+            <div style={styles.metricValueSmall}>
+              {selectedExam.doctorPresenceRequired ? "Required" : "Not Required"}
             </div>
-            <div style={styles.metricCard}>
-              <div style={styles.metricLabel}>Status</div>
-              <div style={styles.metricValueSmall}>{selectedExam.status}</div>
-            </div>
-            <div style={styles.metricCard}>
-              <div style={styles.metricLabel}>Doctor Presence</div>
-              <div style={styles.metricValueSmall}>
-                {selectedExam.doctorPresenceRequired
-                  ? "Required"
-                  : "Not Required"}
+          </div>
+        </div>
+
+        <div style={styles.mainGrid}>
+          <aside style={styles.leftRail}>
+            <div style={styles.panelHeaderRow}>
+              <div>
+                <div style={styles.panelTitle}>Exam Search</div>
+                <div style={styles.panelSub}>Find and switch exam quickly</div>
               </div>
             </div>
-          </div>
 
-          <div style={styles.contentGrid}>
-            <section style={styles.panel}>
-              <div style={styles.panelHeader}>
-                <div>
-                  <div style={styles.panelTitle}>Examination Details</div>
-                  <div style={styles.panelSub}>
-                    Configure exam master data, billing, restrictions, and
-                    readiness settings.
+            <div style={styles.filterSection}>
+              <div style={styles.filterLabel}>Search</div>
+              <input
+                style={styles.input}
+                placeholder="Exam, code, billing..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+
+            <div style={styles.examList}>
+              {filteredExams.map((exam) => (
+                <div
+                  key={exam.id}
+                  onClick={() => setSelectedId(exam.id)}
+                  style={
+                    exam.id === selectedId
+                      ? styles.examItemActive
+                      : styles.examItem
+                  }
+                >
+                  <div style={styles.examName}>{exam.examName}</div>
+                  <div style={styles.examMeta}>{exam.examCode}</div>
+                  <div style={styles.examMeta}>
+                    {exam.modality} • {exam.billingCode}
                   </div>
                 </div>
-              </div>
+              ))}
+            </div>
 
-              <form onSubmit={handleSave}>
-                <div style={styles.formGrid}>
-                  <input
-                    style={styles.input}
-                    value={form.examName}
-                    onChange={(e) =>
-                      handleFieldChange("examName", e.target.value)
-                    }
-                    placeholder="Exam Name"
-                  />
-                  <input
-                    style={styles.input}
-                    value={form.examCode}
-                    onChange={(e) =>
-                      handleFieldChange("examCode", e.target.value)
-                    }
-                    placeholder="Exam Code"
-                  />
-                  <select
-                    style={styles.select}
-                    value={form.modality}
-                    onChange={(e) =>
-                      handleFieldChange("modality", e.target.value as Modality)
-                    }
-                  >
-                    {modalities.map((item) => (
-                      <option key={item} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    style={styles.input}
-                    value={form.category}
-                    onChange={(e) =>
-                      handleFieldChange("category", e.target.value)
-                    }
-                    placeholder="Category"
-                  />
-                  <input
-                    style={styles.input}
-                    value={form.bodyPart}
-                    onChange={(e) =>
-                      handleFieldChange("bodyPart", e.target.value)
-                    }
-                    placeholder="Body Part"
-                  />
-                  <select
-                    style={styles.select}
-                    value={form.contrast}
-                    onChange={(e) =>
-                      handleFieldChange(
-                        "contrast",
-                        e.target.value as ContrastOption
-                      )
-                    }
-                  >
-                    {contrastOptions.map((item) => (
-                      <option key={item} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    style={styles.input}
-                    value={form.billingCode}
-                    onChange={(e) =>
-                      handleFieldChange("billingCode", e.target.value)
-                    }
-                    placeholder="Practice Billing Code"
-                  />
-                  <input
-                    style={styles.input}
-                    value={form.medicareItemNumber}
-                    onChange={(e) =>
-                      handleFieldChange("medicareItemNumber", e.target.value)
-                    }
-                    placeholder="Medicare Item Number"
-                  />
-                  <input
-                    style={styles.input}
-                    value={form.medicareRebateFee}
-                    onChange={(e) =>
-                      handleFieldChange("medicareRebateFee", e.target.value)
-                    }
-                    placeholder="Medicare Rebate Fee"
-                  />
-                  <input
-                    style={styles.input}
-                    value={form.outOfPocketFee}
-                    onChange={(e) =>
-                      handleFieldChange("outOfPocketFee", e.target.value)
-                    }
-                    placeholder="Out-of-pocket Fee"
-                  />
-                  <input
-                    style={styles.input}
-                    value={form.privateBillingFee}
-                    onChange={(e) =>
-                      handleFieldChange("privateBillingFee", e.target.value)
-                    }
-                    placeholder="Private Billing Fee"
-                  />
-                  <input
-                    style={styles.input}
-                    value={form.equipmentRequirement}
-                    onChange={(e) =>
-                      handleFieldChange("equipmentRequirement", e.target.value)
-                    }
-                    placeholder="Equipment Requirement"
-                  />
-                  <input
-                    style={styles.input}
-                    value={form.duration}
-                    onChange={(e) =>
-                      handleFieldChange("duration", e.target.value)
-                    }
-                    placeholder="Duration"
-                  />
-                  <select
-                    style={styles.select}
-                    value={form.status}
-                    onChange={(e) =>
-                      handleFieldChange("status", e.target.value as ExamStatus)
-                    }
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
+            <div style={styles.statusCard}>
+              <div style={styles.statusTitle}>Overview</div>
+              <div style={styles.statusRow}>
+                <span style={styles.dotGreen} />
+                <span>{activeCount} Active Exams</span>
+              </div>
+              <div style={styles.statusRow}>
+                <span style={styles.dotRed} />
+                <span>{inactiveCount} Inactive Exams</span>
+              </div>
+              <div style={styles.statusRow}>
+                <span style={styles.dotBlue} />
+                <span>{modalityCount} Modalities</span>
+              </div>
+              <div style={styles.statusRow}>
+                <span style={styles.dotPurple} />
+                <span>{doctorPresenceCount} Need Doctor Presence</span>
+              </div>
+            </div>
+          </aside>
+
+          <section style={styles.centerArea}>
+            <div style={styles.compactStack}>
+              <form onSubmit={handleSave} style={styles.panelCompact}>
+                <div style={styles.panelHeaderRow}>
+                  <div>
+                    <div style={styles.panelTitle}>Examination Details</div>
+                    <div style={styles.panelSub}>
+                      Manage exam data, billing, instructions, competencies, and doctor presence
+                    </div>
+                  </div>
+                </div>
+
+                <div style={styles.formGrid4}>
+                  <div>
+                    <label style={styles.label}>Exam Name</label>
+                    <input
+                      style={styles.input}
+                      value={form.examName}
+                      onChange={(e) => handleFieldChange("examName", e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Exam Code</label>
+                    <input
+                      style={styles.input}
+                      value={form.examCode}
+                      onChange={(e) => handleFieldChange("examCode", e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Modality</label>
+                    <select
+                      style={styles.select}
+                      value={form.modality}
+                      onChange={(e) =>
+                        handleFieldChange("modality", e.target.value as Modality)
+                      }
+                    >
+                      {modalities.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Category</label>
+                    <input
+                      style={styles.input}
+                      value={form.category}
+                      onChange={(e) => handleFieldChange("category", e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Body Part</label>
+                    <input
+                      style={styles.input}
+                      value={form.bodyPart}
+                      onChange={(e) => handleFieldChange("bodyPart", e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Contrast</label>
+                    <select
+                      style={styles.select}
+                      value={form.contrast}
+                      onChange={(e) =>
+                        handleFieldChange("contrast", e.target.value as ContrastOption)
+                      }
+                    >
+                      {contrastOptions.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Billing Code</label>
+                    <input
+                      style={styles.input}
+                      value={form.billingCode}
+                      onChange={(e) => handleFieldChange("billingCode", e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Medicare Item</label>
+                    <input
+                      style={styles.input}
+                      value={form.medicareItemNumber}
+                      onChange={(e) =>
+                        handleFieldChange("medicareItemNumber", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Medicare Rebate</label>
+                    <input
+                      style={styles.input}
+                      value={form.medicareRebateFee}
+                      onChange={(e) =>
+                        handleFieldChange("medicareRebateFee", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Out-of-pocket Fee</label>
+                    <input
+                      style={styles.input}
+                      value={form.outOfPocketFee}
+                      onChange={(e) =>
+                        handleFieldChange("outOfPocketFee", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Private Billing Fee</label>
+                    <input
+                      style={styles.input}
+                      value={form.privateBillingFee}
+                      onChange={(e) =>
+                        handleFieldChange("privateBillingFee", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Equipment Requirement</label>
+                    <input
+                      style={styles.input}
+                      value={form.equipmentRequirement}
+                      onChange={(e) =>
+                        handleFieldChange("equipmentRequirement", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Duration</label>
+                    <input
+                      style={styles.input}
+                      value={form.duration}
+                      onChange={(e) => handleFieldChange("duration", e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={styles.label}>Status</label>
+                    <select
+                      style={styles.select}
+                      value={form.status}
+                      onChange={(e) =>
+                        handleFieldChange("status", e.target.value as ExamStatus)
+                      }
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
 
                   <div style={styles.toggleBox}>
-                    <div style={styles.toggleLabel}>
-                      Doctor Presence Required
-                    </div>
+                    <div style={styles.toggleLabel}>Doctor Presence Required</div>
                     <button
                       type="button"
                       onClick={handleDoctorPresenceToggle}
@@ -547,99 +566,100 @@ export default function ExaminationConfigurationPage() {
                           : styles.toggleInactive
                       }
                     >
-                      {form.doctorPresenceRequired
-                        ? "Required"
-                        : "Not Required"}
+                      {form.doctorPresenceRequired ? "Required" : "Not Required"}
                     </button>
                   </div>
 
-                  <select
-                    style={styles.select}
-                    value={form.doctorPresenceType}
-                    onChange={(e) =>
-                      handleFieldChange(
-                        "doctorPresenceType",
-                        e.target.value as DoctorPresenceType
-                      )
-                    }
-                    disabled={!form.doctorPresenceRequired}
-                  >
-                    {doctorPresenceTypes.map((item) => (
-                      <option key={item} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                  </select>
-
-                  <input
-                    style={styles.input}
-                    type="number"
-                    min="0"
-                    value={form.minimumDoctorsRequired}
-                    onChange={(e) =>
-                      handleFieldChange(
-                        "minimumDoctorsRequired",
-                        Number(e.target.value)
-                      )
-                    }
-                    placeholder="Minimum Doctors Required"
-                    disabled={!form.doctorPresenceRequired}
-                  />
-
-                  <div style={styles.readOnlyBox}>
-                    <span style={styles.readOnlyLabel}>Exam Type</span>
-                    <strong style={styles.readOnlyValue}>{form.modality}</strong>
+                  <div>
+                    <label style={styles.label}>Presence Type</label>
+                    <select
+                      style={styles.select}
+                      value={form.doctorPresenceType}
+                      onChange={(e) =>
+                        handleFieldChange(
+                          "doctorPresenceType",
+                          e.target.value as DoctorPresenceType
+                        )
+                      }
+                      disabled={!form.doctorPresenceRequired}
+                    >
+                      {doctorPresenceTypes.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
-                  <textarea
-                    style={{ ...styles.textarea, gridColumn: "1 / span 2" }}
-                    value={form.preparation}
-                    onChange={(e) =>
-                      handleFieldChange("preparation", e.target.value)
-                    }
-                    placeholder="Preparation and arrival instructions"
-                  />
+                  <div>
+                    <label style={styles.label}>Minimum Doctors</label>
+                    <input
+                      style={styles.input}
+                      type="number"
+                      min="0"
+                      value={form.minimumDoctorsRequired}
+                      onChange={(e) =>
+                        handleFieldChange(
+                          "minimumDoctorsRequired",
+                          Number(e.target.value)
+                        )
+                      }
+                      disabled={!form.doctorPresenceRequired}
+                    />
+                  </div>
 
-                  <textarea
-                    style={{ ...styles.textarea, gridColumn: "1 / span 2" }}
-                    value={form.smsRules}
-                    onChange={(e) =>
-                      handleFieldChange("smsRules", e.target.value)
-                    }
-                    placeholder="SMS content rules"
-                  />
+                  <div style={{ gridColumn: "span 2" }}>
+                    <label style={styles.label}>Preparation</label>
+                    <textarea
+                      style={styles.textarea}
+                      value={form.preparation}
+                      onChange={(e) => handleFieldChange("preparation", e.target.value)}
+                    />
+                  </div>
 
-                  <textarea
-                    style={{ ...styles.textarea, gridColumn: "1 / span 2" }}
-                    value={form.postProcedureInstructions}
-                    onChange={(e) =>
-                      handleFieldChange(
-                        "postProcedureInstructions",
-                        e.target.value
-                      )
-                    }
-                    placeholder="Post-procedure instructions"
-                  />
+                  <div style={{ gridColumn: "span 2" }}>
+                    <label style={styles.label}>Post-Procedure Instructions</label>
+                    <textarea
+                      style={styles.textarea}
+                      value={form.postProcedureInstructions}
+                      onChange={(e) =>
+                        handleFieldChange("postProcedureInstructions", e.target.value)
+                      }
+                    />
+                  </div>
 
-                  <textarea
-                    style={{ ...styles.textarea, gridColumn: "1 / span 2" }}
-                    value={form.doctorPresenceNotes}
-                    onChange={(e) =>
-                      handleFieldChange("doctorPresenceNotes", e.target.value)
-                    }
-                    placeholder="Doctor presence notes"
-                  />
+                  <div style={{ gridColumn: "span 2" }}>
+                    <label style={styles.label}>SMS Rules</label>
+                    <textarea
+                      style={styles.textarea}
+                      value={form.smsRules}
+                      onChange={(e) => handleFieldChange("smsRules", e.target.value)}
+                    />
+                  </div>
 
-                  <textarea
-                    style={{ ...styles.textarea, gridColumn: "1 / span 2" }}
-                    value={form.notes}
-                    onChange={(e) => handleFieldChange("notes", e.target.value)}
-                    placeholder="Operational notes"
-                  />
+                  <div style={{ gridColumn: "span 2" }}>
+                    <label style={styles.label}>Doctor Presence Notes</label>
+                    <textarea
+                      style={styles.textarea}
+                      value={form.doctorPresenceNotes}
+                      onChange={(e) =>
+                        handleFieldChange("doctorPresenceNotes", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div style={{ gridColumn: "span 4" }}>
+                    <label style={styles.label}>Operational Notes</label>
+                    <textarea
+                      style={styles.textarea}
+                      value={form.notes}
+                      onChange={(e) => handleFieldChange("notes", e.target.value)}
+                    />
+                  </div>
                 </div>
 
                 <div style={styles.formActions}>
-                  <button type="button" style={styles.secondaryButton}>
+                  <button type="button" style={styles.ghostButton}>
                     Cancel
                   </button>
                   <button type="submit" style={styles.primaryButton}>
@@ -648,181 +668,100 @@ export default function ExaminationConfigurationPage() {
                 </div>
               </form>
 
-              {message ? <div style={styles.message}>{message}</div> : null}
-            </section>
-
-            <section style={styles.panel}>
-              <div style={styles.panelHeader}>
-                <div>
-                  <div style={styles.panelTitle}>Configuration Summary</div>
-                  <div style={styles.panelSub}>
-                    Current visibility of exam, billing, and doctor presence
-                    rules.
-                  </div>
-                </div>
-              </div>
-
-              <div style={styles.summaryBox}>
-                <div style={styles.summaryRow}>
-                  <span>Exam Name</span>
-                  <strong>{selectedExam.examName}</strong>
-                </div>
-                <div style={styles.summaryRow}>
-                  <span>Exam Code</span>
-                  <strong>{selectedExam.examCode}</strong>
-                </div>
-                <div style={styles.summaryRow}>
-                  <span>Modality</span>
-                  <strong>{selectedExam.modality}</strong>
-                </div>
-                <div style={styles.summaryRow}>
-                  <span>Body Part</span>
-                  <strong>{selectedExam.bodyPart}</strong>
-                </div>
-                <div style={styles.summaryRow}>
-                  <span>Billing Code</span>
-                  <strong>{selectedExam.billingCode}</strong>
-                </div>
-                <div style={styles.summaryRow}>
-                  <span>Medicare Item</span>
-                  <strong>{selectedExam.medicareItemNumber}</strong>
-                </div>
-                <div style={styles.summaryRow}>
-                  <span>Equipment</span>
-                  <strong>{selectedExam.equipmentRequirement}</strong>
-                </div>
-                <div style={styles.summaryRow}>
-                  <span>Doctor Presence</span>
-                  <strong>
-                    {selectedExam.doctorPresenceRequired
-                      ? "Required"
-                      : "Not Required"}
-                  </strong>
-                </div>
-                <div style={styles.summaryRow}>
-                  <span>Presence Type</span>
-                  <strong>{selectedExam.doctorPresenceType}</strong>
-                </div>
-              </div>
-            </section>
-          </div>
-
-          <div style={styles.bottomGrid}>
-            <section style={styles.panel}>
-              <div style={styles.panelHeader}>
-                <div>
-                  <div style={styles.panelTitle}>Preparation Instructions</div>
-                  <div style={styles.panelSub}>
-                    Review the patient-facing preparation guidance.
-                  </div>
-                </div>
-              </div>
-
-              <div style={styles.instructionsBox}>
-                {selectedExam.preparation}
-              </div>
-            </section>
-
-            <section style={styles.panel}>
-              <div style={styles.panelHeader}>
-                <div>
+              <div style={styles.bottomGrid}>
+                <section style={styles.panelCompact}>
                   <div style={styles.panelTitle}>Required Competencies</div>
-                  <div style={styles.panelSub}>
-                    Define user competencies required to perform this exam.
+                  <div style={styles.panelSub}>Toggle staff competencies for this exam</div>
+
+                  <div style={styles.competencyGrid}>
+                    {competencyOptions.map((item) => {
+                      const active = form.competencies.includes(item);
+                      return (
+                        <button
+                          type="button"
+                          key={item}
+                          onClick={() => toggleCompetency(item)}
+                          style={active ? styles.competencyActive : styles.competencyItem}
+                        >
+                          {item}
+                        </button>
+                      );
+                    })}
                   </div>
-                </div>
-              </div>
 
-              <div style={styles.competencyGrid}>
-                {competencyOptions.map((item) => {
-                  const active = form.competencies.includes(item);
-                  return (
-                    <button
-                      type="button"
-                      key={item}
-                      onClick={() => toggleCompetency(item)}
-                      style={
-                        active ? styles.competencyActive : styles.competencyItem
-                      }
-                    >
-                      {item}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div style={styles.selectedCompetencies}>
-                {form.competencies.map((item) => (
-                  <span key={item} style={styles.badgeActive}>
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </section>
-          </div>
-
-          <div style={styles.bottomGrid}>
-            <section style={styles.panel}>
-              <div style={styles.panelHeader}>
-                <div>
-                  <div style={styles.panelTitle}>Doctor Presence Rules</div>
-                  <div style={styles.panelSub}>
-                    Configure whether on-site radiologist or medical staff
-                    presence is required.
+                  <div style={styles.selectedCompetencies}>
+                    {form.competencies.map((item) => (
+                      <span key={item} style={styles.badgeActive}>
+                        {item}
+                      </span>
+                    ))}
                   </div>
-                </div>
-              </div>
+                </section>
 
-              <div style={styles.summaryBox}>
-                <div style={styles.summaryRow}>
-                  <span>Presence Required</span>
-                  <strong>
-                    {selectedExam.doctorPresenceRequired ? "Yes" : "No"}
-                  </strong>
-                </div>
-                <div style={styles.summaryRow}>
-                  <span>Requirement Type</span>
-                  <strong>{selectedExam.doctorPresenceType}</strong>
-                </div>
-                <div style={styles.summaryRow}>
-                  <span>Minimum Doctors</span>
-                  <strong>{selectedExam.minimumDoctorsRequired}</strong>
-                </div>
-              </div>
+                <section style={styles.panelCompact}>
+                  <div style={styles.panelTitle}>Configuration Summary</div>
+                  <div style={styles.panelSub}>Current exam visibility and rule overview</div>
 
-              <div style={styles.instructionsBoxAlt}>
-                {selectedExam.doctorPresenceNotes}
-              </div>
-            </section>
-
-            <section style={styles.panel}>
-              <div style={styles.panelHeader}>
-                <div>
-                  <div style={styles.panelTitle}>
-                    Post-Procedure & SMS Rules
+                  <div style={styles.summaryBoxCompact}>
+                    <div style={styles.summaryRowMini}>
+                      <span>Exam Name</span>
+                      <strong>{selectedExam.examName}</strong>
+                    </div>
+                    <div style={styles.summaryRowMini}>
+                      <span>Exam Code</span>
+                      <strong>{selectedExam.examCode}</strong>
+                    </div>
+                    <div style={styles.summaryRowMini}>
+                      <span>Modality</span>
+                      <strong>{selectedExam.modality}</strong>
+                    </div>
+                    <div style={styles.summaryRowMini}>
+                      <span>Body Part</span>
+                      <strong>{selectedExam.bodyPart}</strong>
+                    </div>
+                    <div style={styles.summaryRowMini}>
+                      <span>Billing Code</span>
+                      <strong>{selectedExam.billingCode}</strong>
+                    </div>
+                    <div style={styles.summaryRowMini}>
+                      <span>Presence Type</span>
+                      <strong>{selectedExam.doctorPresenceType}</strong>
+                    </div>
+                    <div style={styles.summaryRowMini}>
+                      <span>Minimum Doctors</span>
+                      <strong>{selectedExam.minimumDoctorsRequired}</strong>
+                    </div>
                   </div>
-                  <div style={styles.panelSub}>
-                    Review communication and post-procedure guidance.
+                </section>
+              </div>
+
+              <div style={styles.bottomGrid}>
+                <section style={styles.panelCompact}>
+                  <div style={styles.panelTitle}>Preparation Instructions</div>
+                  <div style={styles.panelSub}>Patient-facing preparation guidance</div>
+                  <div style={styles.instructionsBox}>{selectedExam.preparation}</div>
+                </section>
+
+                <section style={styles.panelCompact}>
+                  <div style={styles.panelTitle}>Post-Procedure & SMS Rules</div>
+                  <div style={styles.panelSub}>Communication and post-care guidance</div>
+
+                  <div style={styles.detailBlock}>
+                    <div style={styles.detailTitle}>SMS Rules</div>
+                    <div style={styles.detailText}>{selectedExam.smsRules}</div>
                   </div>
-                </div>
-              </div>
 
-              <div style={styles.detailBlock}>
-                <div style={styles.detailTitle}>SMS Content Rules</div>
-                <div style={styles.detailText}>{selectedExam.smsRules}</div>
+                  <div style={styles.detailBlock}>
+                    <div style={styles.detailTitle}>Post-Procedure</div>
+                    <div style={styles.detailText}>
+                      {selectedExam.postProcedureInstructions}
+                    </div>
+                  </div>
+                </section>
               </div>
-
-              <div style={styles.detailBlock}>
-                <div style={styles.detailTitle}>
-                  Post-Procedure Instructions
-                </div>
-                <div style={styles.detailText}>
-                  {selectedExam.postProcedureInstructions}
-                </div>
-              </div>
-            </section>
-          </div>
-        </main>
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   );
@@ -831,570 +770,527 @@ export default function ExaminationConfigurationPage() {
 const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: "100vh",
-    background: "#111315",
+    background: "#030a16",
     color: "#ffffff",
-    fontFamily: "Inter, Segoe UI, Roboto, Arial, sans-serif",
+    fontFamily: "Inter, Segoe UI, Arial, sans-serif",
+    overflowX: "hidden",
+    overflowY: "auto"
   },
 
-  topbar: {
-    height: 52,
-    background: "#1b1d20",
-    borderBottom: "1px solid rgba(255,255,255,0.08)",
+  topStrip: {
+    height: 28,
+    background: "#8d0d46",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "0 18px",
+    padding: "0 8px",
+    position: "sticky",
+    top: 0,
+    zIndex: 20
   },
 
-  topbarLeft: {
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-  },
-
-  headerLogo: {
-    width: 28,
-    height: 28,
-    objectFit: "cover",
-    borderRadius: 4,
-  },
-
-  brand: {
-    fontSize: 18,
+  topStripText: {
+    fontSize: 9,
     fontWeight: 700,
-    color: "#ffffff",
+    whiteSpace: "nowrap"
   },
 
-  topbarText: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.6)",
+  collapseButton: {
+    height: 20,
+    minWidth: 20,
+    borderRadius: 999,
+    border: "none",
+    background: "#d9d9d9",
+    color: "#222",
+    cursor: "pointer",
+    fontSize: 11,
+    fontWeight: 700,
+    lineHeight: 1
   },
 
-  topbarRight: {
+  appShell: {
+    padding: 8,
+    boxSizing: "border-box"
+  },
+
+  titleBar: {
     display: "flex",
     alignItems: "center",
-    gap: 8,
+    justifyContent: "space-between",
+    gap: 10,
+    border: "1px solid rgba(54,112,190,0.28)",
+    borderRadius: 14,
+    background: "#020d1f",
+    padding: "8px 12px",
+    marginBottom: 8,
+    position: "sticky",
+    top: 36,
+    zIndex: 15
   },
 
-  topActionButton: {
-    padding: "6px 10px",
-    borderRadius: 4,
-    background: "#252a31",
-    border: "1px solid rgba(255,255,255,0.08)",
+  titleLeft: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8
+  },
+
+  logo: {
+    width: 24,
+    height: 24,
+    borderRadius: 5,
+    objectFit: "cover"
+  },
+
+  eyebrow: {
+    fontSize: 9,
+    color: "#1da4ff",
+    fontWeight: 800,
+    letterSpacing: "1.2px"
+  },
+
+  title: {
+    fontSize: 14,
+    fontWeight: 800,
+    marginTop: 1
+  },
+
+  titleActions: {
+    display: "flex",
+    gap: 6,
+    alignItems: "center",
+    flexWrap: "wrap"
+  },
+
+  ghostButton: {
+    height: 26,
+    padding: "0 10px",
+    borderRadius: 9,
+    border: "1px solid rgba(54,112,190,0.32)",
+    background: "#0d1d35",
+    color: "#59b7ff",
     fontSize: 11,
-    color: "rgba(255,255,255,0.72)",
+    fontWeight: 700,
+    cursor: "pointer"
+  },
+
+  primaryButton: {
+    height: 26,
+    padding: "0 12px",
+    borderRadius: 9,
+    border: "none",
+    background: "#00a96e",
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: 800,
+    cursor: "pointer"
   },
 
   topInfoPill: {
-    padding: "6px 10px",
-    borderRadius: 4,
-    background: "#1f2c3b",
-    border: "1px solid rgba(86,168,255,0.18)",
-    fontSize: 11,
+    height: 24,
+    padding: "0 10px",
+    borderRadius: 999,
+    background: "#0d1d35",
+    border: "1px solid rgba(54,112,190,0.28)",
+    color: "#59b7ff",
+    fontSize: 10,
     fontWeight: 700,
-    color: "#56a8ff",
+    display: "flex",
+    alignItems: "center"
   },
 
-  userPill: {
-    padding: "6px 10px",
-    borderRadius: 4,
-    background: "#2d8f52",
-    fontSize: 11,
+  messageBanner: {
+    marginBottom: 8,
+    padding: "8px 10px",
+    borderRadius: 10,
+    fontSize: 10,
     fontWeight: 700,
-    color: "#fff",
+    background: "rgba(45,143,82,0.14)",
+    border: "1px solid rgba(45,143,82,0.28)",
+    color: "#7fd19a"
   },
 
-  layout: {
+  metricsRow: {
     display: "grid",
-    gridTemplateColumns: "240px 1fr",
-    minHeight: "calc(100vh - 52px)",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+    gap: 8,
+    marginBottom: 8
   },
 
-  sidebar: {
-    background: "#141618",
-    borderRight: "1px solid rgba(255,255,255,0.08)",
-    padding: 18,
+  metricCard: {
+    border: "1px solid rgba(54,112,190,0.24)",
+    borderRadius: 12,
+    background: "#020d1f",
+    padding: "8px 10px"
+  },
+
+  metricLabel: {
+    fontSize: 9,
+    color: "rgba(255,255,255,0.56)",
+    marginBottom: 3
+  },
+
+  metricValueSmall: {
+    fontSize: 12,
+    fontWeight: 800
+  },
+
+  mainGrid: {
+    display: "grid",
+    gridTemplateColumns: "0.75fr 2fr",
+    gap: 8,
+    alignItems: "start"
+  },
+
+  leftRail: {
+    border: "1px solid rgba(54,112,190,0.24)",
+    borderRadius: 14,
+    background: "#020d1f",
+    padding: 8,
     display: "flex",
     flexDirection: "column",
-    gap: 18,
+    gap: 8,
+    alignSelf: "start",
+    position: "sticky",
+    top: 88
   },
 
-  sidebarHeader: {
-    paddingBottom: 14,
-    borderBottom: "1px solid rgba(255,255,255,0.06)",
+  centerArea: {
+    minWidth: 0
   },
 
-  sidebarTitle: {
-    fontSize: 12,
-    color: "#56a8ff",
-    fontWeight: 700,
-    letterSpacing: "0.9px",
+  compactStack: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8
   },
 
-  sidebarSub: {
-    marginTop: 8,
-    fontSize: 13,
+  panelCompact: {
+    border: "1px solid rgba(54,112,190,0.24)",
+    borderRadius: 14,
+    background: "#020d1f",
+    padding: 8
+  },
+
+  panelHeaderRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 6,
+    marginBottom: 6
+  },
+
+  panelTitle: {
+    fontSize: 11,
+    fontWeight: 800
+  },
+
+  panelSub: {
+    fontSize: 9,
     color: "rgba(255,255,255,0.56)",
+    marginTop: 1
   },
 
   filterSection: {
     display: "flex",
     flexDirection: "column",
-    gap: 8,
+    gap: 4
   },
 
   filterLabel: {
-    fontSize: 12,
+    fontSize: 9,
     fontWeight: 700,
-    color: "rgba(255,255,255,0.82)",
+    color: "rgba(255,255,255,0.72)"
   },
 
   examList: {
     display: "flex",
     flexDirection: "column",
-    gap: 8,
-    overflowY: "auto",
+    gap: 5
   },
 
   examItem: {
-    padding: "12px",
-    background: "#17191d",
-    borderRadius: 6,
+    padding: "7px 8px",
+    background: "#071427",
+    borderRadius: 10,
     cursor: "pointer",
-    border: "1px solid rgba(255,255,255,0.06)",
+    border: "1px solid rgba(54,112,190,0.18)"
   },
 
   examItemActive: {
-    padding: "12px",
-    background: "#1b1e22",
-    borderRadius: 6,
+    padding: "7px 8px",
+    background: "#0b213f",
+    borderRadius: 10,
     cursor: "pointer",
-    border: "1px solid rgba(86,168,255,0.22)",
+    border: "1px solid rgba(26,154,255,0.45)"
   },
 
   examName: {
-    fontSize: 14,
-    fontWeight: 700,
-    color: "#ffffff",
+    fontSize: 11,
+    fontWeight: 800,
+    color: "#ffffff"
   },
 
   examMeta: {
-    marginTop: 4,
-    fontSize: 12,
-    color: "rgba(255,255,255,0.58)",
+    marginTop: 2,
+    fontSize: 9,
+    color: "rgba(255,255,255,0.58)"
   },
 
   input: {
     width: "100%",
-    height: 42,
-    background: "#101215",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 6,
-    color: "#ffffff",
-    padding: "0 12px",
-    boxSizing: "border-box",
+    height: 26,
+    borderRadius: 9,
+    border: "1px solid rgba(92,118,166,0.35)",
+    background: "#0d1830",
+    color: "#fff",
+    padding: "0 8px",
+    fontSize: 11,
     outline: "none",
-    fontSize: 14,
+    boxSizing: "border-box"
   },
 
   select: {
     width: "100%",
-    height: 42,
-    background: "#101215",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 6,
-    color: "#ffffff",
-    padding: "0 12px",
-    boxSizing: "border-box",
+    height: 26,
+    borderRadius: 9,
+    border: "1px solid rgba(92,118,166,0.35)",
+    background: "#0d1830",
+    color: "#fff",
+    padding: "0 8px",
+    fontSize: 11,
     outline: "none",
-    fontSize: 14,
+    boxSizing: "border-box"
   },
 
   textarea: {
     width: "100%",
-    minHeight: 110,
-    background: "#101215",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 6,
-    color: "#ffffff",
-    padding: "12px",
-    boxSizing: "border-box",
-    outline: "none",
-    fontSize: 14,
-    resize: "vertical",
-    fontFamily: "inherit",
-  },
-
-  statusCard: {
-    marginTop: "auto",
-    background: "#17191d",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 8,
-    padding: 14,
-  },
-
-  statusTitle: {
-    fontSize: 12,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.84)",
-    marginBottom: 12,
-    textTransform: "uppercase",
-    letterSpacing: "0.7px",
-  },
-
-  statusRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    fontSize: 13,
-    color: "rgba(255,255,255,0.62)",
-    marginBottom: 10,
-  },
-
-  dotGreen: {
-    width: 9,
-    height: 9,
-    borderRadius: "50%",
-    background: "#2d8f52",
-    display: "inline-block",
-  },
-
-  dotRed: {
-    width: 9,
-    height: 9,
-    borderRadius: "50%",
-    background: "#d24d57",
-    display: "inline-block",
-  },
-
-  dotBlue: {
-    width: 9,
-    height: 9,
-    borderRadius: "50%",
-    background: "#56a8ff",
-    display: "inline-block",
-  },
-
-  dotPurple: {
-    width: 9,
-    height: 9,
-    borderRadius: "50%",
-    background: "#9b6bff",
-    display: "inline-block",
-  },
-
-  main: {
-    padding: 20,
-    background: "#111315",
-  },
-
-  headerPanel: {
-    background: "#17191d",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 10,
-    padding: 20,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 20,
-  },
-
-  kicker: {
+    minHeight: 56,
+    borderRadius: 9,
+    border: "1px solid rgba(92,118,166,0.35)",
+    background: "#0d1830",
+    color: "#fff",
+    padding: "8px",
     fontSize: 11,
-    color: "#56a8ff",
-    fontWeight: 700,
-    letterSpacing: "1px",
-    marginBottom: 10,
+    outline: "none",
+    resize: "vertical",
+    boxSizing: "border-box",
+    fontFamily: "inherit"
   },
 
-  pageTitle: {
-    margin: 0,
-    fontSize: 28,
-    fontWeight: 700,
-  },
-
-  pageSub: {
-    margin: "8px 0 0 0",
-    color: "rgba(255,255,255,0.58)",
-    fontSize: 14,
-    lineHeight: 1.6,
-  },
-
-  headerActions: {
-    display: "flex",
-    gap: 10,
-    alignItems: "center",
-  },
-
-  secondaryButton: {
-    height: 38,
-    padding: "0 14px",
-    borderRadius: 6,
-    border: "1px solid rgba(255,255,255,0.08)",
-    background: "#252a31",
-    color: "#ffffff",
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-
-  primaryButton: {
-    height: 38,
-    padding: "0 14px",
-    borderRadius: 6,
-    border: "none",
-    background: "#2d8f52",
-    color: "#ffffff",
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-
-  metricsRow: {
-    marginTop: 18,
+  formGrid4: {
     display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-    gap: 14,
-  },
-
-  metricCard: {
-    background: "#17191d",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 8,
-    padding: 16,
-  },
-
-  metricLabel: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.56)",
-    marginBottom: 8,
-  },
-
-  metricValue: {
-    fontSize: 28,
-    fontWeight: 700,
-    color: "#ffffff",
-  },
-
-  metricValueSmall: {
-    fontSize: 18,
-    fontWeight: 700,
-    color: "#ffffff",
-  },
-
-  contentGrid: {
-    display: "grid",
-    gridTemplateColumns: "1.4fr 0.8fr",
-    gap: 18,
-    marginTop: 18,
-  },
-
-  bottomGrid: {
-    marginTop: 18,
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 18,
-  },
-
-  panel: {
-    background: "#17191d",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 10,
-    padding: 18,
-  },
-
-  panelHeader: {
-    marginBottom: 16,
-  },
-
-  panelTitle: {
-    fontSize: 18,
-    fontWeight: 700,
-    color: "#ffffff",
-  },
-
-  panelSub: {
-    marginTop: 6,
-    fontSize: 13,
-    color: "rgba(255,255,255,0.55)",
-  },
-
-  formGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 12,
+    gridTemplateColumns: "1fr 1fr 1fr 1fr",
+    gap: 6
   },
 
   formActions: {
     display: "flex",
     justifyContent: "flex-end",
-    gap: 10,
-    marginTop: 16,
+    gap: 6,
+    marginTop: 8
   },
 
-  message: {
-    marginTop: 14,
-    fontSize: 13,
-    color: "#53c27a",
+  statusCard: {
+    border: "1px solid rgba(54,112,190,0.18)",
+    borderRadius: 10,
+    background: "#071427",
+    padding: 8
   },
 
-  summaryBox: {
-    marginTop: 16,
-    background: "#121417",
-    border: "1px solid rgba(255,255,255,0.06)",
-    borderRadius: 8,
-    padding: 14,
+  statusTitle: {
+    fontSize: 10,
+    fontWeight: 800,
+    marginBottom: 4
   },
 
-  summaryRow: {
+  statusRow: {
     display: "flex",
-    justifyContent: "space-between",
-    gap: 12,
-    padding: "10px 0",
-    borderBottom: "1px solid rgba(255,255,255,0.06)",
-    color: "rgba(255,255,255,0.72)",
-    fontSize: 14,
+    alignItems: "center",
+    gap: 8,
+    fontSize: 10,
+    color: "rgba(255,255,255,0.68)",
+    marginBottom: 7
   },
 
-  instructionsBox: {
-    background: "#121417",
-    border: "1px solid rgba(255,255,255,0.06)",
-    borderRadius: 8,
-    padding: 16,
-    color: "rgba(255,255,255,0.78)",
-    lineHeight: 1.7,
-    fontSize: 14,
+  dotGreen: {
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    background: "#2d8f52",
+    display: "inline-block"
   },
 
-  instructionsBoxAlt: {
-    marginTop: 16,
-    background: "#121417",
-    border: "1px solid rgba(255,255,255,0.06)",
-    borderRadius: 8,
-    padding: 16,
-    color: "rgba(255,255,255,0.78)",
-    lineHeight: 1.7,
-    fontSize: 14,
+  dotRed: {
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    background: "#d24d57",
+    display: "inline-block"
   },
 
-  detailBlock: {
-    marginTop: 14,
-    padding: 14,
-    borderRadius: 8,
-    background: "#121417",
-    border: "1px solid rgba(255,255,255,0.06)",
+  dotBlue: {
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    background: "#56a8ff",
+    display: "inline-block"
   },
 
-  detailTitle: {
-    fontSize: 13,
+  dotPurple: {
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    background: "#9b6bff",
+    display: "inline-block"
+  },
+
+  label: {
+    display: "block",
+    fontSize: 9,
     fontWeight: 700,
-    color: "#ffffff",
-    marginBottom: 8,
+    color: "rgba(255,255,255,0.66)",
+    marginBottom: 3
   },
 
-  detailText: {
-    fontSize: 14,
-    color: "rgba(255,255,255,0.72)",
-    lineHeight: 1.6,
+  toggleBox: {
+    height: 26,
+    background: "#0d1830",
+    border: "1px solid rgba(92,118,166,0.35)",
+    borderRadius: 9,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0 8px"
+  },
+
+  toggleLabel: {
+    fontSize: 10,
+    color: "rgba(255,255,255,0.72)"
+  },
+
+  toggleActive: {
+    height: 20,
+    padding: "0 8px",
+    borderRadius: 999,
+    border: "none",
+    background: "#00a96e",
+    color: "#fff",
+    fontSize: 9,
+    fontWeight: 800,
+    cursor: "pointer"
+  },
+
+  toggleInactive: {
+    height: 20,
+    padding: "0 8px",
+    borderRadius: 999,
+    border: "none",
+    background: "#b53d4a",
+    color: "#fff",
+    fontSize: 9,
+    fontWeight: 800,
+    cursor: "pointer"
+  },
+
+  bottomGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 8
   },
 
   competencyGrid: {
     display: "flex",
     flexWrap: "wrap",
-    gap: 10,
+    gap: 6,
+    marginTop: 8
   },
 
   competencyItem: {
-    padding: "10px 12px",
+    padding: "6px 8px",
     borderRadius: 8,
-    border: "1px solid rgba(255,255,255,0.08)",
-    background: "#121417",
+    border: "1px solid rgba(54,112,190,0.18)",
+    background: "#071427",
     color: "rgba(255,255,255,0.72)",
     cursor: "pointer",
     fontWeight: 600,
+    fontSize: 10
   },
 
   competencyActive: {
-    padding: "10px 12px",
+    padding: "6px 8px",
     borderRadius: 8,
-    border: "1px solid rgba(86,168,255,0.24)",
-    background: "rgba(86,168,255,0.14)",
-    color: "#56a8ff",
+    border: "1px solid rgba(26,154,255,0.3)",
+    background: "#0b213f",
+    color: "#59b7ff",
     cursor: "pointer",
     fontWeight: 700,
+    fontSize: 10
   },
 
   selectedCompetencies: {
     display: "flex",
     flexWrap: "wrap",
-    gap: 8,
-    marginTop: 16,
+    gap: 6,
+    marginTop: 8
   },
 
   badgeActive: {
     display: "inline-block",
-    padding: "6px 12px",
+    padding: "3px 8px",
     borderRadius: 999,
     background: "rgba(45,143,82,0.18)",
     color: "#53c27a",
-    fontSize: 12,
-    fontWeight: 700,
+    fontSize: 9,
+    fontWeight: 700
   },
 
-  readOnlyBox: {
-    height: 42,
-    background: "#101215",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 6,
+  summaryBoxCompact: {
+    border: "1px solid rgba(54,112,190,0.18)",
+    borderRadius: 10,
+    background: "#071427",
+    padding: 8,
+    marginTop: 6
+  },
+
+  summaryRowMini: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
-    padding: "0 12px",
+    gap: 6,
+    padding: "5px 0",
+    borderBottom: "1px solid rgba(54,112,190,0.12)",
+    fontSize: 10,
+    color: "rgba(255,255,255,0.75)"
   },
 
-  readOnlyLabel: {
-    fontSize: 13,
-    color: "rgba(255,255,255,0.6)",
+  instructionsBox: {
+    marginTop: 8,
+    background: "#071427",
+    border: "1px solid rgba(54,112,190,0.18)",
+    borderRadius: 10,
+    padding: 8,
+    color: "rgba(255,255,255,0.78)",
+    lineHeight: 1.5,
+    fontSize: 10
   },
 
-  readOnlyValue: {
-    fontSize: 13,
+  detailBlock: {
+    marginTop: 8,
+    padding: 8,
+    borderRadius: 10,
+    background: "#071427",
+    border: "1px solid rgba(54,112,190,0.18)"
+  },
+
+  detailTitle: {
+    fontSize: 10,
+    fontWeight: 800,
     color: "#ffffff",
+    marginBottom: 4
   },
 
-  toggleBox: {
-    height: 42,
-    background: "#101215",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 6,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 12px",
-  },
-
-  toggleLabel: {
-    fontSize: 13,
+  detailText: {
+    fontSize: 10,
     color: "rgba(255,255,255,0.72)",
-  },
-
-  toggleActive: {
-    height: 28,
-    padding: "0 10px",
-    borderRadius: 999,
-    border: "none",
-    background: "#2d8f52",
-    color: "#fff",
-    fontWeight: 700,
-    cursor: "pointer",
-  },
-
-  toggleInactive: {
-    height: 28,
-    padding: "0 10px",
-    borderRadius: 999,
-    border: "none",
-    background: "#b53d4a",
-    color: "#fff",
-    fontWeight: 700,
-    cursor: "pointer",
-  },
+    lineHeight: 1.5
+  }
 };
