@@ -65,7 +65,6 @@ const days: Day[] = [
 ];
 
 const clinics: Clinic[] = ["Main Clinic", "North Branch", "South Branch"];
-const resources: Resource[] = ["Room 1", "Room 2", "CT Scanner", "Ultrasound"];
 const modalities = ["Consult", "CT", "Ultrasound", "Review", "Follow-up"];
 const notificationMethods: NotificationMethod[] = ["SMS", "Email", "Both"];
 
@@ -230,10 +229,36 @@ function timeToMinutes(t: string) {
   return h * 60 + m;
 }
 
+const inputClass =
+  "h-10 w-full rounded-xl border border-[#284a73] bg-[#0d1830] px-3 text-[13px] text-white outline-none placeholder:text-white/35 focus:border-sky-500/50";
+const selectClass =
+  "h-10 w-full rounded-xl border border-[#284a73] bg-[#0d1830] px-3 text-[13px] text-white outline-none focus:border-sky-500/50";
+const panelClass = "rounded-[22px] border border-[#143a5c] bg-[#020d1f]";
+const labelClass = "mb-1 block text-[11px] font-semibold text-white/78";
+
+function SectionHeader({
+  title,
+  sub,
+  right
+}: {
+  title: string;
+  sub: string;
+  right?: React.ReactNode;
+}) {
+  return (
+    <div className="mb-3 flex items-start justify-between gap-3">
+      <div>
+        <div className="text-[15px] font-extrabold text-white">{title}</div>
+        <div className="mt-0.5 text-[12px] text-white/55">{sub}</div>
+      </div>
+      {right}
+    </div>
+  );
+}
+
 export default function AIAttemptRecommendationPage() {
   const [appointments, setAppointments] =
     useState<Appointment[]>(initialAppointments);
-
   const [patientName, setPatientName] = useState("");
   const [selectedClinic, setSelectedClinic] = useState<Clinic>("Main Clinic");
   const [selectedModality, setSelectedModality] = useState("Consult");
@@ -277,32 +302,23 @@ export default function AIAttemptRecommendationPage() {
           const possibleStaff = staffRoster.filter(
             (s) =>
               s.available &&
-              (s.clinic === selectedClinic ||
-                s.assignedClinics.includes(selectedClinic)) &&
+              (s.clinic === selectedClinic || s.assignedClinics.includes(selectedClinic)) &&
               s.day === day.key &&
               s.capabilities.includes(selectedModality)
           );
-
           if (possibleStaff.length === 0) return;
 
           const staffChoice = possibleStaff[0];
           const clinicianChoice =
-            possibleStaff.find((s) => s.role === "Radiologist")?.name ||
-            staffChoice.name;
+            possibleStaff.find((s) => s.role === "Radiologist")?.name || staffChoice.name;
 
           const staffBusy = appointments.some(
-            (a) =>
-              a.day === day.key &&
-              a.time === time &&
-              a.staff === staffChoice.name
+            (a) => a.day === day.key && a.time === time && a.staff === staffChoice.name
           );
           if (staffBusy) return;
 
           const clinicianBusy = appointments.some(
-            (a) =>
-              a.day === day.key &&
-              a.time === time &&
-              a.clinician === clinicianChoice
+            (a) => a.day === day.key && a.time === time && a.clinician === clinicianChoice
           );
           if (clinicianBusy) return;
 
@@ -383,7 +399,7 @@ export default function AIAttemptRecommendationPage() {
       });
     });
 
-    return list.sort((a, b) => b.score - a.score).slice(0, 6);
+    return list.sort((a, b) => b.score - a.score).slice(0, 8);
   }, [appointments, preferredDay, preferredTime, selectedClinic, selectedModality]);
 
   const applyRecommendation = () => {
@@ -411,126 +427,103 @@ export default function AIAttemptRecommendationPage() {
 
     setAppointments((prev) => [newAppointment, ...prev]);
     setMessage(
-      `Booking created for ${patientName} on ${rec.dayLabel} at ${rec.time}. Notification: ${notificationMethod}.`
+      `Booking created for ${patientName.trim()} on ${rec.dayLabel} at ${rec.time}. Notification: ${notificationMethod}.`
     );
     setPatientName("");
     setSelectedRecommendation(null);
   };
 
+  const summaryRows = [
+    ["Suggestions", recommendations.length],
+    ["Bookings", appointments.length],
+    ["Preferred Day", preferredDay === "Any" ? "Any Day" : getDayLabel(preferredDay)],
+    ["Preferred Time", preferredTime],
+    ["Notification", notificationMethod]
+  ];
+
   return (
-    <div style={styles.page}>
-      <div style={styles.topStrip}>
-        <div style={styles.topStripText}>
-          AI APPOINTMENT • CLINIC {selectedClinic.toUpperCase()} • MODALITY {selectedModality.toUpperCase()} • SUGGESTIONS {recommendations.length}
+    <div className="min-h-screen overflow-hidden bg-[#030a16] text-white">
+      <div className="sticky top-0 z-30 flex h-11 items-center justify-between bg-[#8d0d46] px-4">
+        <div className="truncate text-[14px] font-bold">
+          ADMIN • AI APPOINTMENT • CLINIC {selectedClinic.toUpperCase()} • MODALITY {selectedModality.toUpperCase()} • ACTIVE {appointments.length}
         </div>
-        <button style={styles.collapseButton}>⌄</button>
+        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-sm font-bold text-neutral-900">
+          ⌄
+        </button>
       </div>
 
-      <div style={styles.appShell}>
-        <div style={styles.titleBar}>
-          <div style={styles.titleLeft}>
-            <img src="/logo.jpg" alt="EsyRIS logo" style={styles.logo} />
-            <div>
-              <div style={styles.eyebrow}>AI-ASSISTED BOOKING</div>
-              <div style={styles.title}>Compact Appointment Recommendation</div>
-            </div>
-          </div>
+      <div className="h-[calc(100vh-44px)] overflow-hidden p-2">
+        <div className="flex h-full min-h-0 flex-col gap-2">
+          <div className={`${panelClass} px-4 py-3`}>
+            <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+              <div className="flex min-w-0 items-center gap-3">
+                <img
+                  src="/logo.jpg"
+                  alt="EsyRIS logo"
+                  className="h-10 w-10 rounded-xl object-cover"
+                />
+                <div className="min-w-0">
+                  <div className="text-[11px] font-extrabold tracking-[2px] text-[#1da4ff]">
+                    AI APPOINTMENT
+                  </div>
+                  <div className="truncate text-[16px] font-extrabold">
+                    Compact Appointment Recommendation
+                  </div>
+                </div>
+              </div>
 
-          <div style={styles.titleActions}>
-            <div style={styles.topInfoPill}>Clinic: {selectedClinic}</div>
-            <div style={styles.topInfoPill}>Modality: {selectedModality}</div>
-            <div style={styles.topInfoPill}>Notify: {notificationMethod}</div>
-            <button style={styles.ghostButton}>Export</button>
-            <button style={styles.primaryButton}>Review</button>
-          </div>
-        </div>
-
-        {message ? <div style={styles.messageBanner}>{message}</div> : null}
-
-        <div style={styles.metricsRow}>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Suggestions</div>
-            <div style={styles.metricValueSmall}>{recommendations.length}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Clinic</div>
-            <div style={styles.metricValueSmall}>{selectedClinic}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Modality</div>
-            <div style={styles.metricValueSmall}>{selectedModality}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Bookings</div>
-            <div style={styles.metricValueSmall}>{appointments.length}</div>
-          </div>
-        </div>
-
-        <div style={styles.mainGrid}>
-          <aside style={styles.leftRail}>
-            <div style={styles.panelHeaderRow}>
-              <div>
-                <div style={styles.panelTitle}>Scoring Logic</div>
-                <div style={styles.panelSub}>How recommendations are ranked</div>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex h-9 items-center rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
+                  Clinic: {selectedClinic}
+                </div>
+                <div className="inline-flex h-9 items-center rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
+                  Modality: {selectedModality}
+                </div>
+                <button className="h-9 rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
+                  Export
+                </button>
+                <button className="h-9 rounded-2xl bg-[#00a96e] px-5 text-[14px] font-extrabold">
+                  Save
+                </button>
               </div>
             </div>
+          </div>
 
-            <div style={styles.statusCard}>
-              <div style={styles.statusRow}>
-                <span style={styles.dotGreen} />
-                <span>Resource availability</span>
-              </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotBlue} />
-                <span>Staff / clinician availability</span>
-              </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotPurple} />
-                <span>Efficient scheduling gap</span>
-              </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotRed} />
-                <span>Conflict avoidance</span>
-              </div>
+          {message ? (
+            <div className="rounded-xl border border-[rgba(45,143,82,0.28)] bg-[rgba(45,143,82,0.14)] px-4 py-2 text-[13px] font-semibold text-[#7fd19a]">
+              {message}
             </div>
+          ) : null}
 
-            <div style={styles.infoBox}>
-              <div style={styles.infoTitle}>Recommendation Goal</div>
-              <div style={styles.infoText}>
-                Suggest the best slot based on clinic schedule, modality fit,
-                resource availability, and operational efficiency.
-              </div>
-            </div>
-          </aside>
+          <div className="grid min-h-0 flex-1 gap-2 xl:grid-cols-[320px_minmax(0,1.3fr)_360px]">
+            <aside className={`${panelClass} min-h-0 overflow-hidden p-3`}>
+              <SectionHeader
+                title="Booking Inputs"
+                sub="Compact patient and scheduling preferences"
+                right={
+                  <div className="rounded-full bg-[rgba(0,169,110,0.16)] px-3 py-1 text-xs font-bold text-[#44d08c]">
+                    {recommendations.length} shown
+                  </div>
+                }
+              />
 
-          <section style={styles.centerArea}>
-            <div style={styles.compactStack}>
-              <div style={styles.contentGrid}>
-                <section style={styles.panelCompact}>
-                  <div style={styles.panelHeaderRow}>
-                    <div>
-                      <div style={styles.panelTitle}>Booking Inputs</div>
-                      <div style={styles.panelSub}>
-                        Enter patient and preference details
-                      </div>
-                    </div>
+              <div className="flex h-[calc(100%-44px)] min-h-0 flex-col gap-3 overflow-y-auto pr-1">
+                <div className="grid gap-3">
+                  <div>
+                    <label className={labelClass}>Patient Name</label>
+                    <input
+                      className={inputClass}
+                      value={patientName}
+                      onChange={(e) => setPatientName(e.target.value)}
+                      placeholder="Search or enter patient"
+                    />
                   </div>
 
-                  <div style={styles.formGrid3}>
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label style={styles.label}>Patient Name</label>
-                      <input
-                        style={styles.input}
-                        value={patientName}
-                        onChange={(e) => setPatientName(e.target.value)}
-                        placeholder="Patient Name"
-                      />
-                    </div>
-
-                    <div>
-                      <label style={styles.label}>Clinic</label>
+                      <label className={labelClass}>Clinic</label>
                       <select
-                        style={styles.select}
+                        className={selectClass}
                         value={selectedClinic}
                         onChange={(e) => setSelectedClinic(e.target.value as Clinic)}
                       >
@@ -543,9 +536,9 @@ export default function AIAttemptRecommendationPage() {
                     </div>
 
                     <div>
-                      <label style={styles.label}>Modality</label>
+                      <label className={labelClass}>Modality</label>
                       <select
-                        style={styles.select}
+                        className={selectClass}
                         value={selectedModality}
                         onChange={(e) => setSelectedModality(e.target.value)}
                       >
@@ -556,11 +549,13 @@ export default function AIAttemptRecommendationPage() {
                         ))}
                       </select>
                     </div>
+                  </div>
 
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label style={styles.label}>Preferred Day</label>
+                      <label className={labelClass}>Preferred Day</label>
                       <select
-                        style={styles.select}
+                        className={selectClass}
                         value={preferredDay}
                         onChange={(e) =>
                           setPreferredDay(e.target.value as DayKey | "Any")
@@ -576,9 +571,9 @@ export default function AIAttemptRecommendationPage() {
                     </div>
 
                     <div>
-                      <label style={styles.label}>Preferred Time</label>
+                      <label className={labelClass}>Preferred Time</label>
                       <select
-                        style={styles.select}
+                        className={selectClass}
                         value={preferredTime}
                         onChange={(e) => setPreferredTime(e.target.value)}
                       >
@@ -590,620 +585,229 @@ export default function AIAttemptRecommendationPage() {
                         ))}
                       </select>
                     </div>
-
-                    <div>
-                      <label style={styles.label}>Notification</label>
-                      <select
-                        style={styles.select}
-                        value={notificationMethod}
-                        onChange={(e) =>
-                          setNotificationMethod(e.target.value as NotificationMethod)
-                        }
-                      >
-                        {notificationMethods.map((method) => (
-                          <option key={method} value={method}>
-                            {method}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </section>
-
-                <section style={styles.panelCompact}>
-                  <div style={styles.panelHeaderRow}>
-                    <div>
-                      <div style={styles.panelTitle}>Recommendation Summary</div>
-                      <div style={styles.panelSub}>Top-level suggestion overview</div>
-                    </div>
                   </div>
 
-                  <div style={styles.summaryBoxCompact}>
-                    <div style={styles.summaryRowMini}>
-                      <span>Total Suggestions</span>
-                      <strong>{recommendations.length}</strong>
-                    </div>
-                    <div style={styles.summaryRowMini}>
-                      <span>Preferred Day</span>
-                      <strong>
-                        {preferredDay === "Any" ? "Any Day" : getDayLabel(preferredDay)}
-                      </strong>
-                    </div>
-                    <div style={styles.summaryRowMini}>
-                      <span>Preferred Time</span>
-                      <strong>{preferredTime}</strong>
-                    </div>
-                    <div style={styles.summaryRowMini}>
-                      <span>Notification</span>
-                      <strong>{notificationMethod}</strong>
-                    </div>
-                  </div>
-                </section>
-              </div>
-
-              <section style={styles.panelCompact}>
-                <div style={styles.panelHeaderRow}>
                   <div>
-                    <div style={styles.panelTitle}>Recommended Slots</div>
-                    <div style={styles.panelSub}>
-                      Ranked suggestions from the recommendation engine
-                    </div>
+                    <label className={labelClass}>Notification</label>
+                    <select
+                      className={selectClass}
+                      value={notificationMethod}
+                      onChange={(e) =>
+                        setNotificationMethod(e.target.value as NotificationMethod)
+                      }
+                    >
+                      {notificationMethods.map((method) => (
+                        <option key={method} value={method}>
+                          {method}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
-                <div style={styles.recommendationList}>
-                  {recommendations.length === 0 ? (
-                    <div style={styles.emptyState}>No suitable recommendations found.</div>
-                  ) : (
-                    recommendations.map((rec, index) => (
-                      <div
-                        key={`${rec.id}-${index}`}
-                        style={
-                          selectedRecommendation === rec.id
-                            ? styles.recommendationItemActive
-                            : styles.recommendationItem
-                        }
-                        onClick={() => setSelectedRecommendation(rec.id)}
-                      >
-                        <div style={styles.recommendationTop}>
-                          <div>
-                            <div style={styles.recommendationTitle}>
-                              #{index + 1} • {rec.dayLabel} • {rec.time}
-                            </div>
-                            <div style={styles.recommendationMeta}>
-                              {rec.clinic} • {rec.resource}
-                            </div>
-                            <div style={styles.recommendationMeta}>
-                              Staff: {rec.staff} • Clinician: {rec.clinician}
-                            </div>
-                          </div>
-
-                          <div style={styles.scoreBadge}>Score {rec.score}</div>
-                        </div>
-
-                        <div style={styles.reasonWrap}>
-                          {rec.reasons.map((reason, i) => (
-                            <span key={i} style={styles.reasonBadge}>
-                              {reason}
-                            </span>
-                          ))}
-                        </div>
+                <div className="rounded-xl border border-[rgba(54,112,190,0.18)] bg-[#071427] p-3">
+                  <div className="mb-2 text-[12px] font-extrabold text-white">
+                    Engine Logic
+                  </div>
+                  <div className="space-y-2 text-[12px] text-white/72">
+                    {[
+                      ["#2d8f52", "Resource availability"],
+                      ["#56a8ff", "Staff / clinician availability"],
+                      ["#9b6bff", "Efficient scheduling gap"],
+                      ["#d24d57", "Conflict avoidance"]
+                    ].map(([color, text]) => (
+                      <div key={text} className="flex items-center gap-2">
+                        <span
+                          className="h-2.5 w-2.5 rounded-full"
+                          style={{ backgroundColor: color }}
+                        />
+                        <span>{text}</span>
                       </div>
-                    ))
-                  )}
+                    ))}
+                  </div>
                 </div>
 
-                <div style={styles.formActions}>
+                <div className="rounded-xl border border-[rgba(54,112,190,0.18)] bg-[#071427] p-3">
+                  <div className="mb-2 text-[12px] font-extrabold text-[#59b7ff]">
+                    Quick Summary
+                  </div>
+                  <div className="space-y-2">
+                    {summaryRows.map(([label, value]) => (
+                      <div
+                        key={String(label)}
+                        className="flex items-center justify-between gap-3 border-b border-[rgba(54,112,190,0.12)] pb-2 text-[12px] text-white/78 last:border-b-0 last:pb-0"
+                      >
+                        <span>{label}</span>
+                        <strong className="text-white">{value}</strong>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </aside>
+
+            <section className={`${panelClass} min-h-0 overflow-hidden p-3`}>
+              <SectionHeader
+                title="Recommended Slots"
+                sub="Dense ranked list with sticky action bar"
+                right={
+                  <div className="inline-flex h-8 items-center rounded-full bg-[rgba(41,120,255,0.18)] px-3 text-[12px] font-bold text-[#56a8ff]">
+                    AI Ranked
+                  </div>
+                }
+              />
+
+              <div className="flex h-[calc(100%-44px)] min-h-0 flex-col overflow-hidden">
+                <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+                  <div className="space-y-2">
+                    {recommendations.length === 0 ? (
+                      <div className="rounded-xl border border-[rgba(54,112,190,0.18)] bg-[#071427] p-4 text-[13px] text-white/55">
+                        No suitable recommendations found.
+                      </div>
+                    ) : (
+                      recommendations.map((rec, index) => {
+                        const active = selectedRecommendation === rec.id;
+
+                        return (
+                          <button
+                            key={`${rec.id}-${index}`}
+                            type="button"
+                            onClick={() => setSelectedRecommendation(rec.id)}
+                            className={`w-full rounded-xl border px-3 py-3 text-left transition ${
+                              active
+                                ? "border-[rgba(26,154,255,0.45)] bg-[#0b213f]"
+                                : "border-[rgba(54,112,190,0.18)] bg-[#071427] hover:bg-[#0b1d36]"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0 flex-1">
+                                <div className="truncate text-[14px] font-extrabold">
+                                  #{index + 1} • {rec.dayLabel} • {rec.time}
+                                </div>
+                                <div className="mt-1 text-[12px] text-white/60">
+                                  {rec.clinic} • {rec.resource}
+                                </div>
+                                <div className="mt-1 text-[12px] text-white/60">
+                                  Staff: {rec.staff} • Clinician: {rec.clinician}
+                                </div>
+                              </div>
+                              <div className="rounded-full bg-[rgba(45,143,82,0.18)] px-3 py-1 text-[12px] font-bold text-[#53c27a]">
+                                Score {rec.score}
+                              </div>
+                            </div>
+
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {rec.reasons.map((reason, i) => (
+                                <span
+                                  key={i}
+                                  className="rounded-full bg-[rgba(86,168,255,0.14)] px-3 py-1 text-[11px] font-semibold text-[#56a8ff]"
+                                >
+                                  {reason}
+                                </span>
+                              ))}
+                            </div>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between gap-3 border-t border-[rgba(54,112,190,0.12)] pt-3">
+                  <div className="text-[12px] text-white/55">
+                    Select a slot to create booking
+                  </div>
                   <button
                     type="button"
-                    style={styles.primaryButton}
+                    className="inline-flex h-10 items-center rounded-xl bg-[#00a96e] px-4 text-[14px] font-extrabold text-white transition hover:bg-[#00b97a]"
                     onClick={applyRecommendation}
                   >
                     Apply Recommended Slot
                   </button>
                 </div>
-              </section>
+              </div>
+            </section>
 
-              <section style={styles.panelCompact}>
-                <div style={styles.panelHeaderRow}>
-                  <div>
-                    <div style={styles.panelTitle}>Existing Bookings</div>
-                    <div style={styles.panelSub}>
-                      Current appointments used by the AI engine
+            <aside className={`${panelClass} min-h-0 overflow-hidden p-3`}>
+              <SectionHeader
+                title="Audit Visibility"
+                sub="Recommendations, occupancy and active bookings"
+                right={
+                  <div className="inline-flex h-8 items-center rounded-full bg-[rgba(45,143,82,0.18)] px-3 text-[12px] font-bold text-[#53c27a]">
+                    {appointments.length}
+                  </div>
+                }
+              />
+
+              <div className="flex h-[calc(100%-44px)] min-h-0 flex-col gap-3 overflow-hidden">
+                <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-[rgba(54,112,190,0.18)] bg-[#071427] p-3">
+                  <div className="mb-2 text-[12px] font-extrabold text-white">
+                    Existing Bookings
+                  </div>
+                  <div className="space-y-2">
+                    {appointments.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-start justify-between gap-3 border-b border-[rgba(54,112,190,0.12)] pb-2 last:border-b-0 last:pb-0"
+                      >
+                        <div className="min-w-0">
+                          <div className="truncate text-[13px] font-extrabold">
+                            {item.patient}
+                          </div>
+                          <div className="mt-1 text-[12px] text-white/58">
+                            {getDayLabel(item.day)} • {item.time} • {item.modality}
+                          </div>
+                          <div className="mt-1 text-[12px] text-white/50">
+                            {item.staff} • {item.clinician}
+                          </div>
+                        </div>
+                        <div className="rounded-full bg-[rgba(86,168,255,0.14)] px-3 py-1 text-[11px] font-bold text-[#56a8ff]">
+                          {item.resource}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-[rgba(54,112,190,0.18)] bg-[#071427] p-3">
+                  <div className="mb-3 text-[12px] font-extrabold text-white">
+                    Status Overview
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="rounded-xl border border-[rgba(54,112,190,0.12)] bg-[#0a1830] p-3">
+                      <div className="text-[11px] text-white/55">Clinic</div>
+                      <div className="mt-1 text-[14px] font-extrabold">{selectedClinic}</div>
+                    </div>
+                    <div className="rounded-xl border border-[rgba(54,112,190,0.12)] bg-[#0a1830] p-3">
+                      <div className="text-[11px] text-white/55">Modality</div>
+                      <div className="mt-1 text-[14px] font-extrabold">{selectedModality}</div>
+                    </div>
+                    <div className="rounded-xl border border-[rgba(54,112,190,0.12)] bg-[#0a1830] p-3">
+                      <div className="text-[11px] text-white/55">Notify</div>
+                      <div className="mt-1 text-[14px] font-extrabold">{notificationMethod}</div>
+                    </div>
+                    <div className="rounded-xl border border-[rgba(54,112,190,0.12)] bg-[#0a1830] p-3">
+                      <div className="text-[11px] text-white/55">Selected</div>
+                      <div className="mt-1 text-[14px] font-extrabold">
+                        {selectedRecommendation ? "Ready" : "None"}
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div style={styles.bookingList}>
-                  {appointments.map((item) => (
-                    <div key={item.id} style={styles.bookingRow}>
-                      <div>
-                        <div style={styles.bookingTitle}>{item.patient}</div>
-                        <div style={styles.bookingMeta}>
-                          {getDayLabel(item.day)} • {item.time} • {item.modality}
-                        </div>
-                      </div>
-                      <div style={styles.bookingBadge}>{item.resource}</div>
-                    </div>
-                  ))}
+                <div className="flex items-center gap-2">
+                  <div className="inline-flex h-8 items-center rounded-full bg-[rgba(41,120,255,0.18)] px-3 text-[12px] font-bold text-[#56a8ff]">
+                    Role-Based Active
+                  </div>
+                  <div className="inline-flex h-8 items-center rounded-full bg-[rgba(210,77,87,0.16)] px-3 text-[12px] font-bold text-[#ff8a94]">
+                    Conflicts Blocked
+                  </div>
                 </div>
-              </section>
-            </div>
-          </section>
+              </div>
+            </aside>
+          </div>
         </div>
       </div>
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: "100vh",
-    background: "#030a16",
-    color: "#ffffff",
-    fontFamily: "Inter, Segoe UI, Arial, sans-serif",
-    overflowX: "hidden",
-    overflowY: "auto"
-  },
-
-  topStrip: {
-    height: 28,
-    background: "#8d0d46",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 8px",
-    position: "sticky",
-    top: 0,
-    zIndex: 20
-  },
-
-  topStripText: {
-    fontSize: 9,
-    fontWeight: 700,
-    whiteSpace: "nowrap"
-  },
-
-  collapseButton: {
-    height: 20,
-    minWidth: 20,
-    borderRadius: 999,
-    border: "none",
-    background: "#d9d9d9",
-    color: "#222",
-    cursor: "pointer",
-    fontSize: 11,
-    fontWeight: 700,
-    lineHeight: 1
-  },
-
-  appShell: {
-    padding: 8,
-    boxSizing: "border-box"
-  },
-
-  titleBar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-    border: "1px solid rgba(54,112,190,0.28)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: "8px 12px",
-    marginBottom: 8,
-    position: "sticky",
-    top: 36,
-    zIndex: 15
-  },
-
-  titleLeft: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8
-  },
-
-  logo: {
-    width: 24,
-    height: 24,
-    borderRadius: 5,
-    objectFit: "cover"
-  },
-
-  eyebrow: {
-    fontSize: 9,
-    color: "#1da4ff",
-    fontWeight: 800,
-    letterSpacing: "1.2px"
-  },
-
-  title: {
-    fontSize: 14,
-    fontWeight: 800,
-    marginTop: 1
-  },
-
-  titleActions: {
-    display: "flex",
-    gap: 6,
-    alignItems: "center",
-    flexWrap: "wrap"
-  },
-
-  ghostButton: {
-    height: 26,
-    padding: "0 10px",
-    borderRadius: 9,
-    border: "1px solid rgba(54,112,190,0.32)",
-    background: "#0d1d35",
-    color: "#59b7ff",
-    fontSize: 11,
-    fontWeight: 700,
-    cursor: "pointer"
-  },
-
-  primaryButton: {
-    height: 26,
-    padding: "0 12px",
-    borderRadius: 9,
-    border: "none",
-    background: "#00a96e",
-    color: "#fff",
-    fontSize: 11,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  topInfoPill: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 999,
-    background: "#0d1d35",
-    border: "1px solid rgba(54,112,190,0.28)",
-    color: "#59b7ff",
-    fontSize: 10,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  messageBanner: {
-    marginBottom: 8,
-    padding: "8px 10px",
-    borderRadius: 10,
-    fontSize: 10,
-    fontWeight: 700,
-    background: "rgba(45,143,82,0.14)",
-    border: "1px solid rgba(45,143,82,0.28)",
-    color: "#7fd19a"
-  },
-
-  metricsRow: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-    gap: 8,
-    marginBottom: 8
-  },
-
-  metricCard: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 12,
-    background: "#020d1f",
-    padding: "8px 10px"
-  },
-
-  metricLabel: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.56)",
-    marginBottom: 3
-  },
-
-  metricValueSmall: {
-    fontSize: 12,
-    fontWeight: 800
-  },
-
-  mainGrid: {
-    display: "grid",
-    gridTemplateColumns: "0.75fr 2fr",
-    gap: 8,
-    alignItems: "start"
-  },
-
-  leftRail: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: 8,
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    alignSelf: "start",
-    position: "sticky",
-    top: 88
-  },
-
-  centerArea: {
-    minWidth: 0
-  },
-
-  compactStack: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8
-  },
-
-  contentGrid: {
-    display: "grid",
-    gridTemplateColumns: "1.2fr 0.8fr",
-    gap: 8
-  },
-
-  panelCompact: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: 8
-  },
-
-  panelHeaderRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 6,
-    marginBottom: 6
-  },
-
-  panelTitle: {
-    fontSize: 11,
-    fontWeight: 800
-  },
-
-  panelSub: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.56)",
-    marginTop: 1
-  },
-
-  formGrid3: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr",
-    gap: 6
-  },
-
-  label: {
-    display: "block",
-    fontSize: 9,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.66)",
-    marginBottom: 3
-  },
-
-  input: {
-    width: "100%",
-    height: 26,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "0 8px",
-    fontSize: 11,
-    outline: "none",
-    boxSizing: "border-box"
-  },
-
-  select: {
-    width: "100%",
-    height: 26,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "0 8px",
-    fontSize: 11,
-    outline: "none",
-    boxSizing: "border-box"
-  },
-
-  statusCard: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8
-  },
-
-  statusRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    fontSize: 10,
-    color: "rgba(255,255,255,0.68)",
-    marginBottom: 7
-  },
-
-  dotGreen: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#2d8f52",
-    display: "inline-block"
-  },
-
-  dotBlue: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#56a8ff",
-    display: "inline-block"
-  },
-
-  dotPurple: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#9b6bff",
-    display: "inline-block"
-  },
-
-  dotRed: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#d24d57",
-    display: "inline-block"
-  },
-
-  infoBox: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8
-  },
-
-  infoTitle: {
-    fontSize: 10,
-    fontWeight: 800,
-    color: "#59b7ff",
-    marginBottom: 4
-  },
-
-  infoText: {
-    fontSize: 10,
-    color: "rgba(255,255,255,0.72)",
-    lineHeight: 1.4
-  },
-
-  summaryBoxCompact: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8
-  },
-
-  summaryRowMini: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 6,
-    padding: "5px 0",
-    borderBottom: "1px solid rgba(54,112,190,0.12)",
-    fontSize: 10,
-    color: "rgba(255,255,255,0.75)"
-  },
-
-  recommendationList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 6
-  },
-
-  recommendationItem: {
-    padding: 8,
-    borderRadius: 10,
-    background: "#071427",
-    border: "1px solid rgba(54,112,190,0.18)",
-    cursor: "pointer"
-  },
-
-  recommendationItemActive: {
-    padding: 8,
-    borderRadius: 10,
-    background: "#0b213f",
-    border: "1px solid rgba(26,154,255,0.45)",
-    cursor: "pointer"
-  },
-
-  recommendationTop: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 8
-  },
-
-  recommendationTitle: {
-    fontSize: 10,
-    fontWeight: 800
-  },
-
-  recommendationMeta: {
-    marginTop: 2,
-    fontSize: 9,
-    color: "rgba(255,255,255,0.58)"
-  },
-
-  scoreBadge: {
-    padding: "3px 8px",
-    borderRadius: 999,
-    background: "rgba(45,143,82,0.18)",
-    color: "#53c27a",
-    fontSize: 9,
-    fontWeight: 700,
-    whiteSpace: "nowrap",
-    height: "fit-content"
-  },
-
-  reasonWrap: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 5,
-    marginTop: 6
-  },
-
-  reasonBadge: {
-    display: "inline-block",
-    padding: "3px 8px",
-    borderRadius: 999,
-    background: "rgba(86,168,255,0.14)",
-    color: "#56a8ff",
-    fontSize: 9,
-    fontWeight: 600
-  },
-
-  bookingList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 5
-  },
-
-  bookingRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 8,
-    padding: "8px 0",
-    borderBottom: "1px solid rgba(54,112,190,0.12)"
-  },
-
-  bookingTitle: {
-    fontSize: 10,
-    fontWeight: 800
-  },
-
-  bookingMeta: {
-    marginTop: 2,
-    fontSize: 9,
-    color: "rgba(255,255,255,0.58)"
-  },
-
-  bookingBadge: {
-    display: "inline-block",
-    padding: "3px 8px",
-    borderRadius: 999,
-    background: "rgba(86,168,255,0.14)",
-    color: "#56a8ff",
-    fontSize: 9,
-    fontWeight: 700
-  },
-
-  emptyState: {
-    padding: 10,
-    borderRadius: 10,
-    background: "#071427",
-    color: "rgba(255,255,255,0.5)",
-    fontSize: 10
-  },
-
-  formActions: {
-    display: "flex",
-    justifyContent: "flex-end",
-    marginTop: 8
-  }
-};

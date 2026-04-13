@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 type UserRole =
   | "Receptionist"
@@ -145,6 +145,15 @@ const seedAudit: AuditItem[] = [
   }
 ];
 
+const inputClass =
+  "h-10 w-full rounded-xl border border-[#284a73] bg-[#0d1830] px-3 text-[13px] text-white outline-none placeholder:text-white/35 focus:border-sky-500/50";
+
+const selectClass =
+  "h-10 w-full rounded-xl border border-[#284a73] bg-[#0d1830] px-3 text-[13px] text-white outline-none focus:border-sky-500/50";
+
+const panelClass = "rounded-[22px] border border-[#143a5c] bg-[#020d1f]";
+const labelClass = "mb-1 block text-[11px] font-semibold text-white/78";
+
 export default function CompactUserManagementPage() {
   const [users, setUsers] = useState<UserRecord[]>(seedUsers);
   const [audit, setAudit] = useState<AuditItem[]>(seedAudit);
@@ -159,7 +168,7 @@ export default function CompactUserManagementPage() {
 
   const [form, setForm] = useState<UserRecord>(selectedUser);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setForm(selectedUser);
     setMessage("");
   }, [selectedUser]);
@@ -229,7 +238,10 @@ export default function CompactUserManagementPage() {
     setUsers((prev) =>
       prev.map((user) => (user.id === form.id ? updated : user))
     );
-    pushAudit(nextStatus === "Locked" ? "Locked account" : "Unlocked account", form.fullName);
+    pushAudit(
+      nextStatus === "Locked" ? "Locked account" : "Unlocked account",
+      form.fullName
+    );
     setMessage(`User status changed to ${nextStatus}.`);
   };
 
@@ -274,53 +286,82 @@ export default function CompactUserManagementPage() {
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.topStrip}>
-        <div style={styles.topStripText}>
+    <div className="min-h-screen overflow-hidden bg-[#030a16] text-white">
+      <div className="sticky top-0 z-30 flex h-11 items-center justify-between bg-[#8d0d46] px-4">
+        <div className="truncate text-[14px] font-bold">
           ADMIN • USER MANAGEMENT • ACTIVE {activeCount} • LOCKED {lockedCount} • DEACTIVATED {deactivatedCount}
         </div>
-        <button style={styles.collapseButton}>⌄</button>
+        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-[13px] font-bold text-[#222]">
+          v
+        </button>
       </div>
 
-      <div style={styles.appShell}>
-        <div style={styles.titleBar}>
-          <div style={styles.titleLeft}>
-            <img src="/logo.jpg" alt="logo" style={styles.logo} />
+      <div className="h-[calc(100vh-44px)] overflow-hidden p-2">
+        <div className={`${panelClass} mb-2 flex flex-wrap items-center justify-between gap-3 px-4 py-3`}>
+          <div className="flex items-center gap-3">
+            <img
+              src="/logo.jpg"
+              alt="logo"
+              className="h-10 w-10 rounded-xl object-cover"
+            />
             <div>
-              <div style={styles.eyebrow}>USER ADMINISTRATION</div>
-              <div style={styles.title}>Compact Access & Status Control</div>
+              <div className="text-[11px] font-extrabold tracking-[2px] text-[#1da4ff]">
+                USER ADMINISTRATION
+              </div>
+              <div className="text-[16px] font-extrabold">
+                Compact Access & Status Control
+              </div>
             </div>
           </div>
 
-          <div style={styles.titleActions}>
-            <button style={styles.ghostButton} onClick={quickCreateUser}>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={quickCreateUser}
+              className="h-9 rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]"
+            >
               + New User
             </button>
-            <button style={styles.primaryButton} onClick={saveChanges}>
+            <button
+              type="button"
+              onClick={saveChanges}
+              className="h-9 rounded-2xl bg-[#00a96e] px-5 text-[14px] font-extrabold"
+            >
               Save
             </button>
           </div>
         </div>
 
-        <div style={styles.mainGrid}>
-          <section style={styles.leftPanel}>
-            <div style={styles.panelHeaderRow}>
+        {message ? (
+          <div className="mb-2 rounded-2xl border border-emerald-700/30 bg-emerald-500/15 px-4 py-2 text-[13px] font-bold text-emerald-300">
+            {message}
+          </div>
+        ) : null}
+
+        <div className="grid h-[calc(100%-76px)] grid-cols-1 gap-2 xl:grid-cols-[1.02fr_1.18fr_0.78fr]">
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2 flex items-start justify-between gap-2">
               <div>
-                <div style={styles.panelTitle}>User Directory</div>
-                <div style={styles.panelSub}>Fast search and one-click selection</div>
+                <div className="text-[15px] font-extrabold">User Directory</div>
+                <div className="mt-0.5 text-[12px] text-white/55">
+                  Fast search and one-click selection
+                </div>
               </div>
-              <div style={styles.counterBadge}>{filteredUsers.length} shown</div>
+              <div className="inline-flex h-7 items-center rounded-full bg-emerald-500/15 px-3 text-[11px] font-extrabold text-emerald-300">
+                {filteredUsers.length} shown
+              </div>
             </div>
 
-            <div style={styles.filterRow}>
+            <div className="mb-2 grid grid-cols-[1.5fr_0.9fr_0.9fr] gap-2">
               <input
-                style={styles.input}
+                className={inputClass}
                 placeholder="Search name, email, clinic..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
+
               <select
-                style={styles.select}
+                className={selectClass}
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
               >
@@ -329,8 +370,9 @@ export default function CompactUserManagementPage() {
                   <option key={role}>{role}</option>
                 ))}
               </select>
+
               <select
-                style={styles.select}
+                className={selectClass}
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
@@ -341,204 +383,247 @@ export default function CompactUserManagementPage() {
               </select>
             </div>
 
-            <div style={styles.userList}>
+            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
               {filteredUsers.map((user) => (
-                <div
+                <button
                   key={user.id}
+                  type="button"
                   onClick={() => setSelectedId(user.id)}
-                  style={
+                  className={`flex w-full items-start justify-between rounded-[20px] border px-3 py-3 text-left ${
                     user.id === selectedId
-                      ? styles.userRowActive
-                      : styles.userRow
-                  }
+                      ? "border-sky-500/45 bg-[#0b213f]"
+                      : "border-[#143a5c] bg-[#071427]"
+                  }`}
                 >
-                  <div style={styles.userRowMain}>
-                    <div style={styles.userName}>{user.fullName}</div>
-                    <div style={styles.userMeta}>
+                  <div className="min-w-0">
+                    <div className="truncate text-[14px] font-extrabold">
+                      {user.fullName}
+                    </div>
+                    <div className="mt-1 text-[12px] text-white/62">
                       {user.email} • {user.clinic}
                     </div>
                   </div>
 
-                  <div style={styles.userTags}>
-                    <span style={styles.roleTag}>{user.role}</span>
+                  <div className="ml-3 flex flex-col items-end gap-2">
+                    <span className="rounded-full bg-sky-500/15 px-3 py-1 text-[11px] font-bold text-sky-300">
+                      {user.role}
+                    </span>
                     <span
-                      style={
+                      className={`rounded-full px-3 py-1 text-[11px] font-bold ${
                         user.status === "Active"
-                          ? styles.statusActive
+                          ? "bg-emerald-500/15 text-emerald-300"
                           : user.status === "Locked"
-                          ? styles.statusLocked
-                          : styles.statusDeactivated
-                      }
+                          ? "bg-amber-500/15 text-amber-300"
+                          : "bg-rose-500/15 text-rose-300"
+                      }`}
                     >
                       {user.status}
                     </span>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </section>
 
-          <section style={styles.centerPanel}>
-            <div style={styles.panelHeaderRow}>
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2 flex items-start justify-between gap-2">
               <div>
-                <div style={styles.panelTitle}>Selected User</div>
-                <div style={styles.panelSub}>Compact edit form with inline actions</div>
+                <div className="text-[15px] font-extrabold">Selected User</div>
+                <div className="mt-0.5 text-[12px] text-white/55">
+                  Compact edit form with inline actions
+                </div>
               </div>
-              <div style={styles.inlineMetrics}>
-                <span style={styles.metricChip}>Last login: {form.lastLogin}</span>
-                <span style={styles.metricChip}>Updated: {form.updatedAt}</span>
+
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-full border border-[#284a73] bg-[#0d1d35] px-3 py-1.5 text-[11px] font-bold text-white/85">
+                  Last login: {form.lastLogin}
+                </span>
+                <span className="rounded-full border border-[#284a73] bg-[#0d1d35] px-3 py-1.5 text-[11px] font-bold text-white/85">
+                  Updated: {form.updatedAt}
+                </span>
               </div>
             </div>
 
-            <div style={styles.quickActionRow}>
-              <button style={styles.smallBlueButton} onClick={quickToggleLock}>
+            <div className="mb-2 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={quickToggleLock}
+                className="h-9 rounded-2xl border border-sky-600/30 bg-[#0f2746] px-4 text-[13px] font-bold text-sky-300"
+              >
                 {form.status === "Locked" ? "Unlock" : "Lock"}
               </button>
-              <button style={styles.smallNeutralButton} onClick={quickResetPassword}>
+
+              <button
+                type="button"
+                onClick={quickResetPassword}
+                className="h-9 rounded-2xl border border-slate-700/40 bg-[#111b2f] px-4 text-[13px] font-bold text-white"
+              >
                 Reset Password
               </button>
-              <button style={styles.smallRedButton} onClick={quickDeactivate}>
+
+              <button
+                type="button"
+                onClick={quickDeactivate}
+                className="h-9 rounded-2xl border border-rose-700/30 bg-rose-500/15 px-4 text-[13px] font-bold text-rose-300"
+              >
                 Deactivate
               </button>
             </div>
 
-            <div style={styles.compactFormGrid}>
-              <div>
-                <label style={styles.label}>Full Name</label>
-                <input
-                  style={styles.input}
-                  value={form.fullName}
-                  onChange={(e) => updateForm("fullName", e.target.value)}
-                />
+            <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+              <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+                <div>
+                  <label className={labelClass}>Full Name</label>
+                  <input
+                    className={inputClass}
+                    value={form.fullName}
+                    onChange={(e) => updateForm("fullName", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Email</label>
+                  <input
+                    className={inputClass}
+                    value={form.email}
+                    onChange={(e) => updateForm("email", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Role</label>
+                  <select
+                    className={selectClass}
+                    value={form.role}
+                    onChange={(e) => updateForm("role", e.target.value)}
+                  >
+                    {roles.map((role) => (
+                      <option key={role}>{role}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Clinic</label>
+                  <select
+                    className={selectClass}
+                    value={form.clinic}
+                    onChange={(e) => updateForm("clinic", e.target.value)}
+                  >
+                    {clinics.map((clinic) => (
+                      <option key={clinic}>{clinic}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Access Group</label>
+                  <select
+                    className={selectClass}
+                    value={form.accessGroup}
+                    onChange={(e) => updateForm("accessGroup", e.target.value)}
+                  >
+                    {accessGroups.map((group) => (
+                      <option key={group}>{group}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Status</label>
+                  <select
+                    className={selectClass}
+                    value={form.status}
+                    onChange={(e) => updateForm("status", e.target.value)}
+                  >
+                    <option>Active</option>
+                    <option>Locked</option>
+                    <option>Deactivated</option>
+                  </select>
+                </div>
               </div>
 
-              <div>
-                <label style={styles.label}>Email</label>
-                <input
-                  style={styles.input}
-                  value={form.email}
-                  onChange={(e) => updateForm("email", e.target.value)}
-                />
-              </div>
+              <div className="mt-3 grid grid-cols-1 gap-2 xl:grid-cols-3">
+                <div className="flex h-[52px] items-center justify-between rounded-[18px] border border-[#143a5c] bg-[#071427] px-3">
+                  <span className="text-[13px] font-bold text-white/80">MFA</span>
+                  <button
+                    type="button"
+                    onClick={() => updateForm("mfaEnabled", !form.mfaEnabled)}
+                    className={`rounded-full px-3 py-1 text-[11px] font-extrabold ${
+                      form.mfaEnabled
+                        ? "bg-emerald-500/15 text-emerald-300"
+                        : "bg-slate-500/20 text-slate-200"
+                    }`}
+                  >
+                    {form.mfaEnabled ? "Enabled" : "Disabled"}
+                  </button>
+                </div>
 
-              <div>
-                <label style={styles.label}>Role</label>
-                <select
-                  style={styles.select}
-                  value={form.role}
-                  onChange={(e) => updateForm("role", e.target.value)}
-                >
-                  {roles.map((role) => (
-                    <option key={role}>{role}</option>
-                  ))}
-                </select>
-              </div>
+                <div className="flex h-[52px] items-center justify-between rounded-[18px] border border-[#143a5c] bg-[#071427] px-3">
+                  <span className="text-[13px] font-bold text-white/80">Role-Based Access</span>
+                  <span className="rounded-full bg-sky-500/15 px-3 py-1 text-[11px] font-extrabold text-sky-300">
+                    Active
+                  </span>
+                </div>
 
-              <div>
-                <label style={styles.label}>Clinic</label>
-                <select
-                  style={styles.select}
-                  value={form.clinic}
-                  onChange={(e) => updateForm("clinic", e.target.value)}
-                >
-                  {clinics.map((clinic) => (
-                    <option key={clinic}>{clinic}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label style={styles.label}>Access Group</label>
-                <select
-                  style={styles.select}
-                  value={form.accessGroup}
-                  onChange={(e) => updateForm("accessGroup", e.target.value)}
-                >
-                  {accessGroups.map((group) => (
-                    <option key={group}>{group}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label style={styles.label}>Status</label>
-                <select
-                  style={styles.select}
-                  value={form.status}
-                  onChange={(e) => updateForm("status", e.target.value)}
-                >
-                  <option>Active</option>
-                  <option>Locked</option>
-                  <option>Deactivated</option>
-                </select>
+                <div className="flex h-[52px] items-center justify-between rounded-[18px] border border-[#143a5c] bg-[#071427] px-3">
+                  <span className="text-[13px] font-bold text-white/80">Status Control</span>
+                  <span className="rounded-full bg-sky-500/15 px-3 py-1 text-[11px] font-extrabold text-sky-300">
+                    {form.status}
+                  </span>
+                </div>
               </div>
             </div>
-
-            <div style={styles.inlineToggleRow}>
-              <div style={styles.toggleCard}>
-                <span style={styles.toggleLabel}>MFA</span>
-                <button
-                  style={form.mfaEnabled ? styles.toggleOn : styles.toggleOff}
-                  onClick={() => updateForm("mfaEnabled", !form.mfaEnabled)}
-                >
-                  {form.mfaEnabled ? "Enabled" : "Disabled"}
-                </button>
-              </div>
-
-              <div style={styles.toggleCard}>
-                <span style={styles.toggleLabel}>RBAC</span>
-                <span style={styles.miniBadge}>Active</span>
-              </div>
-
-              <div style={styles.toggleCard}>
-                <span style={styles.toggleLabel}>Status</span>
-                <span style={styles.miniBadge}>{form.status}</span>
-              </div>
-            </div>
-
-            {message ? <div style={styles.message}>{message}</div> : null}
           </section>
 
-          <section style={styles.rightPanel}>
-            <div style={styles.panelHeaderRow}>
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2 flex items-start justify-between gap-2">
               <div>
-                <div style={styles.panelTitle}>Audit Visibility</div>
-                <div style={styles.panelSub}>Recent admin actions</div>
-              </div>
-              <div style={styles.counterBadge}>{audit.length}</div>
-            </div>
-
-            <div style={styles.auditList}>
-              {audit.slice(0, 8).map((item) => (
-                <div key={item.id} style={styles.auditRow}>
-                  <div style={styles.auditTop}>
-                    <span style={styles.auditAction}>{item.action}</span>
-                    <span style={styles.auditTime}>{item.timestamp}</span>
-                  </div>
-                  <div style={styles.auditMeta}>
-                    {item.target} • {item.actor}
-                  </div>
+                <div className="text-[15px] font-extrabold">Audit Visibility</div>
+                <div className="mt-0.5 text-[12px] text-white/55">
+                  Recent admin actions
                 </div>
-              ))}
+              </div>
+              <div className="flex h-8 min-w-8 items-center justify-center rounded-full bg-emerald-500/15 text-[12px] font-extrabold text-emerald-300">
+                {audit.length}
+              </div>
             </div>
 
-            <div style={styles.summaryPanel}>
-              <div style={styles.summaryTitle}>Quick Summary</div>
-              <div style={styles.summaryRow}>
-                <span>Selected</span>
-                <strong>{form.fullName}</strong>
+            <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+              <div className="space-y-0">
+                {audit.slice(0, 8).map((item) => (
+                  <div
+                    key={item.id}
+                    className="border-b border-[#143a5c] py-3"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-[13px] font-bold">{item.action}</span>
+                      <span className="text-[11px] text-white/50">{item.timestamp}</span>
+                    </div>
+                    <div className="mt-1 text-[12px] text-white/60">
+                      {item.target} • {item.actor}
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div style={styles.summaryRow}>
-                <span>Role</span>
-                <strong>{form.role}</strong>
-              </div>
-              <div style={styles.summaryRow}>
-                <span>Clinic</span>
-                <strong>{form.clinic}</strong>
-              </div>
-              <div style={styles.summaryRow}>
-                <span>MFA</span>
-                <strong>{form.mfaEnabled ? "Enabled" : "Disabled"}</strong>
+
+              <div className="mt-3 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+                <div className="mb-2 text-[14px] font-extrabold">Quick Summary</div>
+
+                {[
+                  ["Selected", form.fullName],
+                  ["Role", form.role],
+                  ["Clinic", form.clinic],
+                  ["MFA", form.mfaEnabled ? "Enabled" : "Disabled"]
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="flex justify-between gap-2 border-b border-[#143a5c] py-2 text-[13px] text-white/80"
+                  >
+                    <span>{label}</span>
+                    <strong>{value}</strong>
+                  </div>
+                ))}
               </div>
             </div>
           </section>
@@ -547,502 +632,3 @@ export default function CompactUserManagementPage() {
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: "100vh",
-    background: "#030a16",
-    color: "#ffffff",
-    fontFamily: "Inter, Segoe UI, Arial, sans-serif",
-    overflow: "hidden"
-  },
-
-  topStrip: {
-    height: 28,
-    background: "#8d0d46",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 8px"
-  },
-
-  topStripText: {
-    fontSize: 9,
-    fontWeight: 700,
-    whiteSpace: "nowrap"
-  },
-
-  collapseButton: {
-    height: 20,
-    minWidth: 20,
-    borderRadius: 999,
-    border: "none",
-    background: "#d9d9d9",
-    color: "#222",
-    cursor: "pointer",
-    fontSize: 11,
-    fontWeight: 700,
-    lineHeight: 1
-  },
-
-  appShell: {
-    padding: 8,
-    height: "calc(100vh - 28px)",
-    boxSizing: "border-box"
-  },
-
-  titleBar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-    border: "1px solid rgba(54,112,190,0.28)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: "8px 12px",
-    marginBottom: 8
-  },
-
-  titleLeft: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8
-  },
-
-  logo: {
-    width: 24,
-    height: 24,
-    borderRadius: 5,
-    objectFit: "cover"
-  },
-
-  eyebrow: {
-    fontSize: 9,
-    color: "#1da4ff",
-    fontWeight: 800,
-    letterSpacing: "1.2px"
-  },
-
-  title: {
-    fontSize: 14,
-    fontWeight: 800,
-    marginTop: 1
-  },
-
-  titleActions: {
-    display: "flex",
-    gap: 6,
-    alignItems: "center"
-  },
-
-  ghostButton: {
-    height: 26,
-    padding: "0 10px",
-    borderRadius: 9,
-    border: "1px solid rgba(54,112,190,0.32)",
-    background: "#0d1d35",
-    color: "#59b7ff",
-    fontSize: 11,
-    fontWeight: 700,
-    cursor: "pointer"
-  },
-
-  primaryButton: {
-    height: 26,
-    padding: "0 12px",
-    borderRadius: 9,
-    border: "none",
-    background: "#00a96e",
-    color: "#fff",
-    fontSize: 11,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  mainGrid: {
-    display: "grid",
-    gridTemplateColumns: "1.05fr 1.2fr 0.8fr",
-    gap: 8,
-    height: "calc(100% - 50px)"
-  },
-
-  leftPanel: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: 8,
-    display: "flex",
-    flexDirection: "column",
-    minHeight: 0
-  },
-
-  centerPanel: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: 8,
-    display: "flex",
-    flexDirection: "column",
-    minHeight: 0
-  },
-
-  rightPanel: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: 8,
-    display: "flex",
-    flexDirection: "column",
-    minHeight: 0
-  },
-
-  panelHeaderRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 6,
-    marginBottom: 6
-  },
-
-  panelTitle: {
-    fontSize: 11,
-    fontWeight: 800
-  },
-
-  panelSub: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.56)",
-    marginTop: 1
-  },
-
-  counterBadge: {
-    height: 18,
-    padding: "0 7px",
-    borderRadius: 999,
-    background: "rgba(0,169,110,0.16)",
-    color: "#00d18a",
-    fontSize: 9,
-    fontWeight: 800,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  filterRow: {
-    display: "grid",
-    gridTemplateColumns: "1.5fr 0.9fr 0.9fr",
-    gap: 5,
-    marginBottom: 6
-  },
-
-  input: {
-    width: "100%",
-    height: 26,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "0 8px",
-    fontSize: 11,
-    outline: "none",
-    boxSizing: "border-box"
-  },
-
-  select: {
-    width: "100%",
-    height: 26,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "0 8px",
-    fontSize: 11,
-    outline: "none",
-    boxSizing: "border-box"
-  },
-
-  userList: {
-    overflowY: "auto",
-    minHeight: 0,
-    paddingRight: 2
-  },
-
-  userRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 6,
-    border: "1px solid rgba(54,112,190,0.18)",
-    background: "#071427",
-    borderRadius: 10,
-    padding: "6px 8px",
-    marginBottom: 5,
-    cursor: "pointer"
-  },
-
-  userRowActive: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 6,
-    border: "1px solid rgba(26,154,255,0.45)",
-    background: "#0b213f",
-    borderRadius: 10,
-    padding: "6px 8px",
-    marginBottom: 5,
-    cursor: "pointer"
-  },
-
-  userRowMain: {
-    minWidth: 0
-  },
-
-  userName: {
-    fontSize: 11,
-    fontWeight: 800,
-    lineHeight: 1.1
-  },
-
-  userMeta: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.6)",
-    marginTop: 1,
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    maxWidth: 220
-  },
-
-  userTags: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end",
-    gap: 3
-  },
-
-  roleTag: {
-    fontSize: 9,
-    padding: "2px 7px",
-    borderRadius: 999,
-    background: "rgba(26,154,255,0.14)",
-    color: "#59b7ff",
-    fontWeight: 700
-  },
-
-  statusActive: {
-    fontSize: 9,
-    padding: "2px 7px",
-    borderRadius: 999,
-    background: "rgba(0,169,110,0.16)",
-    color: "#00d18a",
-    fontWeight: 700
-  },
-
-  statusLocked: {
-    fontSize: 9,
-    padding: "2px 7px",
-    borderRadius: 999,
-    background: "rgba(255,170,0,0.16)",
-    color: "#ffb84d",
-    fontWeight: 700
-  },
-
-  statusDeactivated: {
-    fontSize: 9,
-    padding: "2px 7px",
-    borderRadius: 999,
-    background: "rgba(210,77,87,0.16)",
-    color: "#ff8b95",
-    fontWeight: 700
-  },
-
-  inlineMetrics: {
-    display: "flex",
-    gap: 5,
-    flexWrap: "wrap"
-  },
-
-  metricChip: {
-    fontSize: 9,
-    padding: "3px 7px",
-    borderRadius: 999,
-    background: "#0d1830",
-    color: "rgba(255,255,255,0.7)",
-    border: "1px solid rgba(92,118,166,0.24)"
-  },
-
-  quickActionRow: {
-    display: "flex",
-    gap: 5,
-    marginBottom: 6
-  },
-
-  smallBlueButton: {
-    height: 24,
-    padding: "0 8px",
-    borderRadius: 8,
-    border: "1px solid rgba(26,154,255,0.3)",
-    background: "#0f2746",
-    color: "#59b7ff",
-    fontSize: 10,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  smallNeutralButton: {
-    height: 24,
-    padding: "0 8px",
-    borderRadius: 8,
-    border: "1px solid rgba(92,118,166,0.28)",
-    background: "#111b2f",
-    color: "#ffffff",
-    fontSize: 10,
-    fontWeight: 700,
-    cursor: "pointer"
-  },
-
-  smallRedButton: {
-    height: 24,
-    padding: "0 8px",
-    borderRadius: 8,
-    border: "1px solid rgba(210,77,87,0.28)",
-    background: "#32141b",
-    color: "#ff8b95",
-    fontSize: 10,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  compactFormGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 6
-  },
-
-  label: {
-    display: "block",
-    fontSize: 9,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.66)",
-    marginBottom: 3
-  },
-
-  inlineToggleRow: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr",
-    gap: 6,
-    marginTop: 6
-  },
-
-  toggleCard: {
-    height: 36,
-    borderRadius: 10,
-    border: "1px solid rgba(54,112,190,0.18)",
-    background: "#071427",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 8px"
-  },
-
-  toggleLabel: {
-    fontSize: 10,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.76)"
-  },
-
-  toggleOn: {
-    height: 20,
-    padding: "0 8px",
-    borderRadius: 999,
-    border: "none",
-    background: "#00a96e",
-    color: "#fff",
-    fontSize: 9,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  toggleOff: {
-    height: 20,
-    padding: "0 8px",
-    borderRadius: 999,
-    border: "none",
-    background: "#4b5563",
-    color: "#fff",
-    fontSize: 9,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  miniBadge: {
-    fontSize: 9,
-    padding: "3px 7px",
-    borderRadius: 999,
-    background: "#113254",
-    color: "#59b7ff",
-    fontWeight: 800
-  },
-
-  message: {
-    marginTop: 6,
-    fontSize: 10,
-    color: "#00d18a",
-    fontWeight: 700
-  },
-
-  auditList: {
-    overflowY: "auto",
-    minHeight: 0,
-    marginBottom: 6
-  },
-
-  auditRow: {
-    padding: "6px 0",
-    borderBottom: "1px solid rgba(54,112,190,0.14)"
-  },
-
-  auditTop: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 6
-  },
-
-  auditAction: {
-    fontSize: 10,
-    fontWeight: 700
-  },
-
-  auditTime: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.5)"
-  },
-
-  auditMeta: {
-    marginTop: 2,
-    fontSize: 9,
-    color: "rgba(255,255,255,0.58)"
-  },
-
-  summaryPanel: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8
-  },
-
-  summaryTitle: {
-    fontSize: 10,
-    fontWeight: 800,
-    marginBottom: 4
-  },
-
-  summaryRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 6,
-    padding: "5px 0",
-    borderBottom: "1px solid rgba(54,112,190,0.12)",
-    fontSize: 10,
-    color: "rgba(255,255,255,0.75)"
-  }
-};

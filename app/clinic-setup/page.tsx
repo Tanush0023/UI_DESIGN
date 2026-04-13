@@ -116,11 +116,19 @@ const clinicSeed: Clinic[] = [
       sat: "Closed",
       sun: "Closed"
     },
-    resources: [
-      { id: 1, name: "Room S1", type: "Consult Room", status: "Inactive" }
-    ]
+    resources: [{ id: 1, name: "Room S1", type: "Consult Room", status: "Inactive" }]
   }
 ];
+
+const inputClass =
+  "h-10 w-full rounded-xl border border-[#284a73] bg-[#0d1830] px-3 text-[13px] text-white outline-none placeholder:text-white/35 focus:border-sky-500/50";
+
+const selectClass =
+  "h-10 w-full rounded-xl border border-[#284a73] bg-[#0d1830] px-3 text-[13px] text-white outline-none focus:border-sky-500/50";
+
+const labelClass = "mb-1 block text-[11px] font-semibold text-white/78";
+
+const panelClass = "rounded-[22px] border border-[#143a5c] bg-[#020d1f]";
 
 export default function ClinicSetupPage() {
   const [clinics, setClinics] = useState<Clinic[]>(clinicSeed);
@@ -141,7 +149,6 @@ export default function ClinicSetupPage() {
   const filteredClinics = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return clinics;
-
     return clinics.filter((clinic) => {
       const text =
         `${clinic.name} ${clinic.code} ${clinic.type} ${clinic.address} ${clinic.email}`.toLowerCase();
@@ -154,10 +161,7 @@ export default function ClinicSetupPage() {
   const visibleCount = clinics.filter((c) => c.onlineVisible).length;
 
   const handleFieldChange = <K extends keyof Clinic>(field: K, value: Clinic[K]) => {
-    setForm((prev) => ({
-      ...prev,
-      [field]: value
-    }));
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleHoursChange = (day: keyof Hours, value: string) => {
@@ -186,382 +190,383 @@ export default function ClinicSetupPage() {
 
   const handleSave = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     setClinics((prev) =>
       prev.map((clinic) => (clinic.id === selectedId ? form : clinic))
     );
-
     setMessage("Clinic setup updated successfully.");
   };
 
   const totalResources = form.resources.length;
-  const activeResources = form.resources.filter(
-    (r) => r.status === "Active"
-  ).length;
-
-  const statusStyle =
-    selectedClinic.status === "Active"
-      ? styles.topInfoSuccess
-      : styles.topInfoDanger;
+  const activeResources = form.resources.filter((r) => r.status === "Active").length;
 
   return (
-    <div style={styles.page}>
-      <div style={styles.topStrip}>
-        <div style={styles.topStripText}>
+    <div className="min-h-screen overflow-hidden bg-[#030a16] text-white">
+      <div className="sticky top-0 z-30 flex h-11 items-center justify-between bg-[#8d0d46] px-4">
+        <div className="truncate text-[14px] font-bold">
           CLINIC SETUP • ACTIVE {activeCount} • INACTIVE {inactiveCount} • ONLINE {visibleCount}
         </div>
-        <button style={styles.collapseButton}>⌄</button>
+        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-[13px] font-bold text-[#222]">
+          v
+        </button>
       </div>
 
-      <div style={styles.appShell}>
-        <div style={styles.titleBar}>
-          <div style={styles.titleLeft}>
-            <img src="/logo.jpg" alt="EsyRIS logo" style={styles.logo} />
+      <div className="h-[calc(100vh-44px)] overflow-hidden p-2">
+        <div className={`${panelClass} mb-2 flex flex-wrap items-center justify-between gap-3 px-4 py-3`}>
+          <div className="flex items-center gap-3">
+            <img
+              src="/logo.jpg"
+              alt="EsyRIS logo"
+              className="h-10 w-10 rounded-xl object-cover"
+            />
             <div>
-              <div style={styles.eyebrow}>CLINIC CONFIGURATION</div>
-              <div style={styles.title}>Compact Clinic Setup Admin</div>
+              <div className="text-[11px] font-extrabold tracking-[2px] text-[#1da4ff]">
+                CLINIC CONFIGURATION
+              </div>
+              <div className="text-[16px] font-extrabold">
+                Compact Clinic Setup Admin
+              </div>
             </div>
           </div>
 
-          <div style={styles.titleActions}>
-            <div style={styles.topInfoPill}>Clinic: {selectedClinic.code}</div>
-            <div style={statusStyle}>Status: {selectedClinic.status}</div>
-            <div style={styles.topInfoPill}>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex h-9 items-center rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
+              Clinic: {selectedClinic.code}
+            </div>
+            <div
+              className={`inline-flex h-9 items-center rounded-2xl px-4 text-[13px] font-bold ${
+                selectedClinic.status === "Active"
+                  ? "border border-emerald-700/30 bg-emerald-500/15 text-emerald-300"
+                  : "border border-rose-700/30 bg-rose-500/15 text-rose-300"
+              }`}
+            >
+              Status: {selectedClinic.status}
+            </div>
+            <div className="inline-flex h-9 items-center rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
               Booking: {selectedClinic.bookingEnabled ? "On" : "Off"}
             </div>
-            <div style={styles.topInfoPill}>
+            <div className="inline-flex h-9 items-center rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
               Online: {selectedClinic.onlineVisible ? "Visible" : "Hidden"}
             </div>
-            <button style={styles.ghostButton}>Export</button>
-            <button style={styles.primaryButton}>Save</button>
+            <button className="h-9 rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
+              Export
+            </button>
+            <button
+              form="clinic-form"
+              type="submit"
+              className="h-9 rounded-2xl bg-[#00a96e] px-5 text-[14px] font-extrabold"
+            >
+              Save
+            </button>
           </div>
         </div>
 
-        {message ? <div style={styles.messageBanner}>{message}</div> : null}
+        {message ? (
+          <div className="mb-2 rounded-2xl border border-emerald-700/30 bg-emerald-500/15 px-4 py-2 text-[13px] font-bold text-emerald-300">
+            {message}
+          </div>
+        ) : null}
 
-        <div style={styles.metricsRow}>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Selected Clinic</div>
-            <div style={styles.metricValueSmall}>{selectedClinic.name}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Status</div>
-            <div style={styles.metricValueSmall}>{selectedClinic.status}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Resources</div>
-            <div style={styles.metricValueSmall}>{totalResources}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Active Resources</div>
-            <div style={styles.metricValueSmall}>{activeResources}</div>
-          </div>
-        </div>
-
-        <div style={styles.mainGrid}>
-          <section style={styles.leftRail}>
-            <div style={styles.panelHeaderRow}>
+        <div className="grid h-[calc(100%-76px)] grid-cols-1 gap-2 xl:grid-cols-[1.02fr_1.18fr_0.78fr]">
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2 flex items-start justify-between gap-2">
               <div>
-                <div style={styles.panelTitle}>Clinic Directory</div>
-                <div style={styles.panelSub}>Search and switch clinics quickly</div>
+                <div className="text-[15px] font-extrabold">Clinic Directory</div>
+                <div className="mt-0.5 text-[12px] text-white/55">
+                  Fast search and one-click selection
+                </div>
+              </div>
+              <div className="inline-flex h-7 items-center rounded-full bg-emerald-500/15 px-3 text-[11px] font-extrabold text-emerald-300">
+                {filteredClinics.length} shown
               </div>
             </div>
 
-            <div style={styles.filterSection}>
-              <div style={styles.filterLabel}>Clinic Search</div>
+            <div className="mb-2">
               <input
-                style={styles.input}
-                placeholder="Search clinic name or code..."
+                className={inputClass}
+                placeholder="Search clinic name, email, code..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
 
-            <div style={styles.clinicList}>
+            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
               {filteredClinics.map((clinic) => (
-                <div
+                <button
                   key={clinic.id}
+                  type="button"
                   onClick={() => setSelectedId(clinic.id)}
-                  style={
+                  className={`flex w-full items-start justify-between rounded-[20px] border px-3 py-3 text-left ${
                     clinic.id === selectedId
-                      ? styles.clinicItemActive
-                      : styles.clinicItem
-                  }
+                      ? "border-sky-500/45 bg-[#0b213f]"
+                      : "border-[#143a5c] bg-[#071427]"
+                  }`}
                 >
-                  <div style={styles.clinicName}>{clinic.name}</div>
-                  <div style={styles.clinicMeta}>{clinic.code}</div>
-                  <div style={styles.clinicMeta}>{clinic.type}</div>
-                </div>
-              ))}
-            </div>
+                  <div className="min-w-0">
+                    <div className="truncate text-[14px] font-extrabold">
+                      {clinic.name}
+                    </div>
+                    <div className="mt-1 text-[12px] text-white/62">
+                      {clinic.code} • {clinic.type}
+                    </div>
+                    <div className="mt-0.5 truncate text-[12px] text-white/55">
+                      {clinic.email}
+                    </div>
+                  </div>
 
-            <div style={styles.statusCard}>
-              <div style={styles.statusTitle}>Overview</div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotGreen} />
-                <span>{activeCount} Active Clinics</span>
-              </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotRed} />
-                <span>{inactiveCount} Inactive Clinics</span>
-              </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotBlue} />
-                <span>{visibleCount} Online Visible</span>
-              </div>
+                  <div className="ml-3 flex flex-col items-end gap-2">
+                    <span className="rounded-full bg-sky-500/15 px-3 py-1 text-[11px] font-bold text-sky-300">
+                      {clinic.code}
+                    </span>
+                    <span
+                      className={`rounded-full px-3 py-1 text-[11px] font-bold ${
+                        clinic.status === "Active"
+                          ? "bg-emerald-500/15 text-emerald-300"
+                          : "bg-rose-500/15 text-rose-300"
+                      }`}
+                    >
+                      {clinic.status}
+                    </span>
+                  </div>
+                </button>
+              ))}
             </div>
           </section>
 
-          <section style={styles.centerArea}>
-            <div style={styles.compactStack}>
-              <form onSubmit={handleSave} style={styles.panelCompact}>
-                <div style={styles.panelHeaderRow}>
-                  <div>
-                    <div style={styles.panelTitle}>Clinic Details</div>
-                    <div style={styles.panelSub}>
-                      Identity, contact, visibility and operational controls
-                    </div>
-                  </div>
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2 flex items-start justify-between gap-2">
+              <div>
+                <div className="text-[15px] font-extrabold">Selected Clinic</div>
+                <div className="mt-0.5 text-[12px] text-white/55">
+                  Compact edit form with inline actions
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-full border border-[#284a73] bg-[#0d1d35] px-3 py-1.5 text-[11px] font-bold text-white/85">
+                  Timezone: {form.timezone}
+                </span>
+                <span className="rounded-full border border-[#284a73] bg-[#0d1d35] px-3 py-1.5 text-[11px] font-bold text-white/85">
+                  Resources: {totalResources}
+                </span>
+              </div>
+            </div>
+
+            <div className="mb-2 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => handleFieldChange("bookingEnabled", !form.bookingEnabled)}
+                className={`h-9 rounded-2xl px-4 text-[13px] font-bold ${
+                  form.bookingEnabled
+                    ? "border border-sky-600/30 bg-[#0f2746] text-sky-300"
+                    : "border border-slate-700/40 bg-[#111b2f] text-white"
+                }`}
+              >
+                {form.bookingEnabled ? "Booking On" : "Booking Off"}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleFieldChange("onlineVisible", !form.onlineVisible)}
+                className={`h-9 rounded-2xl px-4 text-[13px] font-bold ${
+                  form.onlineVisible
+                    ? "border border-sky-600/30 bg-[#0f2746] text-sky-300"
+                    : "border border-slate-700/40 bg-[#111b2f] text-white"
+                }`}
+              >
+                {form.onlineVisible ? "Online Visible" : "Online Hidden"}
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  handleFieldChange(
+                    "status",
+                    form.status === "Active" ? "Inactive" : "Active"
+                  )
+                }
+                className={`h-9 rounded-2xl px-4 text-[13px] font-bold ${
+                  form.status === "Active"
+                    ? "border border-emerald-700/30 bg-emerald-500/15 text-emerald-300"
+                    : "border border-rose-700/30 bg-rose-500/15 text-rose-300"
+                }`}
+              >
+                {form.status === "Active" ? "Deactivate" : "Activate"}
+              </button>
+            </div>
+
+            <form id="clinic-form" onSubmit={handleSave} className="min-h-0 flex-1 overflow-y-auto pr-1">
+              <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+                <div>
+                  <label className={labelClass}>Clinic Name</label>
+                  <input
+                    className={inputClass}
+                    value={form.name}
+                    onChange={(e) => handleFieldChange("name", e.target.value)}
+                  />
                 </div>
 
-                <div style={styles.formGrid4}>
-                  <div>
-                    <label style={styles.label}>Clinic Name</label>
-                    <input
-                      style={styles.input}
-                      value={form.name}
-                      onChange={(e) => handleFieldChange("name", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Clinic Code</label>
-                    <input
-                      style={styles.input}
-                      value={form.code}
-                      onChange={(e) => handleFieldChange("code", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Clinic Type</label>
-                    <input
-                      style={styles.input}
-                      value={form.type}
-                      onChange={(e) => handleFieldChange("type", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Status</label>
-                    <select
-                      style={styles.select}
-                      value={form.status}
-                      onChange={(e) =>
-                        handleFieldChange("status", e.target.value as ClinicStatus)
-                      }
-                    >
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Phone</label>
-                    <input
-                      style={styles.input}
-                      value={form.phone}
-                      onChange={(e) => handleFieldChange("phone", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Email</label>
-                    <input
-                      style={styles.input}
-                      value={form.email}
-                      onChange={(e) => handleFieldChange("email", e.target.value)}
-                    />
-                  </div>
-
-                  <div style={{ gridColumn: "span 2" }}>
-                    <label style={styles.label}>Address</label>
-                    <input
-                      style={styles.input}
-                      value={form.address}
-                      onChange={(e) => handleFieldChange("address", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Timezone</label>
-                    <input
-                      style={styles.input}
-                      value={form.timezone}
-                      onChange={(e) => handleFieldChange("timezone", e.target.value)}
-                    />
-                  </div>
-
-                  <div style={styles.toggleBox}>
-                    <div style={styles.toggleLabel}>Booking Enabled</div>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleFieldChange("bookingEnabled", !form.bookingEnabled)
-                      }
-                      style={
-                        form.bookingEnabled
-                          ? styles.toggleActive
-                          : styles.toggleInactive
-                      }
-                    >
-                      {form.bookingEnabled ? "Enabled" : "Disabled"}
-                    </button>
-                  </div>
-
-                  <div style={styles.toggleBox}>
-                    <div style={styles.toggleLabel}>Online Visible</div>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleFieldChange("onlineVisible", !form.onlineVisible)
-                      }
-                      style={
-                        form.onlineVisible
-                          ? styles.toggleActive
-                          : styles.toggleInactive
-                      }
-                    >
-                      {form.onlineVisible ? "Visible" : "Hidden"}
-                    </button>
-                  </div>
-
-                  <div style={{ gridColumn: "span 4" }}>
-                    <label style={styles.label}>Notes</label>
-                    <textarea
-                      style={styles.textarea}
-                      value={form.notes}
-                      onChange={(e) => handleFieldChange("notes", e.target.value)}
-                    />
-                  </div>
+                <div>
+                  <label className={labelClass}>Clinic Code</label>
+                  <input
+                    className={inputClass}
+                    value={form.code}
+                    onChange={(e) => handleFieldChange("code", e.target.value)}
+                  />
                 </div>
 
-                <div style={styles.formActions}>
-                  <button type="button" style={styles.ghostButton}>
-                    Cancel
-                  </button>
-                  <button type="submit" style={styles.primaryButton}>
-                    Save Setup
-                  </button>
-                </div>
-              </form>
-
-              <div style={styles.panelCompact}>
-                <div style={styles.panelHeaderRow}>
-                  <div>
-                    <div style={styles.panelTitle}>Operating Hours</div>
-                    <div style={styles.panelSub}>
-                      Configure clinic opening hours by day
-                    </div>
-                  </div>
+                <div>
+                  <label className={labelClass}>Clinic Type</label>
+                  <input
+                    className={inputClass}
+                    value={form.type}
+                    onChange={(e) => handleFieldChange("type", e.target.value)}
+                  />
                 </div>
 
-                <div style={styles.hoursGrid}>
+                <div>
+                  <label className={labelClass}>Status</label>
+                  <select
+                    className={selectClass}
+                    value={form.status}
+                    onChange={(e) =>
+                      handleFieldChange("status", e.target.value as ClinicStatus)
+                    }
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Phone</label>
+                  <input
+                    className={inputClass}
+                    value={form.phone}
+                    onChange={(e) => handleFieldChange("phone", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Email</label>
+                  <input
+                    className={inputClass}
+                    value={form.email}
+                    onChange={(e) => handleFieldChange("email", e.target.value)}
+                  />
+                </div>
+
+                <div className="xl:col-span-2">
+                  <label className={labelClass}>Address</label>
+                  <input
+                    className={inputClass}
+                    value={form.address}
+                    onChange={(e) => handleFieldChange("address", e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-3 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+                <div className="mb-2 text-[14px] font-extrabold">Operating Hours</div>
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   {(Object.entries(form.hours) as [keyof Hours, string][]).map(
                     ([day, value]) => (
-                      <React.Fragment key={day}>
-                        <div style={styles.hoursLabel}>{day.toUpperCase()}</div>
+                      <div key={day}>
+                        <label className={labelClass}>{day.toUpperCase()}</label>
                         <input
-                          style={styles.input}
+                          className={inputClass}
                           value={value}
                           onChange={(e) => handleHoursChange(day, e.target.value)}
                         />
-                      </React.Fragment>
+                      </div>
                     )
                   )}
                 </div>
               </div>
-            </div>
+
+              <div className="mt-3">
+                <label className={labelClass}>Notes</label>
+                <textarea
+                  className="min-h-[84px] w-full resize-y rounded-2xl border border-[#284a73] bg-[#0d1830] p-3 text-[14px] text-white outline-none"
+                  value={form.notes}
+                  onChange={(e) => handleFieldChange("notes", e.target.value)}
+                />
+              </div>
+            </form>
           </section>
 
-          <section style={styles.rightRail}>
-            <div style={styles.panelCompact}>
-              <div style={styles.panelHeaderRow}>
-                <div>
-                  <div style={styles.panelTitle}>Setup Summary</div>
-                  <div style={styles.panelSub}>
-                    Current operational and visibility configuration
-                  </div>
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2 flex items-start justify-between gap-2">
+              <div>
+                <div className="text-[15px] font-extrabold">Clinic Summary</div>
+                <div className="mt-0.5 text-[12px] text-white/55">
+                  Current setup and visibility
                 </div>
               </div>
-
-              <div style={styles.summaryBoxCompact}>
-                <div style={styles.summaryRowMini}>
-                  <span>Clinic Name</span>
-                  <strong>{selectedClinic.name}</strong>
-                </div>
-                <div style={styles.summaryRowMini}>
-                  <span>Clinic Code</span>
-                  <strong>{selectedClinic.code}</strong>
-                </div>
-                <div style={styles.summaryRowMini}>
-                  <span>Status</span>
-                  <strong>{selectedClinic.status}</strong>
-                </div>
-                <div style={styles.summaryRowMini}>
-                  <span>Booking Enabled</span>
-                  <strong>{selectedClinic.bookingEnabled ? "Yes" : "No"}</strong>
-                </div>
-                <div style={styles.summaryRowMini}>
-                  <span>Online Visible</span>
-                  <strong>{selectedClinic.onlineVisible ? "Yes" : "No"}</strong>
-                </div>
-                <div style={styles.summaryRowMini}>
-                  <span>Timezone</span>
-                  <strong>{selectedClinic.timezone}</strong>
-                </div>
+              <div className="flex h-8 min-w-8 items-center justify-center rounded-full bg-emerald-500/15 text-[12px] font-extrabold text-emerald-300">
+                {activeResources}
               </div>
             </div>
 
-            <div style={styles.panelCompact}>
-              <div style={styles.panelHeaderRow}>
-                <div>
-                  <div style={styles.panelTitle}>Clinic Resources</div>
-                  <div style={styles.panelSub}>
-                    Manage room and equipment visibility
-                  </div>
+            <div className="mb-3 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+              {[
+                ["Selected", selectedClinic.name],
+                ["Code", selectedClinic.code],
+                ["Type", selectedClinic.type],
+                ["Status", selectedClinic.status],
+                ["Booking", selectedClinic.bookingEnabled ? "Enabled" : "Disabled"],
+                ["Online", selectedClinic.onlineVisible ? "Visible" : "Hidden"]
+              ].map(([label, value]) => (
+                <div
+                  key={label}
+                  className="flex justify-between gap-2 border-b border-[#143a5c] py-2 text-[13px] text-white/80"
+                >
+                  <span>{label}</span>
+                  <strong>{value}</strong>
                 </div>
-              </div>
+              ))}
+            </div>
 
-              <div style={styles.resourceList}>
+            <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+              <div className="mb-2 text-[14px] font-extrabold">Resources</div>
+              <div className="space-y-2">
                 {form.resources.map((resource) => (
-                  <div key={resource.id} style={styles.resourceRow}>
-                    <div>
-                      <div style={styles.resourceTitle}>{resource.name}</div>
-                      <div style={styles.resourceMeta}>{resource.type}</div>
-                    </div>
+                  <div
+                    key={resource.id}
+                    className="rounded-[18px] border border-[#143a5c] bg-[#071427] p-3"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="truncate text-[14px] font-extrabold">
+                          {resource.name}
+                        </div>
+                        <div className="mt-1 text-[12px] text-white/55">
+                          {resource.type}
+                        </div>
+                      </div>
 
-                    <div style={styles.resourceActions}>
-                      <span
-                        style={
-                          resource.status === "Active"
-                            ? styles.badgeActive
-                            : styles.badgeInactive
-                        }
-                      >
-                        {resource.status}
-                      </span>
                       <button
                         type="button"
                         onClick={() => toggleResourceStatus(resource.id)}
-                        style={
+                        className={`h-8 rounded-xl px-3 text-[11px] font-bold text-white ${
                           resource.status === "Active"
-                            ? styles.warningButton
-                            : styles.unlockButton
-                        }
+                            ? "bg-[#8d6a1d]"
+                            : "bg-[#2d8f52]"
+                        }`}
                       >
                         {resource.status === "Active" ? "Disable" : "Enable"}
                       </button>
+                    </div>
+
+                    <div className="mt-2 flex justify-end">
+                      <span
+                        className={`rounded-full px-3 py-1 text-[11px] font-bold ${
+                          resource.status === "Active"
+                            ? "bg-emerald-500/15 text-emerald-300"
+                            : "bg-rose-500/15 text-rose-300"
+                        }`}
+                      >
+                        {resource.status}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -573,563 +578,3 @@ export default function ClinicSetupPage() {
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: "100vh",
-    background: "#030a16",
-    color: "#ffffff",
-    fontFamily: "Inter, Segoe UI, Arial, sans-serif",
-    overflowX: "hidden",
-    overflowY: "auto"
-  },
-
-  topStrip: {
-    height: 28,
-    background: "#8d0d46",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 8px",
-    position: "sticky",
-    top: 0,
-    zIndex: 20
-  },
-
-  topStripText: {
-    fontSize: 9,
-    fontWeight: 700,
-    whiteSpace: "nowrap"
-  },
-
-  collapseButton: {
-    height: 20,
-    minWidth: 20,
-    borderRadius: 999,
-    border: "none",
-    background: "#d9d9d9",
-    color: "#222",
-    cursor: "pointer",
-    fontSize: 11,
-    fontWeight: 700,
-    lineHeight: 1
-  },
-
-  appShell: {
-    padding: 8,
-    boxSizing: "border-box"
-  },
-
-  titleBar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-    border: "1px solid rgba(54,112,190,0.28)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: "8px 12px",
-    marginBottom: 8,
-    position: "sticky",
-    top: 36,
-    zIndex: 15
-  },
-
-  titleLeft: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8
-  },
-
-  logo: {
-    width: 24,
-    height: 24,
-    borderRadius: 5,
-    objectFit: "cover"
-  },
-
-  eyebrow: {
-    fontSize: 9,
-    color: "#1da4ff",
-    fontWeight: 800,
-    letterSpacing: "1.2px"
-  },
-
-  title: {
-    fontSize: 14,
-    fontWeight: 800,
-    marginTop: 1
-  },
-
-  titleActions: {
-    display: "flex",
-    gap: 6,
-    alignItems: "center",
-    flexWrap: "wrap"
-  },
-
-  ghostButton: {
-    height: 26,
-    padding: "0 10px",
-    borderRadius: 9,
-    border: "1px solid rgba(54,112,190,0.32)",
-    background: "#0d1d35",
-    color: "#59b7ff",
-    fontSize: 11,
-    fontWeight: 700,
-    cursor: "pointer"
-  },
-
-  primaryButton: {
-    height: 26,
-    padding: "0 12px",
-    borderRadius: 9,
-    border: "none",
-    background: "#00a96e",
-    color: "#fff",
-    fontSize: 11,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  topInfoPill: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 999,
-    background: "#0d1d35",
-    border: "1px solid rgba(54,112,190,0.28)",
-    color: "#59b7ff",
-    fontSize: 10,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  topInfoSuccess: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 999,
-    background: "rgba(45,143,82,0.16)",
-    border: "1px solid rgba(45,143,82,0.28)",
-    color: "#7fd19a",
-    fontSize: 10,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  topInfoDanger: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 999,
-    background: "rgba(210,77,87,0.16)",
-    border: "1px solid rgba(210,77,87,0.28)",
-    color: "#f08b8b",
-    fontSize: 10,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  messageBanner: {
-    marginBottom: 8,
-    padding: "8px 10px",
-    borderRadius: 10,
-    fontSize: 11,
-    fontWeight: 700,
-    background: "rgba(45,143,82,0.14)",
-    border: "1px solid rgba(45,143,82,0.28)",
-    color: "#7fd19a"
-  },
-
-  metricsRow: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-    gap: 8,
-    marginBottom: 8
-  },
-
-  metricCard: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 12,
-    background: "#020d1f",
-    padding: "8px 10px"
-  },
-
-  metricLabel: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.56)",
-    marginBottom: 3
-  },
-
-  metricValueSmall: {
-    fontSize: 12,
-    fontWeight: 800
-  },
-
-  mainGrid: {
-    display: "grid",
-    gridTemplateColumns: "0.75fr 1.8fr 0.95fr",
-    gap: 8,
-    alignItems: "start"
-  },
-
-  leftRail: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: 8,
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    alignSelf: "start",
-    position: "sticky",
-    top: 88
-  },
-
-  centerArea: {
-    minWidth: 0
-  },
-
-  rightRail: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    minWidth: 0
-  },
-
-  compactStack: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8
-  },
-
-  panelCompact: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: 8
-  },
-
-  panelHeaderRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 6,
-    marginBottom: 6
-  },
-
-  panelTitle: {
-    fontSize: 11,
-    fontWeight: 800
-  },
-
-  panelSub: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.56)",
-    marginTop: 1
-  },
-
-  filterSection: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 4
-  },
-
-  filterLabel: {
-    fontSize: 9,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.72)"
-  },
-
-  clinicList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 5
-  },
-
-  clinicItem: {
-    padding: "7px 8px",
-    background: "#071427",
-    borderRadius: 10,
-    cursor: "pointer",
-    border: "1px solid rgba(54,112,190,0.18)"
-  },
-
-  clinicItemActive: {
-    padding: "7px 8px",
-    background: "#0b213f",
-    borderRadius: 10,
-    cursor: "pointer",
-    border: "1px solid rgba(26,154,255,0.45)"
-  },
-
-  clinicName: {
-    fontSize: 11,
-    fontWeight: 800,
-    color: "#ffffff"
-  },
-
-  clinicMeta: {
-    marginTop: 2,
-    fontSize: 9,
-    color: "rgba(255,255,255,0.58)"
-  },
-
-  input: {
-    width: "100%",
-    height: 26,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "0 8px",
-    fontSize: 11,
-    outline: "none",
-    boxSizing: "border-box"
-  },
-
-  select: {
-    width: "100%",
-    height: 26,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "0 8px",
-    fontSize: 11,
-    outline: "none",
-    boxSizing: "border-box"
-  },
-
-  textarea: {
-    width: "100%",
-    minHeight: 52,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "8px",
-    fontSize: 11,
-    outline: "none",
-    resize: "vertical",
-    boxSizing: "border-box",
-    fontFamily: "inherit"
-  },
-
-  formGrid4: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr 1fr",
-    gap: 6
-  },
-
-  formActions: {
-    display: "flex",
-    justifyContent: "flex-end",
-    gap: 6,
-    marginTop: 8
-  },
-
-  label: {
-    display: "block",
-    fontSize: 9,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.66)",
-    marginBottom: 3
-  },
-
-  toggleBox: {
-    height: 26,
-    background: "#0d1830",
-    border: "1px solid rgba(92,118,166,0.35)",
-    borderRadius: 9,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 8px"
-  },
-
-  toggleLabel: {
-    fontSize: 10,
-    color: "rgba(255,255,255,0.72)"
-  },
-
-  toggleActive: {
-    height: 20,
-    padding: "0 8px",
-    borderRadius: 999,
-    border: "none",
-    background: "#00a96e",
-    color: "#fff",
-    fontSize: 9,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  toggleInactive: {
-    height: 20,
-    padding: "0 8px",
-    borderRadius: 999,
-    border: "none",
-    background: "#b53d4a",
-    color: "#fff",
-    fontSize: 9,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  statusCard: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8
-  },
-
-  statusTitle: {
-    fontSize: 10,
-    fontWeight: 800,
-    marginBottom: 4
-  },
-
-  statusRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    fontSize: 10,
-    color: "rgba(255,255,255,0.68)",
-    marginBottom: 7
-  },
-
-  dotGreen: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#2d8f52",
-    display: "inline-block"
-  },
-
-  dotRed: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#d24d57",
-    display: "inline-block"
-  },
-
-  dotBlue: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#56a8ff",
-    display: "inline-block"
-  },
-
-  hoursGrid: {
-    display: "grid",
-    gridTemplateColumns: "52px 1fr 52px 1fr",
-    gap: 6,
-    alignItems: "center"
-  },
-
-  hoursLabel: {
-    fontSize: 9,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.78)"
-  },
-
-  summaryBoxCompact: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8
-  },
-
-  summaryRowMini: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 6,
-    padding: "5px 0",
-    borderBottom: "1px solid rgba(54,112,190,0.12)",
-    fontSize: 10,
-    color: "rgba(255,255,255,0.75)"
-  },
-
-  resourceList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 6
-  },
-
-  resourceRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 8,
-    padding: "8px",
-    borderRadius: 10,
-    background: "#071427",
-    border: "1px solid rgba(54,112,190,0.18)"
-  },
-
-  resourceTitle: {
-    fontSize: 10,
-    fontWeight: 800,
-    color: "#ffffff"
-  },
-
-  resourceMeta: {
-    marginTop: 2,
-    fontSize: 9,
-    color: "rgba(255,255,255,0.55)"
-  },
-
-  resourceActions: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6
-  },
-
-  badgeActive: {
-    display: "inline-block",
-    padding: "3px 8px",
-    borderRadius: 999,
-    background: "rgba(45,143,82,0.18)",
-    color: "#53c27a",
-    fontSize: 9,
-    fontWeight: 700
-  },
-
-  badgeInactive: {
-    display: "inline-block",
-    padding: "3px 8px",
-    borderRadius: 999,
-    background: "rgba(210,77,87,0.18)",
-    color: "#e06a6a",
-    fontSize: 9,
-    fontWeight: 700
-  },
-
-  warningButton: {
-    height: 22,
-    padding: "0 8px",
-    borderRadius: 8,
-    border: "none",
-    background: "#8d6a1d",
-    color: "#ffffff",
-    fontSize: 9,
-    fontWeight: 700,
-    cursor: "pointer"
-  },
-
-  unlockButton: {
-    height: 22,
-    padding: "0 8px",
-    borderRadius: 8,
-    border: "none",
-    background: "#2d8f52",
-    color: "#ffffff",
-    fontSize: 9,
-    fontWeight: 700,
-    cursor: "pointer"
-  }
-};

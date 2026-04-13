@@ -199,6 +199,15 @@ type EditableExamField =
   | "smsRules"
   | "notes";
 
+const inputClass =
+  "h-10 w-full rounded-xl border border-[#284a73] bg-[#0d1830] px-3 text-[13px] text-white outline-none placeholder:text-white/35 focus:border-sky-500/50";
+
+const selectClass =
+  "h-10 w-full rounded-xl border border-[#284a73] bg-[#0d1830] px-3 text-[13px] text-white outline-none focus:border-sky-500/50";
+
+const panelClass = "rounded-[22px] border border-[#143a5c] bg-[#020d1f]";
+const labelClass = "mb-1 block text-[11px] font-semibold text-white/78";
+
 export default function ExaminationConfigurationPage() {
   const [exams, setExams] = useState<Exam[]>(examSeed);
   const [selectedId, setSelectedId] = useState<number>(1);
@@ -273,491 +282,505 @@ export default function ExaminationConfigurationPage() {
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.topStrip}>
-        <div style={styles.topStripText}>
+    <div className="min-h-screen overflow-hidden bg-[#030a16] text-white">
+      <div className="sticky top-0 z-30 flex h-11 items-center justify-between bg-[#8d0d46] px-4">
+        <div className="truncate text-[14px] font-bold">
           EXAM CONFIG • ACTIVE {activeCount} • INACTIVE {inactiveCount} • MODALITIES {modalityCount} • DOCTOR PRESENCE {doctorPresenceCount}
         </div>
-        <button style={styles.collapseButton}>⌄</button>
+        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-[13px] font-bold text-[#222]">
+          v
+        </button>
       </div>
 
-      <div style={styles.appShell}>
-        <div style={styles.titleBar}>
-          <div style={styles.titleLeft}>
-            <img src="/logo.jpg" alt="EsyRIS logo" style={styles.logo} />
+      <div className="h-[calc(100vh-44px)] overflow-hidden p-2">
+        <div className={`${panelClass} mb-2 flex flex-wrap items-center justify-between gap-3 px-4 py-3`}>
+          <div className="flex items-center gap-3">
+            <img
+              src="/logo.jpg"
+              alt="EsyRIS logo"
+              className="h-10 w-10 rounded-xl object-cover"
+            />
             <div>
-              <div style={styles.eyebrow}>EXAMINATION CONFIGURATION</div>
-              <div style={styles.title}>Compact Examination Setup</div>
+              <div className="text-[11px] font-extrabold tracking-[2px] text-[#1da4ff]">
+                EXAMINATION CONFIGURATION
+              </div>
+              <div className="text-[16px] font-extrabold">
+                Compact Examination Setup
+              </div>
             </div>
           </div>
 
-          <div style={styles.titleActions}>
-            <div style={styles.topInfoPill}>Exam: {selectedExam.examCode}</div>
-            <div style={styles.topInfoPill}>Modality: {selectedExam.modality}</div>
-            <div style={styles.topInfoPill}>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex h-9 items-center rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
+              Exam: {selectedExam.examCode}
+            </div>
+            <div className="inline-flex h-9 items-center rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
+              Modality: {selectedExam.modality}
+            </div>
+            <div className="inline-flex h-9 items-center rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
               Presence: {selectedExam.doctorPresenceRequired ? "Required" : "Not Required"}
             </div>
-            <button style={styles.ghostButton}>Export</button>
-            <button style={styles.primaryButton}>Save Exam</button>
+            <button
+              type="button"
+              className="h-9 rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]"
+            >
+              Export
+            </button>
+            <button
+              type="submit"
+              form="exam-form"
+              className="h-9 rounded-2xl bg-[#00a96e] px-5 text-[14px] font-extrabold"
+            >
+              Save Exam
+            </button>
           </div>
         </div>
 
-        {message ? <div style={styles.messageBanner}>{message}</div> : null}
+        {message ? (
+          <div className="mb-2 rounded-2xl border border-emerald-700/30 bg-emerald-500/15 px-4 py-2 text-[13px] font-bold text-emerald-300">
+            {message}
+          </div>
+        ) : null}
 
-        <div style={styles.metricsRow}>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Selected Exam</div>
-            <div style={styles.metricValueSmall}>{selectedExam.examCode}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Modality</div>
-            <div style={styles.metricValueSmall}>{selectedExam.modality}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Status</div>
-            <div style={styles.metricValueSmall}>{selectedExam.status}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Doctor Presence</div>
-            <div style={styles.metricValueSmall}>
-              {selectedExam.doctorPresenceRequired ? "Required" : "Not Required"}
-            </div>
-          </div>
-        </div>
-
-        <div style={styles.mainGrid}>
-          <aside style={styles.leftRail}>
-            <div style={styles.panelHeaderRow}>
+        <div className="grid h-[calc(100%-76px)] grid-cols-1 gap-2 xl:grid-cols-[1.02fr_1.18fr_0.78fr]">
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2 flex items-start justify-between gap-2">
               <div>
-                <div style={styles.panelTitle}>Exam Search</div>
-                <div style={styles.panelSub}>Find and switch exam quickly</div>
+                <div className="text-[15px] font-extrabold">Exam Search</div>
+                <div className="mt-0.5 text-[12px] text-white/55">
+                  Find and switch exam quickly
+                </div>
+              </div>
+              <div className="inline-flex h-7 items-center rounded-full bg-emerald-500/15 px-3 text-[11px] font-extrabold text-emerald-300">
+                {filteredExams.length} shown
               </div>
             </div>
 
-            <div style={styles.filterSection}>
-              <div style={styles.filterLabel}>Search</div>
+            <div className="mb-2">
               <input
-                style={styles.input}
+                className={inputClass}
                 placeholder="Exam, code, billing..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
 
-            <div style={styles.examList}>
+            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
               {filteredExams.map((exam) => (
-                <div
+                <button
                   key={exam.id}
+                  type="button"
                   onClick={() => setSelectedId(exam.id)}
-                  style={
+                  className={`w-full rounded-[20px] border px-3 py-3 text-left ${
                     exam.id === selectedId
-                      ? styles.examItemActive
-                      : styles.examItem
-                  }
+                      ? "border-sky-500/45 bg-[#0b213f]"
+                      : "border-[#143a5c] bg-[#071427]"
+                  }`}
                 >
-                  <div style={styles.examName}>{exam.examName}</div>
-                  <div style={styles.examMeta}>{exam.examCode}</div>
-                  <div style={styles.examMeta}>
+                  <div className="text-[14px] font-extrabold">{exam.examName}</div>
+                  <div className="mt-1 text-[12px] text-white/62">{exam.examCode}</div>
+                  <div className="mt-0.5 text-[12px] text-white/55">
                     {exam.modality} • {exam.billingCode}
                   </div>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-2 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+              <div className="mb-2 text-[14px] font-extrabold">Overview</div>
+              <div className="mb-2 flex items-center gap-2 text-[13px] text-white/75">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#2d8f52]" />
+                <span>{activeCount} Active Exams</span>
+              </div>
+              <div className="mb-2 flex items-center gap-2 text-[13px] text-white/75">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#d24d57]" />
+                <span>{inactiveCount} Inactive Exams</span>
+              </div>
+              <div className="mb-2 flex items-center gap-2 text-[13px] text-white/75">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#56a8ff]" />
+                <span>{modalityCount} Modalities</span>
+              </div>
+              <div className="flex items-center gap-2 text-[13px] text-white/75">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#9b6bff]" />
+                <span>{doctorPresenceCount} Need Doctor Presence</span>
+              </div>
+            </div>
+          </section>
+
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2 flex items-start justify-between gap-2">
+              <div>
+                <div className="text-[15px] font-extrabold">Examination Details</div>
+                <div className="mt-0.5 text-[12px] text-white/55">
+                  Manage exam data, billing, instructions and presence rules
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-full border border-[#284a73] bg-[#0d1d35] px-3 py-1.5 text-[11px] font-bold text-white/85">
+                  Status: {form.status}
+                </span>
+                <span className="rounded-full border border-[#284a73] bg-[#0d1d35] px-3 py-1.5 text-[11px] font-bold text-white/85">
+                  Duration: {form.duration}
+                </span>
+              </div>
+            </div>
+
+            <div className="mb-2 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={handleDoctorPresenceToggle}
+                className={`h-9 rounded-2xl px-4 text-[13px] font-bold ${
+                  form.doctorPresenceRequired
+                    ? "border border-emerald-700/30 bg-emerald-500/15 text-emerald-300"
+                    : "border border-slate-700/40 bg-[#111b2f] text-white"
+                }`}
+              >
+                {form.doctorPresenceRequired ? "Presence Required" : "Presence Not Required"}
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  handleFieldChange(
+                    "status",
+                    form.status === "Active" ? "Inactive" : "Active"
+                  )
+                }
+                className={`h-9 rounded-2xl px-4 text-[13px] font-bold ${
+                  form.status === "Active"
+                    ? "border border-sky-600/30 bg-[#0f2746] text-sky-300"
+                    : "border border-rose-700/30 bg-rose-500/15 text-rose-300"
+                }`}
+              >
+                {form.status === "Active" ? "Deactivate" : "Activate"}
+              </button>
+            </div>
+
+            <form id="exam-form" onSubmit={handleSave} className="min-h-0 flex-1 overflow-y-auto pr-1">
+              <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+                <div>
+                  <label className={labelClass}>Exam Name</label>
+                  <input
+                    className={inputClass}
+                    value={form.examName}
+                    onChange={(e) => handleFieldChange("examName", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Exam Code</label>
+                  <input
+                    className={inputClass}
+                    value={form.examCode}
+                    onChange={(e) => handleFieldChange("examCode", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Modality</label>
+                  <select
+                    className={selectClass}
+                    value={form.modality}
+                    onChange={(e) =>
+                      handleFieldChange("modality", e.target.value as Modality)
+                    }
+                  >
+                    {modalities.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Category</label>
+                  <input
+                    className={inputClass}
+                    value={form.category}
+                    onChange={(e) => handleFieldChange("category", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Body Part</label>
+                  <input
+                    className={inputClass}
+                    value={form.bodyPart}
+                    onChange={(e) => handleFieldChange("bodyPart", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Contrast</label>
+                  <select
+                    className={selectClass}
+                    value={form.contrast}
+                    onChange={(e) =>
+                      handleFieldChange("contrast", e.target.value as ContrastOption)
+                    }
+                  >
+                    {contrastOptions.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Billing Code</label>
+                  <input
+                    className={inputClass}
+                    value={form.billingCode}
+                    onChange={(e) => handleFieldChange("billingCode", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Medicare Item</label>
+                  <input
+                    className={inputClass}
+                    value={form.medicareItemNumber}
+                    onChange={(e) =>
+                      handleFieldChange("medicareItemNumber", e.target.value)
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Medicare Rebate</label>
+                  <input
+                    className={inputClass}
+                    value={form.medicareRebateFee}
+                    onChange={(e) =>
+                      handleFieldChange("medicareRebateFee", e.target.value)
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Out-of-pocket Fee</label>
+                  <input
+                    className={inputClass}
+                    value={form.outOfPocketFee}
+                    onChange={(e) =>
+                      handleFieldChange("outOfPocketFee", e.target.value)
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Private Billing Fee</label>
+                  <input
+                    className={inputClass}
+                    value={form.privateBillingFee}
+                    onChange={(e) =>
+                      handleFieldChange("privateBillingFee", e.target.value)
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Equipment Requirement</label>
+                  <input
+                    className={inputClass}
+                    value={form.equipmentRequirement}
+                    onChange={(e) =>
+                      handleFieldChange("equipmentRequirement", e.target.value)
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Duration</label>
+                  <input
+                    className={inputClass}
+                    value={form.duration}
+                    onChange={(e) => handleFieldChange("duration", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Status</label>
+                  <select
+                    className={selectClass}
+                    value={form.status}
+                    onChange={(e) =>
+                      handleFieldChange("status", e.target.value as ExamStatus)
+                    }
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Presence Type</label>
+                  <select
+                    className={selectClass}
+                    value={form.doctorPresenceType}
+                    onChange={(e) =>
+                      handleFieldChange(
+                        "doctorPresenceType",
+                        e.target.value as DoctorPresenceType
+                      )
+                    }
+                    disabled={!form.doctorPresenceRequired}
+                  >
+                    {doctorPresenceTypes.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Minimum Doctors</label>
+                  <input
+                    className={inputClass}
+                    type="number"
+                    min="0"
+                    value={form.minimumDoctorsRequired}
+                    onChange={(e) =>
+                      handleFieldChange(
+                        "minimumDoctorsRequired",
+                        Number(e.target.value)
+                      )
+                    }
+                    disabled={!form.doctorPresenceRequired}
+                  />
+                </div>
+
+                <div className="xl:col-span-2">
+                  <label className={labelClass}>Preparation</label>
+                  <textarea
+                    className="min-h-[70px] w-full resize-y rounded-2xl border border-[#284a73] bg-[#0d1830] p-3 text-[13px] text-white outline-none"
+                    value={form.preparation}
+                    onChange={(e) => handleFieldChange("preparation", e.target.value)}
+                  />
+                </div>
+
+                <div className="xl:col-span-2">
+                  <label className={labelClass}>Post-Procedure Instructions</label>
+                  <textarea
+                    className="min-h-[70px] w-full resize-y rounded-2xl border border-[#284a73] bg-[#0d1830] p-3 text-[13px] text-white outline-none"
+                    value={form.postProcedureInstructions}
+                    onChange={(e) =>
+                      handleFieldChange("postProcedureInstructions", e.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="xl:col-span-2">
+                  <label className={labelClass}>SMS Rules</label>
+                  <textarea
+                    className="min-h-[70px] w-full resize-y rounded-2xl border border-[#284a73] bg-[#0d1830] p-3 text-[13px] text-white outline-none"
+                    value={form.smsRules}
+                    onChange={(e) => handleFieldChange("smsRules", e.target.value)}
+                  />
+                </div>
+
+                <div className="xl:col-span-2">
+                  <label className={labelClass}>Doctor Presence Notes</label>
+                  <textarea
+                    className="min-h-[70px] w-full resize-y rounded-2xl border border-[#284a73] bg-[#0d1830] p-3 text-[13px] text-white outline-none"
+                    value={form.doctorPresenceNotes}
+                    onChange={(e) =>
+                      handleFieldChange("doctorPresenceNotes", e.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="xl:col-span-2">
+                  <label className={labelClass}>Operational Notes</label>
+                  <textarea
+                    className="min-h-[84px] w-full resize-y rounded-2xl border border-[#284a73] bg-[#0d1830] p-3 text-[14px] text-white outline-none"
+                    value={form.notes}
+                    onChange={(e) => handleFieldChange("notes", e.target.value)}
+                  />
+                </div>
+              </div>
+            </form>
+          </section>
+
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2 flex items-start justify-between gap-2">
+              <div>
+                <div className="text-[15px] font-extrabold">Configuration Summary</div>
+                <div className="mt-0.5 text-[12px] text-white/55">
+                  Competencies, rules and setup visibility
+                </div>
+              </div>
+              <div className="flex h-8 min-w-8 items-center justify-center rounded-full bg-emerald-500/15 text-[12px] font-extrabold text-emerald-300">
+                {form.competencies.length}
+              </div>
+            </div>
+
+            <div className="mb-3 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+              {[
+                ["Exam Name", selectedExam.examName],
+                ["Exam Code", selectedExam.examCode],
+                ["Modality", selectedExam.modality],
+                ["Body Part", selectedExam.bodyPart],
+                ["Billing Code", selectedExam.billingCode],
+                ["Presence Type", selectedExam.doctorPresenceType],
+                ["Minimum Doctors", selectedExam.minimumDoctorsRequired]
+              ].map(([label, value]) => (
+                <div
+                  key={label}
+                  className="flex justify-between gap-2 border-b border-[#143a5c] py-2 text-[13px] text-white/80"
+                >
+                  <span>{label}</span>
+                  <strong>{value}</strong>
                 </div>
               ))}
             </div>
 
-            <div style={styles.statusCard}>
-              <div style={styles.statusTitle}>Overview</div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotGreen} />
-                <span>{activeCount} Active Exams</span>
-              </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotRed} />
-                <span>{inactiveCount} Inactive Exams</span>
-              </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotBlue} />
-                <span>{modalityCount} Modalities</span>
-              </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotPurple} />
-                <span>{doctorPresenceCount} Need Doctor Presence</span>
-              </div>
-            </div>
-          </aside>
+            <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+              <div className="mb-2 text-[14px] font-extrabold">Required Competencies</div>
 
-          <section style={styles.centerArea}>
-            <div style={styles.compactStack}>
-              <form onSubmit={handleSave} style={styles.panelCompact}>
-                <div style={styles.panelHeaderRow}>
-                  <div>
-                    <div style={styles.panelTitle}>Examination Details</div>
-                    <div style={styles.panelSub}>
-                      Manage exam data, billing, instructions, competencies, and doctor presence
-                    </div>
-                  </div>
-                </div>
-
-                <div style={styles.formGrid4}>
-                  <div>
-                    <label style={styles.label}>Exam Name</label>
-                    <input
-                      style={styles.input}
-                      value={form.examName}
-                      onChange={(e) => handleFieldChange("examName", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Exam Code</label>
-                    <input
-                      style={styles.input}
-                      value={form.examCode}
-                      onChange={(e) => handleFieldChange("examCode", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Modality</label>
-                    <select
-                      style={styles.select}
-                      value={form.modality}
-                      onChange={(e) =>
-                        handleFieldChange("modality", e.target.value as Modality)
-                      }
-                    >
-                      {modalities.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Category</label>
-                    <input
-                      style={styles.input}
-                      value={form.category}
-                      onChange={(e) => handleFieldChange("category", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Body Part</label>
-                    <input
-                      style={styles.input}
-                      value={form.bodyPart}
-                      onChange={(e) => handleFieldChange("bodyPart", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Contrast</label>
-                    <select
-                      style={styles.select}
-                      value={form.contrast}
-                      onChange={(e) =>
-                        handleFieldChange("contrast", e.target.value as ContrastOption)
-                      }
-                    >
-                      {contrastOptions.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Billing Code</label>
-                    <input
-                      style={styles.input}
-                      value={form.billingCode}
-                      onChange={(e) => handleFieldChange("billingCode", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Medicare Item</label>
-                    <input
-                      style={styles.input}
-                      value={form.medicareItemNumber}
-                      onChange={(e) =>
-                        handleFieldChange("medicareItemNumber", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Medicare Rebate</label>
-                    <input
-                      style={styles.input}
-                      value={form.medicareRebateFee}
-                      onChange={(e) =>
-                        handleFieldChange("medicareRebateFee", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Out-of-pocket Fee</label>
-                    <input
-                      style={styles.input}
-                      value={form.outOfPocketFee}
-                      onChange={(e) =>
-                        handleFieldChange("outOfPocketFee", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Private Billing Fee</label>
-                    <input
-                      style={styles.input}
-                      value={form.privateBillingFee}
-                      onChange={(e) =>
-                        handleFieldChange("privateBillingFee", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Equipment Requirement</label>
-                    <input
-                      style={styles.input}
-                      value={form.equipmentRequirement}
-                      onChange={(e) =>
-                        handleFieldChange("equipmentRequirement", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Duration</label>
-                    <input
-                      style={styles.input}
-                      value={form.duration}
-                      onChange={(e) => handleFieldChange("duration", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Status</label>
-                    <select
-                      style={styles.select}
-                      value={form.status}
-                      onChange={(e) =>
-                        handleFieldChange("status", e.target.value as ExamStatus)
-                      }
-                    >
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                  </div>
-
-                  <div style={styles.toggleBox}>
-                    <div style={styles.toggleLabel}>Doctor Presence Required</div>
+              <div className="mb-3 flex flex-wrap gap-2">
+                {competencyOptions.map((item) => {
+                  const active = form.competencies.includes(item);
+                  return (
                     <button
                       type="button"
-                      onClick={handleDoctorPresenceToggle}
-                      style={
-                        form.doctorPresenceRequired
-                          ? styles.toggleActive
-                          : styles.toggleInactive
+                      key={item}
+                      onClick={() => toggleCompetency(item)}
+                      className={
+                        active
+                          ? "rounded-xl border border-sky-500/30 bg-[#0b213f] px-3 py-2 text-[11px] font-bold text-sky-300"
+                          : "rounded-xl border border-[#143a5c] bg-[#071427] px-3 py-2 text-[11px] font-semibold text-white/72"
                       }
                     >
-                      {form.doctorPresenceRequired ? "Required" : "Not Required"}
+                      {item}
                     </button>
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Presence Type</label>
-                    <select
-                      style={styles.select}
-                      value={form.doctorPresenceType}
-                      onChange={(e) =>
-                        handleFieldChange(
-                          "doctorPresenceType",
-                          e.target.value as DoctorPresenceType
-                        )
-                      }
-                      disabled={!form.doctorPresenceRequired}
-                    >
-                      {doctorPresenceTypes.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Minimum Doctors</label>
-                    <input
-                      style={styles.input}
-                      type="number"
-                      min="0"
-                      value={form.minimumDoctorsRequired}
-                      onChange={(e) =>
-                        handleFieldChange(
-                          "minimumDoctorsRequired",
-                          Number(e.target.value)
-                        )
-                      }
-                      disabled={!form.doctorPresenceRequired}
-                    />
-                  </div>
-
-                  <div style={{ gridColumn: "span 2" }}>
-                    <label style={styles.label}>Preparation</label>
-                    <textarea
-                      style={styles.textarea}
-                      value={form.preparation}
-                      onChange={(e) => handleFieldChange("preparation", e.target.value)}
-                    />
-                  </div>
-
-                  <div style={{ gridColumn: "span 2" }}>
-                    <label style={styles.label}>Post-Procedure Instructions</label>
-                    <textarea
-                      style={styles.textarea}
-                      value={form.postProcedureInstructions}
-                      onChange={(e) =>
-                        handleFieldChange("postProcedureInstructions", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div style={{ gridColumn: "span 2" }}>
-                    <label style={styles.label}>SMS Rules</label>
-                    <textarea
-                      style={styles.textarea}
-                      value={form.smsRules}
-                      onChange={(e) => handleFieldChange("smsRules", e.target.value)}
-                    />
-                  </div>
-
-                  <div style={{ gridColumn: "span 2" }}>
-                    <label style={styles.label}>Doctor Presence Notes</label>
-                    <textarea
-                      style={styles.textarea}
-                      value={form.doctorPresenceNotes}
-                      onChange={(e) =>
-                        handleFieldChange("doctorPresenceNotes", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div style={{ gridColumn: "span 4" }}>
-                    <label style={styles.label}>Operational Notes</label>
-                    <textarea
-                      style={styles.textarea}
-                      value={form.notes}
-                      onChange={(e) => handleFieldChange("notes", e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div style={styles.formActions}>
-                  <button type="button" style={styles.ghostButton}>
-                    Cancel
-                  </button>
-                  <button type="submit" style={styles.primaryButton}>
-                    Save Exam
-                  </button>
-                </div>
-              </form>
-
-              <div style={styles.bottomGrid}>
-                <section style={styles.panelCompact}>
-                  <div style={styles.panelTitle}>Required Competencies</div>
-                  <div style={styles.panelSub}>Toggle staff competencies for this exam</div>
-
-                  <div style={styles.competencyGrid}>
-                    {competencyOptions.map((item) => {
-                      const active = form.competencies.includes(item);
-                      return (
-                        <button
-                          type="button"
-                          key={item}
-                          onClick={() => toggleCompetency(item)}
-                          style={active ? styles.competencyActive : styles.competencyItem}
-                        >
-                          {item}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <div style={styles.selectedCompetencies}>
-                    {form.competencies.map((item) => (
-                      <span key={item} style={styles.badgeActive}>
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </section>
-
-                <section style={styles.panelCompact}>
-                  <div style={styles.panelTitle}>Configuration Summary</div>
-                  <div style={styles.panelSub}>Current exam visibility and rule overview</div>
-
-                  <div style={styles.summaryBoxCompact}>
-                    <div style={styles.summaryRowMini}>
-                      <span>Exam Name</span>
-                      <strong>{selectedExam.examName}</strong>
-                    </div>
-                    <div style={styles.summaryRowMini}>
-                      <span>Exam Code</span>
-                      <strong>{selectedExam.examCode}</strong>
-                    </div>
-                    <div style={styles.summaryRowMini}>
-                      <span>Modality</span>
-                      <strong>{selectedExam.modality}</strong>
-                    </div>
-                    <div style={styles.summaryRowMini}>
-                      <span>Body Part</span>
-                      <strong>{selectedExam.bodyPart}</strong>
-                    </div>
-                    <div style={styles.summaryRowMini}>
-                      <span>Billing Code</span>
-                      <strong>{selectedExam.billingCode}</strong>
-                    </div>
-                    <div style={styles.summaryRowMini}>
-                      <span>Presence Type</span>
-                      <strong>{selectedExam.doctorPresenceType}</strong>
-                    </div>
-                    <div style={styles.summaryRowMini}>
-                      <span>Minimum Doctors</span>
-                      <strong>{selectedExam.minimumDoctorsRequired}</strong>
-                    </div>
-                  </div>
-                </section>
+                  );
+                })}
               </div>
 
-              <div style={styles.bottomGrid}>
-                <section style={styles.panelCompact}>
-                  <div style={styles.panelTitle}>Preparation Instructions</div>
-                  <div style={styles.panelSub}>Patient-facing preparation guidance</div>
-                  <div style={styles.instructionsBox}>{selectedExam.preparation}</div>
-                </section>
+              <div className="mb-3 rounded-[18px] border border-[#143a5c] bg-[#071427] p-3">
+                <div className="mb-2 text-[13px] font-extrabold">Preparation Instructions</div>
+                <div className="text-[12px] leading-6 text-white/75">{selectedExam.preparation}</div>
+              </div>
 
-                <section style={styles.panelCompact}>
-                  <div style={styles.panelTitle}>Post-Procedure & SMS Rules</div>
-                  <div style={styles.panelSub}>Communication and post-care guidance</div>
+              <div className="rounded-[18px] border border-[#143a5c] bg-[#071427] p-3">
+                <div className="mb-2 text-[13px] font-extrabold">Post-Procedure & SMS Rules</div>
 
-                  <div style={styles.detailBlock}>
-                    <div style={styles.detailTitle}>SMS Rules</div>
-                    <div style={styles.detailText}>{selectedExam.smsRules}</div>
+                <div className="mb-3 rounded-xl border border-[#143a5c] bg-[#081321] p-3">
+                  <div className="mb-1 text-[12px] font-extrabold text-white">SMS Rules</div>
+                  <div className="text-[12px] leading-6 text-white/72">{selectedExam.smsRules}</div>
+                </div>
+
+                <div className="rounded-xl border border-[#143a5c] bg-[#081321] p-3">
+                  <div className="mb-1 text-[12px] font-extrabold text-white">Post-Procedure</div>
+                  <div className="text-[12px] leading-6 text-white/72">
+                    {selectedExam.postProcedureInstructions}
                   </div>
-
-                  <div style={styles.detailBlock}>
-                    <div style={styles.detailTitle}>Post-Procedure</div>
-                    <div style={styles.detailText}>
-                      {selectedExam.postProcedureInstructions}
-                    </div>
-                  </div>
-                </section>
+                </div>
               </div>
             </div>
           </section>
@@ -766,531 +789,3 @@ export default function ExaminationConfigurationPage() {
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: "100vh",
-    background: "#030a16",
-    color: "#ffffff",
-    fontFamily: "Inter, Segoe UI, Arial, sans-serif",
-    overflowX: "hidden",
-    overflowY: "auto"
-  },
-
-  topStrip: {
-    height: 28,
-    background: "#8d0d46",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 8px",
-    position: "sticky",
-    top: 0,
-    zIndex: 20
-  },
-
-  topStripText: {
-    fontSize: 9,
-    fontWeight: 700,
-    whiteSpace: "nowrap"
-  },
-
-  collapseButton: {
-    height: 20,
-    minWidth: 20,
-    borderRadius: 999,
-    border: "none",
-    background: "#d9d9d9",
-    color: "#222",
-    cursor: "pointer",
-    fontSize: 11,
-    fontWeight: 700,
-    lineHeight: 1
-  },
-
-  appShell: {
-    padding: 8,
-    boxSizing: "border-box"
-  },
-
-  titleBar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-    border: "1px solid rgba(54,112,190,0.28)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: "8px 12px",
-    marginBottom: 8,
-    position: "sticky",
-    top: 36,
-    zIndex: 15
-  },
-
-  titleLeft: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8
-  },
-
-  logo: {
-    width: 24,
-    height: 24,
-    borderRadius: 5,
-    objectFit: "cover"
-  },
-
-  eyebrow: {
-    fontSize: 9,
-    color: "#1da4ff",
-    fontWeight: 800,
-    letterSpacing: "1.2px"
-  },
-
-  title: {
-    fontSize: 14,
-    fontWeight: 800,
-    marginTop: 1
-  },
-
-  titleActions: {
-    display: "flex",
-    gap: 6,
-    alignItems: "center",
-    flexWrap: "wrap"
-  },
-
-  ghostButton: {
-    height: 26,
-    padding: "0 10px",
-    borderRadius: 9,
-    border: "1px solid rgba(54,112,190,0.32)",
-    background: "#0d1d35",
-    color: "#59b7ff",
-    fontSize: 11,
-    fontWeight: 700,
-    cursor: "pointer"
-  },
-
-  primaryButton: {
-    height: 26,
-    padding: "0 12px",
-    borderRadius: 9,
-    border: "none",
-    background: "#00a96e",
-    color: "#fff",
-    fontSize: 11,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  topInfoPill: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 999,
-    background: "#0d1d35",
-    border: "1px solid rgba(54,112,190,0.28)",
-    color: "#59b7ff",
-    fontSize: 10,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  messageBanner: {
-    marginBottom: 8,
-    padding: "8px 10px",
-    borderRadius: 10,
-    fontSize: 10,
-    fontWeight: 700,
-    background: "rgba(45,143,82,0.14)",
-    border: "1px solid rgba(45,143,82,0.28)",
-    color: "#7fd19a"
-  },
-
-  metricsRow: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-    gap: 8,
-    marginBottom: 8
-  },
-
-  metricCard: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 12,
-    background: "#020d1f",
-    padding: "8px 10px"
-  },
-
-  metricLabel: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.56)",
-    marginBottom: 3
-  },
-
-  metricValueSmall: {
-    fontSize: 12,
-    fontWeight: 800
-  },
-
-  mainGrid: {
-    display: "grid",
-    gridTemplateColumns: "0.75fr 2fr",
-    gap: 8,
-    alignItems: "start"
-  },
-
-  leftRail: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: 8,
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    alignSelf: "start",
-    position: "sticky",
-    top: 88
-  },
-
-  centerArea: {
-    minWidth: 0
-  },
-
-  compactStack: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8
-  },
-
-  panelCompact: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: 8
-  },
-
-  panelHeaderRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 6,
-    marginBottom: 6
-  },
-
-  panelTitle: {
-    fontSize: 11,
-    fontWeight: 800
-  },
-
-  panelSub: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.56)",
-    marginTop: 1
-  },
-
-  filterSection: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 4
-  },
-
-  filterLabel: {
-    fontSize: 9,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.72)"
-  },
-
-  examList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 5
-  },
-
-  examItem: {
-    padding: "7px 8px",
-    background: "#071427",
-    borderRadius: 10,
-    cursor: "pointer",
-    border: "1px solid rgba(54,112,190,0.18)"
-  },
-
-  examItemActive: {
-    padding: "7px 8px",
-    background: "#0b213f",
-    borderRadius: 10,
-    cursor: "pointer",
-    border: "1px solid rgba(26,154,255,0.45)"
-  },
-
-  examName: {
-    fontSize: 11,
-    fontWeight: 800,
-    color: "#ffffff"
-  },
-
-  examMeta: {
-    marginTop: 2,
-    fontSize: 9,
-    color: "rgba(255,255,255,0.58)"
-  },
-
-  input: {
-    width: "100%",
-    height: 26,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "0 8px",
-    fontSize: 11,
-    outline: "none",
-    boxSizing: "border-box"
-  },
-
-  select: {
-    width: "100%",
-    height: 26,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "0 8px",
-    fontSize: 11,
-    outline: "none",
-    boxSizing: "border-box"
-  },
-
-  textarea: {
-    width: "100%",
-    minHeight: 56,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "8px",
-    fontSize: 11,
-    outline: "none",
-    resize: "vertical",
-    boxSizing: "border-box",
-    fontFamily: "inherit"
-  },
-
-  formGrid4: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr 1fr",
-    gap: 6
-  },
-
-  formActions: {
-    display: "flex",
-    justifyContent: "flex-end",
-    gap: 6,
-    marginTop: 8
-  },
-
-  statusCard: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8
-  },
-
-  statusTitle: {
-    fontSize: 10,
-    fontWeight: 800,
-    marginBottom: 4
-  },
-
-  statusRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    fontSize: 10,
-    color: "rgba(255,255,255,0.68)",
-    marginBottom: 7
-  },
-
-  dotGreen: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#2d8f52",
-    display: "inline-block"
-  },
-
-  dotRed: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#d24d57",
-    display: "inline-block"
-  },
-
-  dotBlue: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#56a8ff",
-    display: "inline-block"
-  },
-
-  dotPurple: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#9b6bff",
-    display: "inline-block"
-  },
-
-  label: {
-    display: "block",
-    fontSize: 9,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.66)",
-    marginBottom: 3
-  },
-
-  toggleBox: {
-    height: 26,
-    background: "#0d1830",
-    border: "1px solid rgba(92,118,166,0.35)",
-    borderRadius: 9,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 8px"
-  },
-
-  toggleLabel: {
-    fontSize: 10,
-    color: "rgba(255,255,255,0.72)"
-  },
-
-  toggleActive: {
-    height: 20,
-    padding: "0 8px",
-    borderRadius: 999,
-    border: "none",
-    background: "#00a96e",
-    color: "#fff",
-    fontSize: 9,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  toggleInactive: {
-    height: 20,
-    padding: "0 8px",
-    borderRadius: 999,
-    border: "none",
-    background: "#b53d4a",
-    color: "#fff",
-    fontSize: 9,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  bottomGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 8
-  },
-
-  competencyGrid: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 6,
-    marginTop: 8
-  },
-
-  competencyItem: {
-    padding: "6px 8px",
-    borderRadius: 8,
-    border: "1px solid rgba(54,112,190,0.18)",
-    background: "#071427",
-    color: "rgba(255,255,255,0.72)",
-    cursor: "pointer",
-    fontWeight: 600,
-    fontSize: 10
-  },
-
-  competencyActive: {
-    padding: "6px 8px",
-    borderRadius: 8,
-    border: "1px solid rgba(26,154,255,0.3)",
-    background: "#0b213f",
-    color: "#59b7ff",
-    cursor: "pointer",
-    fontWeight: 700,
-    fontSize: 10
-  },
-
-  selectedCompetencies: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 6,
-    marginTop: 8
-  },
-
-  badgeActive: {
-    display: "inline-block",
-    padding: "3px 8px",
-    borderRadius: 999,
-    background: "rgba(45,143,82,0.18)",
-    color: "#53c27a",
-    fontSize: 9,
-    fontWeight: 700
-  },
-
-  summaryBoxCompact: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8,
-    marginTop: 6
-  },
-
-  summaryRowMini: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 6,
-    padding: "5px 0",
-    borderBottom: "1px solid rgba(54,112,190,0.12)",
-    fontSize: 10,
-    color: "rgba(255,255,255,0.75)"
-  },
-
-  instructionsBox: {
-    marginTop: 8,
-    background: "#071427",
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    padding: 8,
-    color: "rgba(255,255,255,0.78)",
-    lineHeight: 1.5,
-    fontSize: 10
-  },
-
-  detailBlock: {
-    marginTop: 8,
-    padding: 8,
-    borderRadius: 10,
-    background: "#071427",
-    border: "1px solid rgba(54,112,190,0.18)"
-  },
-
-  detailTitle: {
-    fontSize: 10,
-    fontWeight: 800,
-    color: "#ffffff",
-    marginBottom: 4
-  },
-
-  detailText: {
-    fontSize: 10,
-    color: "rgba(255,255,255,0.72)",
-    lineHeight: 1.5
-  }
-};

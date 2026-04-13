@@ -1,6 +1,6 @@
 "use client";
 
-import React, { CSSProperties, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 const modalities = [
   {
@@ -53,8 +53,20 @@ function generatePatientId(firstName: string, lastName: string) {
   return `PT-${base}-${random}`;
 }
 
+const inputClass =
+  "h-10 w-full rounded-xl border border-[#284a73] bg-[#0d1830] px-3 text-[13px] text-white outline-none placeholder:text-white/35 focus:border-sky-500/50";
+
+const selectClass =
+  "h-10 w-full rounded-xl border border-[#284a73] bg-[#0d1830] px-3 text-[13px] text-white outline-none focus:border-sky-500/50";
+
+const panelClass = "rounded-[22px] border border-[#143a5c] bg-[#020d1f]";
+const labelClass = "mb-1 block text-[11px] font-semibold text-white/78";
+
 export default function PatientRegistrationPage() {
-  const [statusMessage, setStatusMessage] = useState<{ type: string; text: string } | null>(null);
+  const [statusMessage, setStatusMessage] = useState<{
+    type: string;
+    text: string;
+  } | null>(null);
   const [showTimeSlotCard, setShowTimeSlotCard] = useState(false);
   const [savedPatientId, setSavedPatientId] = useState("");
 
@@ -119,7 +131,11 @@ export default function PatientRegistrationPage() {
     return filteredTests.filter((test) => test !== formData.test.selectedTest);
   }, [filteredTests, formData.test.selectedTest]);
 
-  const updateSection = (section: keyof typeof formData, field: string, value: any) => {
+  const updateSection = (
+    section: keyof typeof formData,
+    field: string,
+    value: any
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [section]: {
@@ -146,7 +162,10 @@ export default function PatientRegistrationPage() {
 
     updateSection("medicare", "expiryDate", formatted);
 
-    if (formatted.length === 7 && formData.medicare.medicareNumber.length >= 10) {
+    if (
+      formatted.length === 7 &&
+      formData.medicare.medicareNumber.length >= 10
+    ) {
       updateSection("medicare", "verificationStatus", "Verified");
     } else {
       updateSection("medicare", "verificationStatus", "Pending");
@@ -170,7 +189,10 @@ export default function PatientRegistrationPage() {
 
     const patientId =
       formData.patient.patientId ||
-      generatePatientId(formData.patient.firstName, formData.patient.lastName);
+      generatePatientId(
+        formData.patient.firstName,
+        formData.patient.lastName
+      );
 
     setFormData((prev) => ({
       ...prev,
@@ -185,46 +207,73 @@ export default function PatientRegistrationPage() {
 
     setStatusMessage({
       type: "success",
-      text:
-        formData.notification.sendConfirmation
-          ? `Saved. Patient ID ${patientId} created and notification queued.`
-          : `Saved. Patient ID ${patientId} created.`
+      text: formData.notification.sendConfirmation
+        ? `Saved. Patient ID ${patientId} created and notification queued.`
+        : `Saved. Patient ID ${patientId} created.`
     });
   };
 
   const verificationTone =
     formData.medicare.verificationStatus === "Verified"
-      ? styles.topInfoSuccess
+      ? "border border-emerald-700/30 bg-emerald-500/15 text-emerald-300"
       : formData.medicare.verificationStatus === "Failed"
-      ? styles.topInfoDanger
-      : styles.topInfoWarning;
+      ? "border border-rose-700/30 bg-rose-500/15 text-rose-300"
+      : "border border-amber-700/30 bg-amber-500/15 text-amber-300";
+
+  const selectedModalityName =
+    modalities.find((m) => m.id === formData.test.selectedModality)?.name ||
+    "Not Selected";
 
   return (
-    <div style={styles.page}>
-      <div style={styles.topStrip}>
-        <div style={styles.topStripText}>
+    <div className="min-h-screen overflow-hidden bg-[#030a16] text-white">
+      <div className="sticky top-0 z-30 flex h-11 items-center justify-between bg-[#8d0d46] px-4">
+        <div className="truncate text-[14px] font-bold">
           PATIENT REGISTRATION • MEDICARE {formData.medicare.verificationStatus.toUpperCase()} • NOTIFICATION {formData.notification.method.toUpperCase()}
         </div>
-        <button style={styles.collapseButton}>⌄</button>
+        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-[13px] font-bold text-[#222]">
+          v
+        </button>
       </div>
 
-      <div style={styles.appShell}>
-        <div style={styles.titleBar}>
-          <div style={styles.titleLeft}>
-            <img src="/logo.jpg" alt="EsyRIS logo" style={styles.logo} />
+      <div className="h-[calc(100vh-44px)] overflow-hidden p-2">
+        <div className={`${panelClass} mb-2 flex flex-wrap items-center justify-between gap-3 px-4 py-3`}>
+          <div className="flex items-center gap-3">
+            <img
+              src="/logo.jpg"
+              alt="EsyRIS logo"
+              className="h-10 w-10 rounded-xl object-cover"
+            />
             <div>
-              <div style={styles.eyebrow}>PATIENT ONBOARDING</div>
-              <div style={styles.title}>Compact Patient Registration</div>
+              <div className="text-[11px] font-extrabold tracking-[2px] text-[#1da4ff]">
+                PATIENT ONBOARDING
+              </div>
+              <div className="text-[16px] font-extrabold">
+                Compact Patient Registration
+              </div>
             </div>
           </div>
 
-          <div style={styles.titleActions}>
-            <div style={styles.topInfoPill}>ID: {savedPatientId || "Pending"}</div>
-            <div style={verificationTone}>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex h-9 items-center rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
+              ID: {savedPatientId || "Pending"}
+            </div>
+            <div
+              className={`inline-flex h-9 items-center rounded-2xl px-4 text-[13px] font-bold ${verificationTone}`}
+            >
               Medicare: {formData.medicare.verificationStatus}
             </div>
-            <button style={styles.ghostButton}>Reset</button>
-            <button style={styles.primaryButton} onClick={handleSave}>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="h-9 rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]"
+            >
+              Reset
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              className="h-9 rounded-2xl bg-[#00a96e] px-5 text-[14px] font-extrabold"
+            >
               Save
             </button>
           </div>
@@ -232,129 +281,123 @@ export default function PatientRegistrationPage() {
 
         {statusMessage ? (
           <div
-            style={{
-              ...styles.messageBanner,
-              background:
-                statusMessage.type === "success"
-                  ? "rgba(45,143,82,0.14)"
-                  : "rgba(210,77,87,0.14)",
-              color:
-                statusMessage.type === "success" ? "#7fd19a" : "#f08b8b",
-              border:
-                statusMessage.type === "success"
-                  ? "1px solid rgba(45,143,82,0.28)"
-                  : "1px solid rgba(210,77,87,0.28)"
-            }}
+            className={`mb-2 rounded-2xl px-4 py-2 text-[13px] font-bold ${
+              statusMessage.type === "success"
+                ? "border border-emerald-700/30 bg-emerald-500/15 text-emerald-300"
+                : "border border-rose-700/30 bg-rose-500/15 text-rose-300"
+            }`}
           >
             {statusMessage.text}
           </div>
         ) : null}
 
-        <div style={styles.metricsRow}>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Patient ID</div>
-            <div style={styles.metricValueSmall}>{savedPatientId || "Pending"}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Medicare</div>
-            <div style={styles.metricValueSmall}>{formData.medicare.verificationStatus}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Modality</div>
-            <div style={styles.metricValueSmall}>
-              {formData.test.selectedModality
-                ? modalities.find((m) => m.id === formData.test.selectedModality)?.name
-                : "Not Selected"}
-            </div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Notification</div>
-            <div style={styles.metricValueSmall}>{formData.notification.method}</div>
-          </div>
-        </div>
-
-        <div style={styles.mainGrid}>
-          <section style={styles.leftRail}>
-            <div style={styles.panelHeaderRow}>
-              <div>
-                <div style={styles.panelTitle}>Workflow</div>
-                <div style={styles.panelSub}>Compact registration steps</div>
+        <div className="grid h-[calc(100%-76px)] grid-cols-1 gap-2 xl:grid-cols-[0.82fr_1.26fr_0.82fr]">
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2">
+              <div className="text-[15px] font-extrabold">Workflow</div>
+              <div className="mt-0.5 text-[12px] text-white/55">
+                Compact registration steps
               </div>
             </div>
 
-            <div style={styles.statusCard}>
-              <div style={styles.statusRow}>
-                <span style={styles.dotBlue} />
+            <div className="mb-2 rounded-[18px] border border-[#143a5c] bg-[#071427] p-3">
+              <div className="mb-2 flex items-center gap-2 text-[13px] text-white/80">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#56a8ff]" />
                 <span>Patient details</span>
               </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotGreen} />
+              <div className="mb-2 flex items-center gap-2 text-[13px] text-white/80">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#2d8f52]" />
                 <span>Medicare capture</span>
               </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotPurple} />
+              <div className="mb-2 flex items-center gap-2 text-[13px] text-white/80">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#9b6bff]" />
                 <span>Study setup</span>
               </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotRed} />
+              <div className="flex items-center gap-2 text-[13px] text-white/80">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#d24d57]" />
                 <span>Notification + slot</span>
               </div>
             </div>
 
-            <div style={styles.infoBox}>
-              <div style={styles.infoTitle}>Generated Patient ID</div>
-              <div style={styles.infoText}>
+            <div className="mb-2 rounded-[18px] border border-[#143a5c] bg-[#071427] p-3">
+              <div className="mb-1 text-[13px] font-extrabold text-[#59b7ff]">
+                Generated Patient ID
+              </div>
+              <div className="text-[12px] text-white/72">
                 {savedPatientId || "Generated after save"}
               </div>
             </div>
 
-            <div style={styles.summaryPanel}>
-              <div style={styles.summaryTitle}>Quick Summary</div>
-              <div style={styles.summaryRowMini}>
-                <span>Name</span>
-                <strong>
-                  {formData.patient.firstName || "-"} {formData.patient.lastName || ""}
-                </strong>
+            <div className="rounded-[18px] border border-[#143a5c] bg-[#071427] p-3">
+              <div className="mb-2 text-[14px] font-extrabold">
+                Quick Summary
               </div>
-              <div style={styles.summaryRowMini}>
-                <span>Test</span>
-                <strong>{formData.test.selectedTest || "-"}</strong>
-              </div>
-              <div style={styles.summaryRowMini}>
-                <span>Form Link</span>
-                <strong>{formData.notification.includeFormLink ? "Yes" : "No"}</strong>
-              </div>
+              {[
+                [
+                  "Name",
+                  `${formData.patient.firstName || "-"} ${formData.patient.lastName || ""}`.trim()
+                ],
+                ["Test", formData.test.selectedTest || "-"],
+                [
+                  "Form Link",
+                  formData.notification.includeFormLink ? "Yes" : "No"
+                ]
+              ].map(([label, value]) => (
+                <div
+                  key={label}
+                  className="flex justify-between gap-2 border-b border-[#143a5c] py-2 text-[13px] text-white/80"
+                >
+                  <span>{label}</span>
+                  <strong>{value}</strong>
+                </div>
+              ))}
             </div>
           </section>
 
-          <section style={styles.centerArea}>
-            <div style={styles.compactStack}>
-              <div style={styles.panelCompact}>
-                <div style={styles.panelHeaderRow}>
-                  <div>
-                    <div style={styles.panelTitle}>Medicare</div>
-                    <div style={styles.panelSub}>Card and verification</div>
-                  </div>
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2 flex items-start justify-between gap-2">
+              <div>
+                <div className="text-[15px] font-extrabold">
+                  Registration Details
                 </div>
+                <div className="mt-0.5 text-[12px] text-white/55">
+                  Medicare, patient details, and referrer setup
+                </div>
+              </div>
 
-                <div style={styles.formGrid2}>
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-full border border-[#284a73] bg-[#0d1d35] px-3 py-1.5 text-[11px] font-bold text-white/85">
+                  Medicare: {formData.medicare.verificationStatus}
+                </span>
+                <span className="rounded-full border border-[#284a73] bg-[#0d1d35] px-3 py-1.5 text-[11px] font-bold text-white/85">
+                  Modality: {selectedModalityName}
+                </span>
+              </div>
+            </div>
+
+            <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+              <div className="mb-3 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+                <div className="mb-2 text-[14px] font-extrabold">Medicare</div>
+                <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
                   <div>
-                    <label style={styles.label}>Medicare Number</label>
+                    <label className={labelClass}>Medicare Number</label>
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       placeholder="10 digit number"
                       value={formData.medicare.medicareNumber}
                       onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                        const value = e.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 10);
                         updateSection("medicare", "medicareNumber", value);
                       }}
                     />
                   </div>
 
                   <div>
-                    <label style={styles.label}>Expiry</label>
+                    <label className={labelClass}>Expiry</label>
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       placeholder="MM/YYYY"
                       value={formData.medicare.expiryDate}
                       onChange={(e) => handleExpiryDateChange(e.target.value)}
@@ -363,19 +406,16 @@ export default function PatientRegistrationPage() {
                 </div>
               </div>
 
-              <div style={styles.panelCompact}>
-                <div style={styles.panelHeaderRow}>
-                  <div>
-                    <div style={styles.panelTitle}>Patient Details</div>
-                    <div style={styles.panelSub}>Demographics and contact</div>
-                  </div>
+              <div className="mb-3 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+                <div className="mb-2 text-[14px] font-extrabold">
+                  Patient Details
                 </div>
 
-                <div style={styles.formGrid4}>
+                <div className="grid grid-cols-1 gap-3 xl:grid-cols-4">
                   <div>
-                    <label style={styles.label}>First Name *</label>
+                    <label className={labelClass}>First Name *</label>
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.patient.firstName}
                       onChange={(e) =>
                         updateSection("patient", "firstName", e.target.value)
@@ -384,9 +424,9 @@ export default function PatientRegistrationPage() {
                   </div>
 
                   <div>
-                    <label style={styles.label}>Last Name *</label>
+                    <label className={labelClass}>Last Name *</label>
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.patient.lastName}
                       onChange={(e) =>
                         updateSection("patient", "lastName", e.target.value)
@@ -395,10 +435,10 @@ export default function PatientRegistrationPage() {
                   </div>
 
                   <div>
-                    <label style={styles.label}>DOB *</label>
+                    <label className={labelClass}>DOB *</label>
                     <input
                       type="date"
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.patient.dateOfBirth}
                       onChange={(e) =>
                         updateSection("patient", "dateOfBirth", e.target.value)
@@ -407,9 +447,9 @@ export default function PatientRegistrationPage() {
                   </div>
 
                   <div>
-                    <label style={styles.label}>Gender</label>
+                    <label className={labelClass}>Gender</label>
                     <select
-                      style={styles.select}
+                      className={selectClass}
                       value={formData.patient.gender}
                       onChange={(e) =>
                         updateSection("patient", "gender", e.target.value)
@@ -423,10 +463,10 @@ export default function PatientRegistrationPage() {
                   </div>
 
                   <div>
-                    <label style={styles.label}>Email</label>
+                    <label className={labelClass}>Email</label>
                     <input
                       type="email"
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.patient.email}
                       onChange={(e) =>
                         updateSection("patient", "email", e.target.value)
@@ -435,9 +475,9 @@ export default function PatientRegistrationPage() {
                   </div>
 
                   <div>
-                    <label style={styles.label}>Contact Number</label>
+                    <label className={labelClass}>Contact Number</label>
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.patient.contactNumber}
                       onChange={(e) =>
                         updateSection("patient", "contactNumber", e.target.value)
@@ -445,10 +485,10 @@ export default function PatientRegistrationPage() {
                     />
                   </div>
 
-                  <div style={{ gridColumn: "span 2" }}>
-                    <label style={styles.label}>Address Line 1</label>
+                  <div className="xl:col-span-2">
+                    <label className={labelClass}>Address Line 1</label>
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.patient.addressLine1}
                       onChange={(e) =>
                         updateSection("patient", "addressLine1", e.target.value)
@@ -457,9 +497,9 @@ export default function PatientRegistrationPage() {
                   </div>
 
                   <div>
-                    <label style={styles.label}>Address Line 2</label>
+                    <label className={labelClass}>Address Line 2</label>
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.patient.addressLine2}
                       onChange={(e) =>
                         updateSection("patient", "addressLine2", e.target.value)
@@ -468,9 +508,9 @@ export default function PatientRegistrationPage() {
                   </div>
 
                   <div>
-                    <label style={styles.label}>State</label>
+                    <label className={labelClass}>State</label>
                     <select
-                      style={styles.select}
+                      className={selectClass}
                       value={formData.patient.state}
                       onChange={(e) =>
                         updateSection("patient", "state", e.target.value)
@@ -484,9 +524,9 @@ export default function PatientRegistrationPage() {
                   </div>
 
                   <div>
-                    <label style={styles.label}>Suburb</label>
+                    <label className={labelClass}>Suburb</label>
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.patient.suburb}
                       onChange={(e) =>
                         updateSection("patient", "suburb", e.target.value)
@@ -495,9 +535,9 @@ export default function PatientRegistrationPage() {
                   </div>
 
                   <div>
-                    <label style={styles.label}>Postcode</label>
+                    <label className={labelClass}>Postcode</label>
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.patient.postCode}
                       onChange={(e) =>
                         updateSection("patient", "postCode", e.target.value)
@@ -506,9 +546,9 @@ export default function PatientRegistrationPage() {
                   </div>
 
                   <div>
-                    <label style={styles.label}>Contact Person</label>
+                    <label className={labelClass}>Contact Person</label>
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.patient.contactPerson}
                       onChange={(e) =>
                         updateSection("patient", "contactPerson", e.target.value)
@@ -518,30 +558,31 @@ export default function PatientRegistrationPage() {
                 </div>
               </div>
 
-              <div style={styles.panelCompact}>
-                <div style={styles.panelHeaderRow}>
-                  <div>
-                    <div style={styles.panelTitle}>Referrer Details</div>
-                    <div style={styles.panelSub}>Referrer and clinical note setup</div>
-                  </div>
+              <div className="rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+                <div className="mb-2 text-[14px] font-extrabold">
+                  Referrer Details
                 </div>
 
-                <div style={styles.formGrid4}>
+                <div className="grid grid-cols-1 gap-3 xl:grid-cols-4">
                   <div>
-                    <label style={styles.label}>Provider Number</label>
+                    <label className={labelClass}>Provider Number</label>
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.referrer.providerNumber}
                       onChange={(e) =>
-                        updateSection("referrer", "providerNumber", e.target.value)
+                        updateSection(
+                          "referrer",
+                          "providerNumber",
+                          e.target.value
+                        )
                       }
                     />
                   </div>
 
                   <div>
-                    <label style={styles.label}>Referrer Name</label>
+                    <label className={labelClass}>Referrer Name</label>
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.referrer.referrerName}
                       onChange={(e) =>
                         updateSection("referrer", "referrerName", e.target.value)
@@ -550,10 +591,10 @@ export default function PatientRegistrationPage() {
                   </div>
 
                   <div>
-                    <label style={styles.label}>Date Referred</label>
+                    <label className={labelClass}>Date Referred</label>
                     <input
                       type="date"
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.referrer.dateReferred}
                       onChange={(e) =>
                         updateSection("referrer", "dateReferred", e.target.value)
@@ -562,12 +603,16 @@ export default function PatientRegistrationPage() {
                   </div>
 
                   <div>
-                    <label style={styles.label}>Urgency</label>
+                    <label className={labelClass}>Urgency</label>
                     <select
-                      style={styles.select}
+                      className={selectClass}
                       value={formData.referrer.referralUrgency}
                       onChange={(e) =>
-                        updateSection("referrer", "referralUrgency", e.target.value)
+                        updateSection(
+                          "referrer",
+                          "referralUrgency",
+                          e.target.value
+                        )
                       }
                     >
                       <option value="">Select</option>
@@ -578,32 +623,40 @@ export default function PatientRegistrationPage() {
                   </div>
 
                   <div>
-                    <label style={styles.label}>Referrer Email</label>
+                    <label className={labelClass}>Referrer Email</label>
                     <input
                       type="email"
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.referrer.referrerEmail}
                       onChange={(e) =>
-                        updateSection("referrer", "referrerEmail", e.target.value)
+                        updateSection(
+                          "referrer",
+                          "referrerEmail",
+                          e.target.value
+                        )
                       }
                     />
                   </div>
 
                   <div>
-                    <label style={styles.label}>Contact Number</label>
+                    <label className={labelClass}>Contact Number</label>
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.referrer.referrerContact}
                       onChange={(e) =>
-                        updateSection("referrer", "referrerContact", e.target.value)
+                        updateSection(
+                          "referrer",
+                          "referrerContact",
+                          e.target.value
+                        )
                       }
                     />
                   </div>
 
                   <div>
-                    <label style={styles.label}>Speciality</label>
+                    <label className={labelClass}>Speciality</label>
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       value={formData.referrer.speciality}
                       onChange={(e) =>
                         updateSection("referrer", "speciality", e.target.value)
@@ -611,14 +664,17 @@ export default function PatientRegistrationPage() {
                     />
                   </div>
 
-                  <div style={{ gridColumn: "span 4" }}>
-                    <label style={styles.label}>Clinical Notes</label>
+                  <div className="xl:col-span-4">
+                    <label className={labelClass}>Clinical Notes</label>
                     <textarea
-                      style={styles.textarea}
-                      rows={2}
+                      className="min-h-[72px] w-full resize-y rounded-2xl border border-[#284a73] bg-[#0d1830] p-3 text-[13px] text-white outline-none"
                       value={formData.referrer.clinicalNotes}
                       onChange={(e) =>
-                        updateSection("referrer", "clinicalNotes", e.target.value)
+                        updateSection(
+                          "referrer",
+                          "clinicalNotes",
+                          e.target.value
+                        )
                       }
                     />
                   </div>
@@ -627,739 +683,263 @@ export default function PatientRegistrationPage() {
             </div>
           </section>
 
-          <section style={styles.rightRail}>
-            <div style={styles.panelCompact}>
-              <div style={styles.panelHeaderRow}>
-                <div>
-                  <div style={styles.panelTitle}>Test Details</div>
-                  <div style={styles.panelSub}>Study and machine setup</div>
-                </div>
-              </div>
-
-              <div style={styles.formGrid1}>
-                <div>
-                  <label style={styles.label}>Modality *</label>
-                  <select
-                    style={styles.select}
-                    value={formData.test.selectedModality}
-                    onChange={(e) => {
-                      updateSection("test", "selectedModality", e.target.value);
-                      updateSection("test", "selectedTest", "");
-                      updateSection("test", "secondTest", "");
-                    }}
-                  >
-                    <option value="">Select</option>
-                    {modalities.map((modality) => (
-                      <option key={modality.id} value={modality.id}>
-                        {modality.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label style={styles.label}>Test *</label>
-                  <select
-                    style={styles.select}
-                    value={formData.test.selectedTest}
-                    onChange={(e) =>
-                      updateSection("test", "selectedTest", e.target.value)
-                    }
-                    disabled={!formData.test.selectedModality}
-                  >
-                    <option value="">Select</option>
-                    {filteredTests.map((test) => (
-                      <option key={test}>{test}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div style={styles.toggleBox}>
-                  <div style={styles.toggleLabel}>Multi-Exam</div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updateSection(
-                        "test",
-                        "multiExamRequired",
-                        !formData.test.multiExamRequired
-                      )
-                    }
-                    style={
-                      formData.test.multiExamRequired
-                        ? styles.toggleActive
-                        : styles.toggleInactive
-                    }
-                  >
-                    {formData.test.multiExamRequired ? "On" : "Off"}
-                  </button>
-                </div>
-
-                <div>
-                  <label style={styles.label}>Second Test</label>
-                  <select
-                    style={styles.select}
-                    value={formData.test.secondTest}
-                    onChange={(e) =>
-                      updateSection("test", "secondTest", e.target.value)
-                    }
-                    disabled={!formData.test.multiExamRequired}
-                  >
-                    <option value="">Select</option>
-                    {availableSecondTests.map((test) => (
-                      <option key={test}>{test}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label style={styles.label}>Machine Allocation</label>
-                  <input
-                    style={styles.input}
-                    placeholder="Suggested machine / room"
-                    value={formData.test.machineAllocation}
-                    onChange={(e) =>
-                      updateSection("test", "machineAllocation", e.target.value)
-                    }
-                  />
-                </div>
-
-                <div style={styles.toggleBox}>
-                  <div style={styles.toggleLabel}>Pre-Study Form</div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updateSection(
-                        "test",
-                        "preStudyFormRequired",
-                        !formData.test.preStudyFormRequired
-                      )
-                    }
-                    style={
-                      formData.test.preStudyFormRequired
-                        ? styles.toggleActive
-                        : styles.toggleInactive
-                    }
-                  >
-                    {formData.test.preStudyFormRequired ? "Required" : "Not Required"}
-                  </button>
-                </div>
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2">
+              <div className="text-[15px] font-extrabold">Study Setup</div>
+              <div className="mt-0.5 text-[12px] text-white/55">
+                Test details, notifications, and next step
               </div>
             </div>
 
-            <div style={styles.panelCompact}>
-              <div style={styles.panelHeaderRow}>
-                <div>
-                  <div style={styles.panelTitle}>Notification Setup</div>
-                  <div style={styles.panelSub}>Confirmation and prep messages</div>
-                </div>
-              </div>
-
-              <div style={styles.formGrid1}>
-                <div>
-                  <label style={styles.label}>Notification Method</label>
-                  <select
-                    style={styles.select}
-                    value={formData.notification.method}
-                    onChange={(e) =>
-                      updateSection("notification", "method", e.target.value)
-                    }
-                  >
-                    <option>SMS</option>
-                    <option>Email</option>
-                    <option>Both</option>
-                  </select>
+            <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+              <div className="mb-3 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+                <div className="mb-2 text-[14px] font-extrabold">
+                  Test Details
                 </div>
 
-                <label style={styles.checkboxRow}>
-                  <input
-                    type="checkbox"
-                    checked={formData.notification.sendConfirmation}
-                    onChange={(e) =>
-                      updateSection(
-                        "notification",
-                        "sendConfirmation",
-                        e.target.checked
-                      )
-                    }
-                  />
-                  <span style={styles.checkboxLabel}>Send confirmation</span>
-                </label>
-
-                <label style={styles.checkboxRow}>
-                  <input
-                    type="checkbox"
-                    checked={formData.notification.sendPreparation}
-                    onChange={(e) =>
-                      updateSection(
-                        "notification",
-                        "sendPreparation",
-                        e.target.checked
-                      )
-                    }
-                  />
-                  <span style={styles.checkboxLabel}>Send preparation</span>
-                </label>
-
-                <label style={styles.checkboxRow}>
-                  <input
-                    type="checkbox"
-                    checked={formData.notification.includeFormLink}
-                    onChange={(e) =>
-                      updateSection(
-                        "notification",
-                        "includeFormLink",
-                        e.target.checked
-                      )
-                    }
-                  />
-                  <span style={styles.checkboxLabel}>Include form link</span>
-                </label>
-
-                <div style={styles.summaryBoxCompact}>
-                  <div style={styles.summaryRowMini}>
-                    <span>Method</span>
-                    <strong>{formData.notification.method}</strong>
-                  </div>
-                  <div style={styles.summaryRowMini}>
-                    <span>Preparation</span>
-                    <strong>{formData.notification.sendPreparation ? "Yes" : "No"}</strong>
-                  </div>
-                  <div style={styles.summaryRowMini}>
-                    <span>Form Link</span>
-                    <strong>{formData.notification.includeFormLink ? "Included" : "No"}</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {showTimeSlotCard && (
-              <div style={styles.panelCompact}>
-                <div style={styles.panelHeaderRow}>
+                <div className="space-y-3">
                   <div>
-                    <div style={styles.panelTitle}>Time Slot Selection</div>
-                    <div style={styles.panelSub}>
-                      Registration saved. Continue to booking.
+                    <label className={labelClass}>Modality *</label>
+                    <select
+                      className={selectClass}
+                      value={formData.test.selectedModality}
+                      onChange={(e) => {
+                        updateSection(
+                          "test",
+                          "selectedModality",
+                          e.target.value
+                        );
+                        updateSection("test", "selectedTest", "");
+                        updateSection("test", "secondTest", "");
+                      }}
+                    >
+                      <option value="">Select</option>
+                      {modalities.map((modality) => (
+                        <option key={modality.id} value={modality.id}>
+                          {modality.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>Test *</label>
+                    <select
+                      className={selectClass}
+                      value={formData.test.selectedTest}
+                      onChange={(e) =>
+                        updateSection("test", "selectedTest", e.target.value)
+                      }
+                      disabled={!formData.test.selectedModality}
+                    >
+                      <option value="">Select</option>
+                      {filteredTests.map((test) => (
+                        <option key={test}>{test}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex h-10 items-center justify-between rounded-xl border border-[#284a73] bg-[#0d1830] px-3">
+                    <div className="text-[13px] text-white/72">Multi-Exam</div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateSection(
+                          "test",
+                          "multiExamRequired",
+                          !formData.test.multiExamRequired
+                        )
+                      }
+                      className={`rounded-full px-3 py-1 text-[11px] font-extrabold ${
+                        formData.test.multiExamRequired
+                          ? "bg-emerald-500/15 text-emerald-300"
+                          : "bg-rose-500/15 text-rose-300"
+                      }`}
+                    >
+                      {formData.test.multiExamRequired ? "On" : "Off"}
+                    </button>
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>Second Test</label>
+                    <select
+                      className={selectClass}
+                      value={formData.test.secondTest}
+                      onChange={(e) =>
+                        updateSection("test", "secondTest", e.target.value)
+                      }
+                      disabled={!formData.test.multiExamRequired}
+                    >
+                      <option value="">Select</option>
+                      {availableSecondTests.map((test) => (
+                        <option key={test}>{test}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>Machine Allocation</label>
+                    <input
+                      className={inputClass}
+                      placeholder="Suggested machine / room"
+                      value={formData.test.machineAllocation}
+                      onChange={(e) =>
+                        updateSection(
+                          "test",
+                          "machineAllocation",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </div>
+
+                  <div className="flex h-10 items-center justify-between rounded-xl border border-[#284a73] bg-[#0d1830] px-3">
+                    <div className="text-[13px] text-white/72">
+                      Pre-Study Form
                     </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateSection(
+                          "test",
+                          "preStudyFormRequired",
+                          !formData.test.preStudyFormRequired
+                        )
+                      }
+                      className={`rounded-full px-3 py-1 text-[11px] font-extrabold ${
+                        formData.test.preStudyFormRequired
+                          ? "bg-emerald-500/15 text-emerald-300"
+                          : "bg-rose-500/15 text-rose-300"
+                      }`}
+                    >
+                      {formData.test.preStudyFormRequired
+                        ? "Required"
+                        : "Not Required"}
+                    </button>
                   </div>
                 </div>
+              </div>
 
-                <div style={styles.timeSlotCard}>
-                  <div style={styles.timeSlotText}>
-                    Registration complete. Next step is assigning an appointment slot.
+              <div className="mb-3 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+                <div className="mb-2 text-[14px] font-extrabold">
+                  Notification Setup
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className={labelClass}>Notification Method</label>
+                    <select
+                      className={selectClass}
+                      value={formData.notification.method}
+                      onChange={(e) =>
+                        updateSection(
+                          "notification",
+                          "method",
+                          e.target.value
+                        )
+                      }
+                    >
+                      <option>SMS</option>
+                      <option>Email</option>
+                      <option>Both</option>
+                    </select>
+                  </div>
+
+                  <label className="flex items-center gap-3 text-[13px] text-white/82">
+                    <input
+                      type="checkbox"
+                      checked={formData.notification.sendConfirmation}
+                      onChange={(e) =>
+                        updateSection(
+                          "notification",
+                          "sendConfirmation",
+                          e.target.checked
+                        )
+                      }
+                    />
+                    <span>Send confirmation</span>
+                  </label>
+
+                  <label className="flex items-center gap-3 text-[13px] text-white/82">
+                    <input
+                      type="checkbox"
+                      checked={formData.notification.sendPreparation}
+                      onChange={(e) =>
+                        updateSection(
+                          "notification",
+                          "sendPreparation",
+                          e.target.checked
+                        )
+                      }
+                    />
+                    <span>Send preparation</span>
+                  </label>
+
+                  <label className="flex items-center gap-3 text-[13px] text-white/82">
+                    <input
+                      type="checkbox"
+                      checked={formData.notification.includeFormLink}
+                      onChange={(e) =>
+                        updateSection(
+                          "notification",
+                          "includeFormLink",
+                          e.target.checked
+                        )
+                      }
+                    />
+                    <span>Include form link</span>
+                  </label>
+
+                  <div className="rounded-[18px] border border-[#143a5c] bg-[#081321] p-3">
+                    {[
+                      ["Method", formData.notification.method],
+                      [
+                        "Preparation",
+                        formData.notification.sendPreparation ? "Yes" : "No"
+                      ],
+                      [
+                        "Form Link",
+                        formData.notification.includeFormLink
+                          ? "Included"
+                          : "No"
+                      ]
+                    ].map(([label, value]) => (
+                      <div
+                        key={label}
+                        className="flex justify-between gap-2 border-b border-[#143a5c] py-2 text-[13px] text-white/80"
+                      >
+                        <span>{label}</span>
+                        <strong>{value}</strong>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {showTimeSlotCard && (
+                <div className="rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+                  <div className="mb-2 text-[14px] font-extrabold">
+                    Time Slot Selection
+                  </div>
+                  <div className="mb-3 text-[12px] leading-6 text-white/72">
+                    Registration complete. Next step is assigning an appointment
+                    slot.
                   </div>
                   <button
-                    style={styles.primaryButton}
-                    onClick={() => alert("Navigate to calendar / time slot page")}
+                    type="button"
+                    onClick={() =>
+                      alert("Navigate to calendar / time slot page")
+                    }
+                    className="h-9 rounded-2xl bg-[#00a96e] px-5 text-[14px] font-extrabold"
                   >
                     Select Slot
                   </button>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </section>
         </div>
       </div>
     </div>
   );
 }
-
-const styles: Record<string, CSSProperties> = {
-  page: {
-    minHeight: "100vh",
-    background: "#030a16",
-    color: "#ffffff",
-    fontFamily: "Inter, Segoe UI, Arial, sans-serif",
-    overflowX: "hidden",
-    overflowY: "auto"
-  },
-
-  topStrip: {
-    height: 28,
-    background: "#8d0d46",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 8px",
-    position: "sticky",
-    top: 0,
-    zIndex: 20
-  },
-
-  topStripText: {
-    fontSize: 9,
-    fontWeight: 700,
-    whiteSpace: "nowrap"
-  },
-
-  collapseButton: {
-    height: 20,
-    minWidth: 20,
-    borderRadius: 999,
-    border: "none",
-    background: "#d9d9d9",
-    color: "#222",
-    cursor: "pointer",
-    fontSize: 11,
-    fontWeight: 700,
-    lineHeight: 1
-  },
-
-  appShell: {
-    padding: 8,
-    boxSizing: "border-box"
-  },
-
-  titleBar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-    border: "1px solid rgba(54,112,190,0.28)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: "8px 12px",
-    marginBottom: 8,
-    position: "sticky",
-    top: 36,
-    zIndex: 15
-  },
-
-  titleLeft: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8
-  },
-
-  logo: {
-    width: 24,
-    height: 24,
-    borderRadius: 5,
-    objectFit: "cover"
-  },
-
-  eyebrow: {
-    fontSize: 9,
-    color: "#1da4ff",
-    fontWeight: 800,
-    letterSpacing: "1.2px"
-  },
-
-  title: {
-    fontSize: 14,
-    fontWeight: 800,
-    marginTop: 1
-  },
-
-  titleActions: {
-    display: "flex",
-    gap: 6,
-    alignItems: "center",
-    flexWrap: "wrap"
-  },
-
-  ghostButton: {
-    height: 26,
-    padding: "0 10px",
-    borderRadius: 9,
-    border: "1px solid rgba(54,112,190,0.32)",
-    background: "#0d1d35",
-    color: "#59b7ff",
-    fontSize: 11,
-    fontWeight: 700,
-    cursor: "pointer"
-  },
-
-  primaryButton: {
-    height: 26,
-    padding: "0 12px",
-    borderRadius: 9,
-    border: "none",
-    background: "#00a96e",
-    color: "#fff",
-    fontSize: 11,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  topInfoPill: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 999,
-    background: "#0d1d35",
-    border: "1px solid rgba(54,112,190,0.28)",
-    color: "#59b7ff",
-    fontSize: 10,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  topInfoSuccess: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 999,
-    background: "rgba(45,143,82,0.16)",
-    border: "1px solid rgba(45,143,82,0.28)",
-    color: "#7fd19a",
-    fontSize: 10,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  topInfoWarning: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 999,
-    background: "rgba(196,145,49,0.16)",
-    border: "1px solid rgba(196,145,49,0.28)",
-    color: "#f2cb74",
-    fontSize: 10,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  topInfoDanger: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 999,
-    background: "rgba(210,77,87,0.16)",
-    border: "1px solid rgba(210,77,87,0.28)",
-    color: "#f08b8b",
-    fontSize: 10,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  messageBanner: {
-    marginBottom: 8,
-    padding: "8px 10px",
-    borderRadius: 10,
-    fontSize: 11,
-    fontWeight: 700
-  },
-
-  metricsRow: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-    gap: 8,
-    marginBottom: 8
-  },
-
-  metricCard: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 12,
-    background: "#020d1f",
-    padding: "8px 10px"
-  },
-
-  metricLabel: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.56)",
-    marginBottom: 3
-  },
-
-  metricValueSmall: {
-    fontSize: 12,
-    fontWeight: 800
-  },
-
-  mainGrid: {
-    display: "grid",
-    gridTemplateColumns: "0.72fr 1.9fr 0.95fr",
-    gap: 8,
-    alignItems: "start"
-  },
-
-  leftRail: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: 8,
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    alignSelf: "start",
-    position: "sticky",
-    top: 88
-  },
-
-  centerArea: {
-    minWidth: 0
-  },
-
-  rightRail: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    minWidth: 0
-  },
-
-  compactStack: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8
-  },
-
-  panelCompact: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: 8
-  },
-
-  panelHeaderRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 6,
-    marginBottom: 6
-  },
-
-  panelTitle: {
-    fontSize: 11,
-    fontWeight: 800
-  },
-
-  panelSub: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.56)",
-    marginTop: 1
-  },
-
-  formGrid1: {
-    display: "grid",
-    gridTemplateColumns: "1fr",
-    gap: 6
-  },
-
-  formGrid2: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 6
-  },
-
-  formGrid4: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr 1fr",
-    gap: 6
-  },
-
-  label: {
-    display: "block",
-    fontSize: 9,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.66)",
-    marginBottom: 3
-  },
-
-  input: {
-    width: "100%",
-    height: 26,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "0 8px",
-    fontSize: 11,
-    outline: "none",
-    boxSizing: "border-box"
-  },
-
-  select: {
-    width: "100%",
-    height: 26,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "0 8px",
-    fontSize: 11,
-    outline: "none",
-    boxSizing: "border-box"
-  },
-
-  textarea: {
-    width: "100%",
-    minHeight: 52,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "8px",
-    fontSize: 11,
-    outline: "none",
-    resize: "vertical",
-    boxSizing: "border-box",
-    fontFamily: "inherit"
-  },
-
-  toggleBox: {
-    height: 26,
-    background: "#0d1830",
-    border: "1px solid rgba(92,118,166,0.35)",
-    borderRadius: 9,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 8px"
-  },
-
-  toggleLabel: {
-    fontSize: 10,
-    color: "rgba(255,255,255,0.72)"
-  },
-
-  toggleActive: {
-    height: 20,
-    padding: "0 8px",
-    borderRadius: 999,
-    border: "none",
-    background: "#00a96e",
-    color: "#fff",
-    fontSize: 9,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  toggleInactive: {
-    height: 20,
-    padding: "0 8px",
-    borderRadius: 999,
-    border: "none",
-    background: "#b53d4a",
-    color: "#fff",
-    fontSize: 9,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  checkboxRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    fontSize: 10
-  },
-
-  checkboxLabel: {
-    color: "rgba(255,255,255,0.82)"
-  },
-
-  statusCard: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8
-  },
-
-  statusRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    fontSize: 10,
-    color: "rgba(255,255,255,0.68)",
-    marginBottom: 7
-  },
-
-  dotBlue: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#56a8ff",
-    display: "inline-block"
-  },
-
-  dotGreen: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#2d8f52",
-    display: "inline-block"
-  },
-
-  dotPurple: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#9b6bff",
-    display: "inline-block"
-  },
-
-  dotRed: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#d24d57",
-    display: "inline-block"
-  },
-
-  infoBox: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8
-  },
-
-  infoTitle: {
-    fontSize: 10,
-    fontWeight: 800,
-    color: "#59b7ff",
-    marginBottom: 4
-  },
-
-  infoText: {
-    fontSize: 10,
-    color: "rgba(255,255,255,0.72)"
-  },
-
-  summaryPanel: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8
-  },
-
-  summaryTitle: {
-    fontSize: 10,
-    fontWeight: 800,
-    marginBottom: 4
-  },
-
-  summaryBoxCompact: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8,
-    marginTop: 4
-  },
-
-  summaryRowMini: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 6,
-    padding: "5px 0",
-    borderBottom: "1px solid rgba(54,112,190,0.12)",
-    fontSize: 10,
-    color: "rgba(255,255,255,0.75)"
-  },
-
-  timeSlotCard: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "stretch",
-    gap: 8,
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8
-  },
-
-  timeSlotText: {
-    fontSize: 10,
-    color: "rgba(255,255,255,0.72)",
-    lineHeight: 1.4
-  }
-};

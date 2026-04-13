@@ -272,6 +272,13 @@ const blockedSlots: BlockedSlot[] = [
   { day: "fri", time: "16:00", clinic: "Main Clinic", resource: "Room 1" }
 ];
 
+const inputClass =
+  "h-10 w-full rounded-xl border border-[#284a73] bg-[#0d1830] px-3 text-[13px] text-white outline-none placeholder:text-white/35 focus:border-sky-500/50";
+const selectClass =
+  "h-10 w-full rounded-xl border border-[#284a73] bg-[#0d1830] px-3 text-[13px] text-white outline-none focus:border-sky-500/50";
+const panelClass = "rounded-[22px] border border-[#143a5c] bg-[#020d1f]";
+const labelClass = "mb-1 block text-[11px] font-semibold text-white/78";
+
 export default function SchedulerPage() {
   const [appointments, setAppointments] =
     useState<Appointment[]>(initialAppointments);
@@ -560,55 +567,85 @@ export default function SchedulerPage() {
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.topStrip}>
-        <div style={styles.topStripText}>
+    <div className="min-h-screen overflow-hidden bg-[#030a16] text-white">
+      <div className="sticky top-0 z-30 flex h-11 items-center justify-between bg-[#8d0d46] px-4">
+        <div className="truncate text-[14px] font-bold">
           SCHEDULER • CLINIC {selectedClinic.toUpperCase()} • AVAILABLE {dayStats.available} • BOOKED {dayStats.booked}
         </div>
-        <button style={styles.collapseButton}>⌄</button>
+        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-[13px] font-bold text-[#222]">
+          v
+        </button>
       </div>
 
-      <div style={styles.appShell}>
-        <div style={styles.titleBar}>
-          <div style={styles.titleLeft}>
-            <img src="/logo.jpg" alt="logo" style={styles.logo} />
+      <div className="h-[calc(100vh-44px)] overflow-hidden p-2">
+        <div className={`${panelClass} mb-2 flex flex-wrap items-center justify-between gap-3 px-4 py-3`}>
+          <div className="flex items-center gap-3">
+            <img
+              src="/logo.jpg"
+              alt="logo"
+              className="h-10 w-10 rounded-xl object-cover"
+            />
             <div>
-              <div style={styles.eyebrow}>SCHEDULER / ROSTER</div>
-              <div style={styles.title}>Compact Appointment Calendar</div>
+              <div className="text-[11px] font-extrabold tracking-[2px] text-[#1da4ff]">
+                SCHEDULER / ROSTER
+              </div>
+              <div className="text-[16px] font-extrabold">
+                Compact Appointment Calendar
+              </div>
             </div>
           </div>
 
-          <div style={styles.titleActions}>
-            <div style={styles.topInfoPill}>Clinic: {selectedClinic}</div>
-            <div style={styles.topInfoPill}>Open: {dayStats.available}</div>
-            <button style={styles.ghostButton}>Today</button>
-            <button style={styles.ghostButton}>New Booking</button>
-            <button style={styles.primaryButton}>Quick Book</button>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex h-9 items-center rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
+              Clinic: {selectedClinic}
+            </div>
+            <div className="inline-flex h-9 items-center rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
+              Open: {dayStats.available}
+            </div>
+            <button className="h-9 rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
+              Today
+            </button>
+            <button className="h-9 rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
+              New Booking
+            </button>
+            <button className="h-9 rounded-2xl bg-[#00a96e] px-5 text-[14px] font-extrabold">
+              Quick Book
+            </button>
           </div>
         </div>
 
         {(detectedConflicts.length > 0 || intelligentAlerts.length > 0) && (
-          <div style={styles.alertGrid}>
-            <div style={styles.alertPanel}>
-              <div style={styles.alertTitle}>Conflicts</div>
+          <div className="mb-2 grid grid-cols-1 gap-2 xl:grid-cols-2">
+            <div className={`${panelClass} p-3`}>
+              <div className="mb-2 text-[13px] font-extrabold">Conflicts</div>
               {detectedConflicts.length === 0 ? (
-                <div style={styles.alertOk}>No active conflicts</div>
+                <div className="rounded-xl bg-emerald-500/15 px-3 py-2 text-[12px] text-emerald-300">
+                  No active conflicts
+                </div>
               ) : (
                 detectedConflicts.map((alert, index) => (
-                  <div key={index} style={styles.alertError}>
+                  <div
+                    key={index}
+                    className="mb-2 rounded-xl bg-rose-500/15 px-3 py-2 text-[12px] text-rose-300"
+                  >
                     {alert}
                   </div>
                 ))
               )}
             </div>
 
-            <div style={styles.alertPanel}>
-              <div style={styles.alertTitle}>Scheduling Alerts</div>
+            <div className={`${panelClass} p-3`}>
+              <div className="mb-2 text-[13px] font-extrabold">Scheduling Alerts</div>
               {intelligentAlerts.length === 0 ? (
-                <div style={styles.alertOk}>No inefficiency alerts</div>
+                <div className="rounded-xl bg-emerald-500/15 px-3 py-2 text-[12px] text-emerald-300">
+                  No inefficiency alerts
+                </div>
               ) : (
                 intelligentAlerts.map((alert, index) => (
-                  <div key={index} style={styles.alertWarn}>
+                  <div
+                    key={index}
+                    className="mb-2 rounded-xl bg-amber-500/15 px-3 py-2 text-[12px] text-amber-300"
+                  >
                     {alert}
                   </div>
                 ))
@@ -617,57 +654,41 @@ export default function SchedulerPage() {
           </div>
         )}
 
-        <div style={styles.metricsRow}>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Clinic</div>
-            <div style={styles.metricValueSmall}>{selectedClinic}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Available</div>
-            <div style={styles.metricValueSmall}>{dayStats.available}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Booked</div>
-            <div style={styles.metricValueSmall}>{dayStats.booked}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Rostered</div>
-            <div style={styles.metricValueSmall}>{rosterForDay.length}</div>
-          </div>
-        </div>
-
-        <div style={styles.mainGrid}>
-          <aside style={styles.leftRail}>
-            <div style={styles.panelHeaderRow}>
-              <div>
-                <div style={styles.panelTitle}>Filters</div>
-                <div style={styles.panelSub}>Fast scheduling controls</div>
+        <div className="grid h-[calc(100%-76px)] grid-cols-1 gap-2 xl:grid-cols-[0.82fr_1.35fr_0.83fr]">
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2">
+              <div className="text-[15px] font-extrabold">Filters</div>
+              <div className="mt-0.5 text-[12px] text-white/55">
+                Fast scheduling controls
               </div>
             </div>
 
-            <div style={styles.filterSection}>
-              <div style={styles.filterLabel}>Clinic</div>
-              {clinics.map((clinic) => (
-                <div
-                  key={clinic}
-                  onClick={() => setSelectedClinic(clinic)}
-                  style={
-                    selectedClinic === clinic
-                      ? styles.navItemActive
-                      : styles.navItem
-                  }
-                >
-                  {clinic}
-                </div>
-              ))}
+            <div className="mb-3">
+              <div className="mb-1 text-[11px] font-semibold text-white/78">Clinic</div>
+              <div className="space-y-2">
+                {clinics.map((clinic) => (
+                  <button
+                    key={clinic}
+                    type="button"
+                    onClick={() => setSelectedClinic(clinic)}
+                    className={`w-full rounded-[18px] border px-3 py-2 text-left text-[13px] ${
+                      selectedClinic === clinic
+                        ? "border-sky-500/45 bg-[#0b213f] font-bold text-sky-300"
+                        : "border-[#143a5c] bg-[#071427] text-white"
+                    }`}
+                  >
+                    {clinic}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div style={styles.filterSection}>
-              <div style={styles.filterLabel}>Resource</div>
+            <div className="mb-3">
+              <label className={labelClass}>Resource</label>
               <select
                 value={selectedResource}
                 onChange={(e) => setSelectedResource(e.target.value as Resource | "All")}
-                style={styles.select}
+                className={selectClass}
               >
                 <option value="All">All Resources</option>
                 {resources.map((resource) => (
@@ -678,12 +699,12 @@ export default function SchedulerPage() {
               </select>
             </div>
 
-            <div style={styles.filterSection}>
-              <div style={styles.filterLabel}>Modality</div>
+            <div className="mb-3">
+              <label className={labelClass}>Modality</label>
               <select
                 value={selectedModality}
                 onChange={(e) => setSelectedModality(e.target.value as Modality)}
-                style={styles.select}
+                className={selectClass}
               >
                 {modalities.map((item) => (
                   <option key={item} value={item}>
@@ -693,12 +714,12 @@ export default function SchedulerPage() {
               </select>
             </div>
 
-            <div style={styles.filterSection}>
-              <div style={styles.filterLabel}>Slot View</div>
+            <div className="mb-3">
+              <label className={labelClass}>Slot View</label>
               <select
                 value={selectedSlotView}
                 onChange={(e) => setSelectedSlotView(e.target.value as SlotView)}
-                style={styles.select}
+                className={selectClass}
               >
                 {slotViewOptions.map((item) => (
                   <option key={item} value={item}>
@@ -708,141 +729,183 @@ export default function SchedulerPage() {
               </select>
             </div>
 
-            <div style={styles.filterSection}>
-              <div style={styles.filterLabel}>Search</div>
+            <div className="mb-3">
+              <label className={labelClass}>Search</label>
               <input
-                style={styles.input}
+                className={inputClass}
                 placeholder="Search patient, staff..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
 
-            <div style={styles.infoBox}>
-              <div style={styles.infoTitle}>Access Rule</div>
-              <div style={styles.infoText}>
+            <div className="mb-3 rounded-[18px] border border-[#143a5c] bg-[#071427] p-3">
+              <div className="mb-1 text-[13px] font-extrabold text-[#59b7ff]">
+                Access Rule
+              </div>
+              <div className="text-[12px] leading-6 text-white/72">
                 Reception staff can access calendars across clinics while remaining assigned to at least one clinic.
               </div>
             </div>
 
-            <div style={styles.statusCard}>
-              <div style={styles.statusTitle}>Legend</div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotGreen} />
+            <div className="rounded-[18px] border border-[#143a5c] bg-[#071427] p-3">
+              <div className="mb-2 text-[14px] font-extrabold">Legend</div>
+              <div className="mb-2 flex items-center gap-2 text-[13px] text-white/80">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#2d8f52]" />
                 <span>Available</span>
               </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotBlue} />
+              <div className="mb-2 flex items-center gap-2 text-[13px] text-white/80">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#56a8ff]" />
                 <span>Booked</span>
               </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotRed} />
+              <div className="mb-2 flex items-center gap-2 text-[13px] text-white/80">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#d24d57]" />
                 <span>Blocked</span>
               </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotPurple} />
+              <div className="flex items-center gap-2 text-[13px] text-white/80">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#9b6bff]" />
                 <span>Mapping / Roster</span>
               </div>
             </div>
-          </aside>
+          </section>
 
-          <section style={styles.centerArea}>
-            <div style={styles.panelCompact}>
-              <div style={styles.panelHeaderRow}>
-                <div>
-                  <div style={styles.panelTitle}>Appointment Calendar</div>
-                  <div style={styles.panelSub}>
-                    Compact calendar with slot visibility and filters
-                  </div>
-                </div>
-              </div>
-
-              <div style={styles.dayTabs}>
-                {days.map((day) => (
-                  <button
-                    key={day.key}
-                    type="button"
-                    onClick={() => setSelectedDay(day.key)}
-                    style={selectedDay === day.key ? styles.dayTabActive : styles.dayTab}
-                  >
-                    {day.label}
-                  </button>
-                ))}
-              </div>
-
-              <div style={styles.calendarGridWrap}>
-                <div style={styles.calendarGrid}>
-                  <div style={styles.gridHeaderTime}>Time</div>
-                  {days.map((day) => (
-                    <div key={day.key} style={styles.gridHeaderDay}>
-                      {day.label}
-                    </div>
-                  ))}
-
-                  {timeSlots.map((time) => (
-                    <React.Fragment key={time}>
-                      <div style={styles.timeCell}>{time}</div>
-
-                      {days.map((day) => {
-                        const slot = getSlotData(day.key, time);
-
-                        if (!shouldShowSlot(slot.state)) {
-                          return (
-                            <div key={`${day.key}-${time}`} style={styles.slotCellMuted}>
-                              <div style={styles.slotMeta}>Filtered</div>
-                            </div>
-                          );
-                        }
-
-                        if (slot.state === "booked") {
-                          return (
-                            <div key={`${day.key}-${time}`} style={styles.slotCellBooked}>
-                              <div style={styles.slotTitle}>{slot.data.patient}</div>
-                              <div style={styles.slotMeta}>
-                                {slot.data.type} • {slot.data.resource}
-                              </div>
-                              <div style={styles.slotMetaSmall}>
-                                {slot.data.clinician}
-                              </div>
-                            </div>
-                          );
-                        }
-
-                        if (slot.state === "blocked") {
-                          return (
-                            <div key={`${day.key}-${time}`} style={styles.slotCellBlocked}>
-                              <div style={styles.slotTitle}>Blocked</div>
-                              <div style={styles.slotMeta}>{slot.data.resource}</div>
-                            </div>
-                          );
-                        }
-
-                        return (
-                          <div key={`${day.key}-${time}`} style={styles.slotCellAvailable}>
-                            <div style={styles.slotTitle}>Available</div>
-                            <div style={styles.slotMeta}>
-                              {selectedResource === "All" ? "Open Slot" : selectedResource}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </React.Fragment>
-                  ))}
-                </div>
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2">
+              <div className="text-[15px] font-extrabold">Appointment Calendar</div>
+              <div className="mt-0.5 text-[12px] text-white/55">
+                Compact calendar with slot visibility and filters
               </div>
             </div>
 
-            <div style={styles.bottomGrid}>
-              <section style={styles.panelCompact}>
-                <div style={styles.panelTitle}>Reschedule</div>
-                <div style={styles.panelSub}>Maintain resource and staff availability</div>
+            <div className="mb-2 flex flex-wrap gap-2">
+              {days.map((day) => (
+                <button
+                  key={day.key}
+                  type="button"
+                  onClick={() => setSelectedDay(day.key)}
+                  className={`h-9 rounded-2xl px-4 text-[13px] font-bold ${
+                    selectedDay === day.key
+                      ? "border border-sky-500/45 bg-[#0b213f] text-sky-300"
+                      : "border border-[#284a73] bg-[#0d1830] text-white/80"
+                  }`}
+                >
+                  {day.label}
+                </button>
+              ))}
+            </div>
 
-                <div style={{ marginTop: 8 }}>
-                  <div style={styles.filterLabel}>Appointment</div>
+            <div className="min-h-0 flex-1 overflow-auto rounded-[18px] border border-[#143a5c] bg-[#071427]">
+              <div className="grid min-w-[760px] grid-cols-[72px_repeat(5,minmax(120px,1fr))]">
+                <div className="border-b border-r border-[#143a5c] bg-[#091427] px-2 py-2 text-[11px] font-extrabold">
+                  Time
+                </div>
+                {days.map((day) => (
+                  <div
+                    key={day.key}
+                    className="border-b border-r border-[#143a5c] bg-[#091427] px-2 py-2 text-[11px] font-extrabold"
+                  >
+                    {day.label}
+                  </div>
+                ))}
+
+                {timeSlots.map((time) => (
+                  <React.Fragment key={time}>
+                    <div className="min-h-[46px] border-b border-r border-[#143a5c] bg-[#071427] px-2 py-2 text-[11px] text-white/65">
+                      {time}
+                    </div>
+
+                    {days.map((day) => {
+                      const slot = getSlotData(day.key, time);
+
+                      if (!shouldShowSlot(slot.state)) {
+                        return (
+                          <div
+                            key={`${day.key}-${time}`}
+                            className="flex min-h-[46px] flex-col justify-center border-b border-r border-[#143a5c] bg-[#0a1120] px-2 py-2 opacity-70"
+                          >
+                            <div className="text-[10px] text-white/40">Filtered</div>
+                          </div>
+                        );
+                      }
+
+                      if (slot.state === "booked") {
+                        return (
+                          <div
+                            key={`${day.key}-${time}`}
+                            className="flex min-h-[46px] flex-col justify-center border-b border-r border-[#143a5c] bg-sky-500/10 px-2 py-2"
+                          >
+                            <div className="text-[11px] font-extrabold">{slot.data.patient}</div>
+                            <div className="mt-1 text-[10px] text-white/65">
+                              {slot.data.type} • {slot.data.resource}
+                            </div>
+                            <div className="mt-1 text-[9px] text-white/45">
+                              {slot.data.clinician}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (slot.state === "blocked") {
+                        return (
+                          <div
+                            key={`${day.key}-${time}`}
+                            className="flex min-h-[46px] flex-col justify-center border-b border-r border-[#143a5c] bg-rose-500/10 px-2 py-2"
+                          >
+                            <div className="text-[11px] font-extrabold">Blocked</div>
+                            <div className="mt-1 text-[10px] text-white/65">
+                              {slot.data.resource}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div
+                          key={`${day.key}-${time}`}
+                          className="flex min-h-[46px] flex-col justify-center border-b border-r border-[#143a5c] bg-emerald-500/10 px-2 py-2"
+                        >
+                          <div className="text-[11px] font-extrabold">Available</div>
+                          <div className="mt-1 text-[10px] text-white/65">
+                            {selectedResource === "All" ? "Open Slot" : selectedResource}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <div className="rounded-[18px] border border-[#143a5c] bg-[#071427] px-3 py-2">
+                <div className="text-[11px] text-white/55">Available</div>
+                <div className="mt-1 text-[15px] font-extrabold">{dayStats.available}</div>
+              </div>
+              <div className="rounded-[18px] border border-[#143a5c] bg-[#071427] px-3 py-2">
+                <div className="text-[11px] text-white/55">Booked</div>
+                <div className="mt-1 text-[15px] font-extrabold">{dayStats.booked}</div>
+              </div>
+            </div>
+          </section>
+
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2">
+              <div className="text-[15px] font-extrabold">Actions & Summary</div>
+              <div className="mt-0.5 text-[12px] text-white/55">
+                Reschedule, roster, mapping and registration
+              </div>
+            </div>
+
+            <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+              <div className="mb-3 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+                <div className="mb-2 text-[14px] font-extrabold">Reschedule</div>
+
+                <div className="mb-3">
+                  <div className={labelClass}>Appointment</div>
                   <select
                     value={selectedAppointmentId}
                     onChange={(e) => setSelectedAppointmentId(Number(e.target.value))}
-                    style={styles.select}
+                    className={selectClass}
                   >
                     {appointments
                       .filter((item) => item.clinic === selectedClinic)
@@ -854,13 +917,13 @@ export default function SchedulerPage() {
                   </select>
                 </div>
 
-                <div style={styles.rescheduleGrid}>
+                <div className="grid grid-cols-1 gap-3 xl:grid-cols-3">
                   <div>
-                    <div style={styles.filterLabel}>Day</div>
+                    <div className={labelClass}>Day</div>
                     <select
                       value={rescheduleDay}
                       onChange={(e) => setRescheduleDay(e.target.value as DayKey)}
-                      style={styles.select}
+                      className={selectClass}
                     >
                       {days.map((day) => (
                         <option key={day.key} value={day.key}>
@@ -871,11 +934,11 @@ export default function SchedulerPage() {
                   </div>
 
                   <div>
-                    <div style={styles.filterLabel}>Time</div>
+                    <div className={labelClass}>Time</div>
                     <select
                       value={rescheduleTime}
                       onChange={(e) => setRescheduleTime(e.target.value)}
-                      style={styles.select}
+                      className={selectClass}
                     >
                       {timeSlots.map((time) => (
                         <option key={time} value={time}>
@@ -886,11 +949,11 @@ export default function SchedulerPage() {
                   </div>
 
                   <div>
-                    <div style={styles.filterLabel}>Resource</div>
+                    <div className={labelClass}>Resource</div>
                     <select
                       value={rescheduleResource}
                       onChange={(e) => setRescheduleResource(e.target.value as Resource)}
-                      style={styles.select}
+                      className={selectClass}
                     >
                       {resources.map((resource) => (
                         <option key={resource} value={resource}>
@@ -901,131 +964,138 @@ export default function SchedulerPage() {
                   </div>
                 </div>
 
-                <div style={styles.summaryBoxCompact}>
-                  <div style={styles.summaryRowMini}>
-                    <span>Patient</span>
-                    <strong>{selectedAppointment?.patient || "-"}</strong>
-                  </div>
-                  <div style={styles.summaryRowMini}>
-                    <span>Current</span>
-                    <strong>
-                      {selectedAppointment
+                <div className="mt-3 rounded-[18px] border border-[#143a5c] bg-[#081321] p-3">
+                  {[
+                    ["Patient", selectedAppointment?.patient || "-"],
+                    [
+                      "Current",
+                      selectedAppointment
                         ? `${selectedAppointment.day.toUpperCase()} ${selectedAppointment.time}`
-                        : "-"}
-                    </strong>
-                  </div>
-                  <div style={styles.summaryRowMini}>
-                    <span>Check</span>
-                    <strong>{canReschedule ? "Clear" : "Conflict"}</strong>
-                  </div>
+                        : "-"
+                    ],
+                    ["Check", canReschedule ? "Clear" : "Conflict"]
+                  ].map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="flex justify-between gap-2 border-b border-[#143a5c] py-2 text-[13px] text-white/80"
+                    >
+                      <span>{label}</span>
+                      <strong>{value}</strong>
+                    </div>
+                  ))}
                 </div>
 
-                <div style={styles.formActions}>
-                  <button type="button" style={styles.ghostButton}>
+                <div className="mt-3 flex justify-end gap-2">
+                  <button className="h-9 rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
                     Cancel
                   </button>
                   <button
                     type="button"
-                    style={canReschedule ? styles.primaryButton : styles.disabledButton}
+                    className={`h-9 rounded-2xl px-5 text-[14px] font-extrabold ${
+                      canReschedule
+                        ? "bg-[#00a96e] text-white"
+                        : "cursor-not-allowed bg-[#314052] text-white/50"
+                    }`}
                     onClick={handleReschedule}
                   >
                     Confirm
                   </button>
                 </div>
 
-                {message ? <div style={styles.message}>{message}</div> : null}
-              </section>
+                {message ? (
+                  <div className="mt-2 text-[12px] font-bold text-emerald-300">
+                    {message}
+                  </div>
+                ) : null}
+              </div>
 
-              <section style={styles.panelCompact}>
-                <div style={styles.panelTitle}>Staff Roster</div>
-                <div style={styles.panelSub}>Assigned staff for selected clinic/day</div>
-
-                <div style={{ marginTop: 8 }}>
-                  {rosterForDay.length === 0 ? (
-                    <div style={styles.emptyState}>No staff rostered for this day.</div>
-                  ) : (
-                    rosterForDay.map((staff) => (
-                      <div key={staff.id} style={styles.listRow}>
-                        <div>
-                          <div style={styles.listTitle}>{staff.name}</div>
-                          <div style={styles.listMeta}>
-                            {staff.role} • {staff.shift}
-                          </div>
-                          <div style={styles.slotMetaSmall}>
-                            Access: {staff.assignedClinics.join(", ")}
-                          </div>
-                        </div>
-                        <div style={styles.badgeBooked}>
-                          {staff.available ? "Available" : "Unavailable"}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </section>
-            </div>
-
-            <div style={styles.bottomGrid}>
-              <section style={styles.panelCompact}>
-                <div style={styles.panelTitle}>Room / Machine Mapping</div>
-                <div style={styles.panelSub}>Scheduling allocation rules</div>
-
-                <div style={{ marginTop: 8 }}>
-                  {mappingForClinic.map((mapItem, index) => (
-                    <div key={index} style={styles.listRow}>
+              <div className="mb-3 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+                <div className="mb-2 text-[14px] font-extrabold">Staff Roster</div>
+                {rosterForDay.length === 0 ? (
+                  <div className="rounded-xl bg-[#081321] px-3 py-3 text-[12px] text-white/55">
+                    No staff rostered for this day.
+                  </div>
+                ) : (
+                  rosterForDay.map((staff) => (
+                    <div
+                      key={staff.id}
+                      className="flex items-center justify-between gap-2 border-b border-[#143a5c] py-3"
+                    >
                       <div>
-                        <div style={styles.listTitle}>{mapItem.room}</div>
-                        <div style={styles.listMeta}>
-                          {mapItem.machine} • {mapItem.modality}
+                        <div className="text-[12px] font-extrabold">{staff.name}</div>
+                        <div className="mt-1 text-[11px] text-white/58">
+                          {staff.role} • {staff.shift}
+                        </div>
+                        <div className="mt-1 text-[10px] text-white/42">
+                          Access: {staff.assignedClinics.join(", ")}
                         </div>
                       </div>
-                      <div style={styles.mappingBadge}>{mapItem.modality}</div>
+                      <div className="rounded-full bg-sky-500/15 px-3 py-1 text-[11px] font-bold text-sky-300">
+                        {staff.available ? "Available" : "Unavailable"}
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </section>
+                  ))
+                )}
+              </div>
 
-              <section style={styles.panelCompact}>
-                <div style={styles.panelTitle}>Selected Day Appointments</div>
-                <div style={styles.panelSub}>
-                  {days.find((d) => d.key === selectedDay)?.label} • {selectedClinic}
-                </div>
-
-                <div style={{ marginTop: 8 }}>
-                  {dayAppointments.length === 0 ? (
-                    <div style={styles.emptyState}>No appointments for this selection.</div>
-                  ) : (
-                    dayAppointments.map((item) => (
-                      <div key={item.id} style={styles.listRow}>
-                        <div>
-                          <div style={styles.listTitle}>{item.patient}</div>
-                          <div style={styles.listMeta}>
-                            {item.time} • {item.type} • {item.clinician}
-                          </div>
-                        </div>
-                        <div style={styles.badgeBooked}>{item.resource}</div>
+              <div className="mb-3 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+                <div className="mb-2 text-[14px] font-extrabold">Room / Machine Mapping</div>
+                {mappingForClinic.map((mapItem, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between gap-2 border-b border-[#143a5c] py-3"
+                  >
+                    <div>
+                      <div className="text-[12px] font-extrabold">{mapItem.room}</div>
+                      <div className="mt-1 text-[11px] text-white/58">
+                        {mapItem.machine} • {mapItem.modality}
                       </div>
-                    ))
-                  )}
-                </div>
-              </section>
-            </div>
+                    </div>
+                    <div className="rounded-full bg-violet-500/15 px-3 py-1 text-[11px] font-bold text-violet-300">
+                      {mapItem.modality}
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-            <div style={styles.bottomGrid}>
-              <section style={styles.panelCompact}>
-                <div style={styles.panelTitle}>Staff Registration</div>
-                <div style={styles.panelSub}>Add new staff capability records</div>
+              <div className="mb-3 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+                <div className="mb-2 text-[14px] font-extrabold">Selected Day Appointments</div>
+                {dayAppointments.length === 0 ? (
+                  <div className="rounded-xl bg-[#081321] px-3 py-3 text-[12px] text-white/55">
+                    No appointments for this selection.
+                  </div>
+                ) : (
+                  dayAppointments.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between gap-2 border-b border-[#143a5c] py-3"
+                    >
+                      <div>
+                        <div className="text-[12px] font-extrabold">{item.patient}</div>
+                        <div className="mt-1 text-[11px] text-white/58">
+                          {item.time} • {item.type} • {item.clinician}
+                        </div>
+                      </div>
+                      <div className="rounded-full bg-sky-500/15 px-3 py-1 text-[11px] font-bold text-sky-300">
+                        {item.resource}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
 
-                <form onSubmit={handleRegisterStaff} style={{ marginTop: 8 }}>
-                  <div style={styles.staffGrid}>
+              <div className="mb-3 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+                <div className="mb-2 text-[14px] font-extrabold">Staff Registration</div>
+                <form onSubmit={handleRegisterStaff}>
+                  <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       placeholder="Staff Name"
                       value={staffName}
                       onChange={(e) => setStaffName(e.target.value)}
                     />
                     <select
-                      style={styles.select}
+                      className={selectClass}
                       value={staffRole}
                       onChange={(e) => setStaffRole(e.target.value as StaffRole)}
                     >
@@ -1036,7 +1106,7 @@ export default function SchedulerPage() {
                     </select>
 
                     <select
-                      style={styles.select}
+                      className={selectClass}
                       value={staffClinic}
                       onChange={(e) => setStaffClinic(e.target.value as Clinic)}
                     >
@@ -1048,7 +1118,7 @@ export default function SchedulerPage() {
                     </select>
 
                     <select
-                      style={styles.select}
+                      className={selectClass}
                       value={staffDay}
                       onChange={(e) => setStaffDay(e.target.value as DayKey)}
                     >
@@ -1060,56 +1130,54 @@ export default function SchedulerPage() {
                     </select>
 
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       placeholder="Shift"
                       value={staffShift}
                       onChange={(e) => setStaffShift(e.target.value)}
                     />
                     <input
-                      style={styles.input}
+                      className={inputClass}
                       placeholder="Capabilities"
                       value={staffCapabilities}
                       onChange={(e) => setStaffCapabilities(e.target.value)}
                     />
                   </div>
 
-                  <div style={styles.formActions}>
-                    <button type="submit" style={styles.primaryButton}>
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      type="submit"
+                      className="h-9 rounded-2xl bg-[#00a96e] px-5 text-[14px] font-extrabold"
+                    >
                       Register
                     </button>
                   </div>
                 </form>
 
-                {staffMessage ? <div style={styles.message}>{staffMessage}</div> : null}
-              </section>
+                {staffMessage ? (
+                  <div className="mt-2 text-[12px] font-bold text-emerald-300">
+                    {staffMessage}
+                  </div>
+                ) : null}
+              </div>
 
-              <section style={styles.panelCompact}>
-                <div style={styles.panelTitle}>Filter Summary</div>
-                <div style={styles.panelSub}>Active scheduler filters</div>
-
-                <div style={styles.summaryBoxCompact}>
-                  <div style={styles.summaryRowMini}>
-                    <span>Clinic</span>
-                    <strong>{selectedClinic}</strong>
+              <div className="rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+                <div className="mb-2 text-[14px] font-extrabold">Filter Summary</div>
+                {[
+                  ["Clinic", selectedClinic],
+                  ["Resource", selectedResource],
+                  ["Modality", selectedModality],
+                  ["Day", days.find((d) => d.key === selectedDay)?.label || "-"],
+                  ["Slot View", selectedSlotView]
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="flex justify-between gap-2 border-b border-[#143a5c] py-2 text-[13px] text-white/80"
+                  >
+                    <span>{label}</span>
+                    <strong>{String(value)}</strong>
                   </div>
-                  <div style={styles.summaryRowMini}>
-                    <span>Resource</span>
-                    <strong>{selectedResource}</strong>
-                  </div>
-                  <div style={styles.summaryRowMini}>
-                    <span>Modality</span>
-                    <strong>{selectedModality}</strong>
-                  </div>
-                  <div style={styles.summaryRowMini}>
-                    <span>Day</span>
-                    <strong>{days.find((d) => d.key === selectedDay)?.label}</strong>
-                  </div>
-                  <div style={styles.summaryRowMini}>
-                    <span>Slot View</span>
-                    <strong>{selectedSlotView}</strong>
-                  </div>
-                </div>
-              </section>
+                ))}
+              </div>
             </div>
           </section>
         </div>
@@ -1117,634 +1185,3 @@ export default function SchedulerPage() {
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: "100vh",
-    background: "#030a16",
-    color: "#ffffff",
-    fontFamily: "Inter, Segoe UI, Arial, sans-serif",
-    overflowX: "hidden",
-    overflowY: "auto"
-  },
-
-  topStrip: {
-    height: 28,
-    background: "#8d0d46",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 8px",
-    position: "sticky",
-    top: 0,
-    zIndex: 20
-  },
-
-  topStripText: {
-    fontSize: 9,
-    fontWeight: 700,
-    whiteSpace: "nowrap"
-  },
-
-  collapseButton: {
-    height: 20,
-    minWidth: 20,
-    borderRadius: 999,
-    border: "none",
-    background: "#d9d9d9",
-    color: "#222",
-    cursor: "pointer",
-    fontSize: 11,
-    fontWeight: 700,
-    lineHeight: 1
-  },
-
-  appShell: {
-    padding: 8,
-    boxSizing: "border-box"
-  },
-
-  titleBar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-    border: "1px solid rgba(54,112,190,0.28)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: "8px 12px",
-    marginBottom: 8,
-    position: "sticky",
-    top: 36,
-    zIndex: 15
-  },
-
-  titleLeft: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8
-  },
-
-  logo: {
-    width: 24,
-    height: 24,
-    borderRadius: 5,
-    objectFit: "cover"
-  },
-
-  eyebrow: {
-    fontSize: 9,
-    color: "#1da4ff",
-    fontWeight: 800,
-    letterSpacing: "1.2px"
-  },
-
-  title: {
-    fontSize: 14,
-    fontWeight: 800,
-    marginTop: 1
-  },
-
-  titleActions: {
-    display: "flex",
-    gap: 6,
-    alignItems: "center",
-    flexWrap: "wrap"
-  },
-
-  ghostButton: {
-    height: 26,
-    padding: "0 10px",
-    borderRadius: 9,
-    border: "1px solid rgba(54,112,190,0.32)",
-    background: "#0d1d35",
-    color: "#59b7ff",
-    fontSize: 11,
-    fontWeight: 700,
-    cursor: "pointer"
-  },
-
-  primaryButton: {
-    height: 26,
-    padding: "0 12px",
-    borderRadius: 9,
-    border: "none",
-    background: "#00a96e",
-    color: "#fff",
-    fontSize: 11,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  disabledButton: {
-    height: 26,
-    padding: "0 12px",
-    borderRadius: 9,
-    border: "none",
-    background: "#314052",
-    color: "rgba(255,255,255,0.5)",
-    fontSize: 11,
-    fontWeight: 800,
-    cursor: "not-allowed"
-  },
-
-  topInfoPill: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 999,
-    background: "#0d1d35",
-    border: "1px solid rgba(54,112,190,0.28)",
-    color: "#59b7ff",
-    fontSize: 10,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  metricsRow: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-    gap: 8,
-    marginBottom: 8
-  },
-
-  metricCard: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 12,
-    background: "#020d1f",
-    padding: "8px 10px"
-  },
-
-  metricLabel: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.56)",
-    marginBottom: 3
-  },
-
-  metricValueSmall: {
-    fontSize: 12,
-    fontWeight: 800
-  },
-
-  alertGrid: {
-    marginBottom: 8,
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 8
-  },
-
-  alertPanel: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 12,
-    background: "#020d1f",
-    padding: 8
-  },
-
-  alertTitle: {
-    fontSize: 10,
-    fontWeight: 800,
-    marginBottom: 5
-  },
-
-  alertError: {
-    padding: "6px 8px",
-    borderRadius: 8,
-    background: "rgba(210,77,87,0.14)",
-    color: "#f08b8b",
-    marginBottom: 5,
-    fontSize: 10,
-    lineHeight: 1.3
-  },
-
-  alertWarn: {
-    padding: "6px 8px",
-    borderRadius: 8,
-    background: "rgba(196,145,49,0.14)",
-    color: "#f2cb74",
-    marginBottom: 5,
-    fontSize: 10,
-    lineHeight: 1.3
-  },
-
-  alertOk: {
-    padding: "6px 8px",
-    borderRadius: 8,
-    background: "rgba(45,143,82,0.14)",
-    color: "#7fd19a",
-    fontSize: 10
-  },
-
-  mainGrid: {
-    display: "grid",
-    gridTemplateColumns: "0.75fr 2fr",
-    gap: 8,
-    alignItems: "start"
-  },
-
-  leftRail: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: 8,
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    alignSelf: "start",
-    position: "sticky",
-    top: 88
-  },
-
-  centerArea: {
-    minWidth: 0
-  },
-
-  panelCompact: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: 8
-  },
-
-  panelHeaderRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 6,
-    marginBottom: 6
-  },
-
-  panelTitle: {
-    fontSize: 11,
-    fontWeight: 800
-  },
-
-  panelSub: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.56)",
-    marginTop: 1
-  },
-
-  filterSection: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 4
-  },
-
-  filterLabel: {
-    fontSize: 9,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.72)"
-  },
-
-  navItem: {
-    padding: "7px 8px",
-    background: "#071427",
-    borderRadius: 10,
-    cursor: "pointer",
-    border: "1px solid rgba(54,112,190,0.18)",
-    fontSize: 10
-  },
-
-  navItemActive: {
-    padding: "7px 8px",
-    background: "#0b213f",
-    borderRadius: 10,
-    cursor: "pointer",
-    border: "1px solid rgba(26,154,255,0.45)",
-    fontSize: 10,
-    fontWeight: 700
-  },
-
-  input: {
-    width: "100%",
-    height: 26,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "0 8px",
-    fontSize: 11,
-    outline: "none",
-    boxSizing: "border-box"
-  },
-
-  select: {
-    width: "100%",
-    height: 26,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "0 8px",
-    fontSize: 11,
-    outline: "none",
-    boxSizing: "border-box"
-  },
-
-  infoBox: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8
-  },
-
-  infoTitle: {
-    fontSize: 10,
-    fontWeight: 800,
-    color: "#59b7ff",
-    marginBottom: 4
-  },
-
-  infoText: {
-    fontSize: 10,
-    color: "rgba(255,255,255,0.72)",
-    lineHeight: 1.4
-  },
-
-  statusCard: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8
-  },
-
-  statusTitle: {
-    fontSize: 10,
-    fontWeight: 800,
-    marginBottom: 4
-  },
-
-  statusRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    fontSize: 10,
-    color: "rgba(255,255,255,0.68)",
-    marginBottom: 7
-  },
-
-  dotGreen: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#2d8f52",
-    display: "inline-block"
-  },
-
-  dotBlue: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#56a8ff",
-    display: "inline-block"
-  },
-
-  dotRed: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#d24d57",
-    display: "inline-block"
-  },
-
-  dotPurple: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#9b6bff",
-    display: "inline-block"
-  },
-
-  dayTabs: {
-    display: "flex",
-    gap: 5,
-    paddingBottom: 8,
-    flexWrap: "wrap"
-  },
-
-  dayTab: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 8,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#d3d8df",
-    cursor: "pointer",
-    fontWeight: 700,
-    fontSize: 10
-  },
-
-  dayTabActive: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 8,
-    border: "1px solid rgba(26,154,255,0.45)",
-    background: "#0b213f",
-    color: "#59b7ff",
-    cursor: "pointer",
-    fontWeight: 800,
-    fontSize: 10
-  },
-
-  calendarGridWrap: {
-    overflowX: "auto"
-  },
-
-  calendarGrid: {
-    display: "grid",
-    gridTemplateColumns: "64px repeat(5, minmax(120px, 1fr))",
-    minWidth: 720
-  },
-
-  gridHeaderTime: {
-    padding: "8px 6px",
-    background: "#071427",
-    borderBottom: "1px solid rgba(54,112,190,0.18)",
-    borderRight: "1px solid rgba(54,112,190,0.14)",
-    fontSize: 10,
-    fontWeight: 800
-  },
-
-  gridHeaderDay: {
-    padding: "8px 6px",
-    background: "#071427",
-    borderBottom: "1px solid rgba(54,112,190,0.18)",
-    borderRight: "1px solid rgba(54,112,190,0.14)",
-    fontSize: 10,
-    fontWeight: 800
-  },
-
-  timeCell: {
-    minHeight: 44,
-    padding: "8px 6px",
-    borderBottom: "1px solid rgba(54,112,190,0.12)",
-    borderRight: "1px solid rgba(54,112,190,0.12)",
-    fontSize: 10,
-    color: "rgba(255,255,255,0.65)",
-    background: "#071427"
-  },
-
-  slotCellAvailable: {
-    minHeight: 44,
-    padding: "6px",
-    borderBottom: "1px solid rgba(54,112,190,0.12)",
-    borderRight: "1px solid rgba(54,112,190,0.12)",
-    background: "rgba(45,143,82,0.08)",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center"
-  },
-
-  slotCellBooked: {
-    minHeight: 44,
-    padding: "6px",
-    borderBottom: "1px solid rgba(54,112,190,0.12)",
-    borderRight: "1px solid rgba(54,112,190,0.12)",
-    background: "rgba(86,168,255,0.12)",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center"
-  },
-
-  slotCellBlocked: {
-    minHeight: 44,
-    padding: "6px",
-    borderBottom: "1px solid rgba(54,112,190,0.12)",
-    borderRight: "1px solid rgba(54,112,190,0.12)",
-    background: "rgba(210,77,87,0.12)",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center"
-  },
-
-  slotCellMuted: {
-    minHeight: 44,
-    padding: "6px",
-    borderBottom: "1px solid rgba(54,112,190,0.12)",
-    borderRight: "1px solid rgba(54,112,190,0.12)",
-    background: "#0a1120",
-    opacity: 0.7,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center"
-  },
-
-  slotTitle: {
-    fontSize: 10,
-    fontWeight: 800
-  },
-
-  slotMeta: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.66)",
-    marginTop: 2
-  },
-
-  slotMetaSmall: {
-    fontSize: 8,
-    color: "rgba(255,255,255,0.48)",
-    marginTop: 2
-  },
-
-  bottomGrid: {
-    marginTop: 8,
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 8
-  },
-
-  rescheduleGrid: {
-    marginTop: 8,
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr",
-    gap: 6
-  },
-
-  staffGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 6
-  },
-
-  summaryBoxCompact: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8,
-    marginTop: 6
-  },
-
-  summaryRowMini: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 6,
-    padding: "5px 0",
-    borderBottom: "1px solid rgba(54,112,190,0.12)",
-    fontSize: 10,
-    color: "rgba(255,255,255,0.75)"
-  },
-
-  formActions: {
-    display: "flex",
-    gap: 6,
-    justifyContent: "flex-end",
-    marginTop: 8
-  },
-
-  message: {
-    marginTop: 6,
-    fontSize: 10,
-    color: "#7fd19a",
-    fontWeight: 700
-  },
-
-  emptyState: {
-    padding: 10,
-    borderRadius: 10,
-    background: "#071427",
-    color: "rgba(255,255,255,0.55)",
-    fontSize: 10
-  },
-
-  listRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 8,
-    padding: "8px 0",
-    borderBottom: "1px solid rgba(54,112,190,0.12)"
-  },
-
-  listTitle: {
-    fontSize: 10,
-    fontWeight: 800
-  },
-
-  listMeta: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.58)",
-    marginTop: 2
-  },
-
-  badgeBooked: {
-    display: "inline-block",
-    padding: "3px 8px",
-    borderRadius: 999,
-    background: "rgba(86,168,255,0.14)",
-    color: "#56a8ff",
-    fontSize: 9,
-    fontWeight: 700,
-    whiteSpace: "nowrap"
-  },
-
-  mappingBadge: {
-    display: "inline-block",
-    padding: "3px 8px",
-    borderRadius: 999,
-    background: "rgba(155,107,255,0.16)",
-    color: "#c7a7ff",
-    fontSize: 9,
-    fontWeight: 700,
-    whiteSpace: "nowrap"
-  }
-};

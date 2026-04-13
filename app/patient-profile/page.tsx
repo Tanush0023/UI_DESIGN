@@ -193,6 +193,15 @@ type EditablePatientField =
   | "smsNotification"
   | "notes";
 
+const inputClass =
+  "h-10 w-full rounded-xl border border-[#284a73] bg-[#0d1830] px-3 text-[13px] text-white outline-none placeholder:text-white/35 focus:border-sky-500/50";
+
+const selectClass =
+  "h-10 w-full rounded-xl border border-[#284a73] bg-[#0d1830] px-3 text-[13px] text-white outline-none focus:border-sky-500/50";
+
+const panelClass = "rounded-[22px] border border-[#143a5c] bg-[#020d1f]";
+const labelClass = "mb-1 block text-[11px] font-semibold text-white/78";
+
 export default function PatientProfilePage() {
   const [patients, setPatients] = useState<Patient[]>(patientsSeed);
   const [audits, setAudits] = useState<AuditEntry[]>(auditSeed);
@@ -302,959 +311,458 @@ export default function PatientProfilePage() {
   const activeCount = patients.filter((p) => p.status === "Active").length;
   const inactiveCount = patients.filter((p) => p.status === "Inactive").length;
 
-  const medicareTone =
+  const medicareClass =
     selectedPatient.medicareStatus === "Verified"
-      ? styles.topInfoSuccess
+      ? "border border-emerald-700/30 bg-emerald-500/15 text-emerald-300"
       : selectedPatient.medicareStatus === "Pending"
-      ? styles.topInfoWarning
-      : styles.topInfoDanger;
+      ? "border border-amber-700/30 bg-amber-500/15 text-amber-300"
+      : "border border-rose-700/30 bg-rose-500/15 text-rose-300";
 
   return (
-    <div style={styles.page}>
-      <div style={styles.topStrip}>
-        <div style={styles.topStripText}>
+    <div className="min-h-screen overflow-hidden bg-[#030a16] text-white">
+      <div className="sticky top-0 z-30 flex h-11 items-center justify-between bg-[#8d0d46] px-4">
+        <div className="truncate text-[14px] font-bold">
           PATIENT PROFILE • ACTIVE {activeCount} • INACTIVE {inactiveCount} • AUDIT {patientAudits.length}
         </div>
-        <button style={styles.collapseButton}>⌄</button>
+        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-[13px] font-bold text-[#222]">
+          v
+        </button>
       </div>
 
-      <div style={styles.appShell}>
-        <div style={styles.titleBar}>
-          <div style={styles.titleLeft}>
-            <img src="/logo.jpg" alt="EsyRIS logo" style={styles.logo} />
+      <div className="h-[calc(100vh-44px)] overflow-hidden p-2">
+        <div className={`${panelClass} mb-2 flex flex-wrap items-center justify-between gap-3 px-4 py-3`}>
+          <div className="flex items-center gap-3">
+            <img
+              src="/logo.jpg"
+              alt="EsyRIS logo"
+              className="h-10 w-10 rounded-xl object-cover"
+            />
             <div>
-              <div style={styles.eyebrow}>PATIENT PROFILE</div>
-              <div style={styles.title}>Compact Profile Management</div>
+              <div className="text-[11px] font-extrabold tracking-[2px] text-[#1da4ff]">
+                PATIENT PROFILE
+              </div>
+              <div className="text-[16px] font-extrabold">
+                Compact Profile Management
+              </div>
             </div>
           </div>
 
-          <div style={styles.titleActions}>
-            <div style={styles.topInfoPill}>ID: {selectedPatient.patientId}</div>
-            <div style={medicareTone}>Medicare: {selectedPatient.medicareStatus}</div>
-            <div style={styles.topInfoPill}>Referral: {selectedPatient.referralLinked}</div>
-            <div style={styles.topInfoPill}>Form: {selectedPatient.preStudyFormStatus}</div>
-            <button style={styles.ghostButton}>Export</button>
-            <button style={styles.primaryButton}>Authorise</button>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex h-9 items-center rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
+              ID: {selectedPatient.patientId}
+            </div>
+            <div className={`inline-flex h-9 items-center rounded-2xl px-4 text-[13px] font-bold ${medicareClass}`}>
+              Medicare: {selectedPatient.medicareStatus}
+            </div>
+            <div className="inline-flex h-9 items-center rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
+              Referral: {selectedPatient.referralLinked}
+            </div>
+            <div className="inline-flex h-9 items-center rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]">
+              Form: {selectedPatient.preStudyFormStatus}
+            </div>
+            <button
+              type="button"
+              className="h-9 rounded-2xl border border-[#284a73] bg-[#0d1d35] px-4 text-[13px] font-bold text-[#59b7ff]"
+            >
+              Export
+            </button>
+            <button
+              type="submit"
+              form="patient-profile-form"
+              className="h-9 rounded-2xl bg-[#00a96e] px-5 text-[14px] font-extrabold"
+            >
+              Save
+            </button>
           </div>
         </div>
 
         {message ? (
           <div
-            style={{
-              ...styles.messageBanner,
-              background: message.includes("successfully")
-                ? "rgba(45,143,82,0.14)"
-                : "rgba(92,118,166,0.14)",
-              color: message.includes("successfully") ? "#7fd19a" : "#d4d8de",
-              border: message.includes("successfully")
-                ? "1px solid rgba(45,143,82,0.28)"
-                : "1px solid rgba(92,118,166,0.28)"
-            }}
+            className={`mb-2 rounded-2xl px-4 py-2 text-[13px] font-bold ${
+              message.includes("successfully")
+                ? "border border-emerald-700/30 bg-emerald-500/15 text-emerald-300"
+                : "border border-slate-700/30 bg-slate-500/10 text-slate-200"
+            }`}
           >
             {message}
           </div>
         ) : null}
 
-        <div style={styles.metricsRow}>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>MRN</div>
-            <div style={styles.metricValueSmall}>{selectedPatient.mrn}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Status</div>
-            <div style={styles.metricValueSmall}>{selectedPatient.status}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Last Updated</div>
-            <div style={styles.metricValueSmall}>{selectedPatient.lastUpdated}</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricLabel}>Audit Count</div>
-            <div style={styles.metricValueSmall}>{patientAudits.length}</div>
-          </div>
-        </div>
-
-        <div style={styles.mainGrid}>
-          <aside style={styles.leftRail}>
-            <div style={styles.panelHeaderRow}>
+        <div className="grid h-[calc(100%-76px)] grid-cols-1 gap-2 xl:grid-cols-[1.02fr_1.18fr_0.78fr]">
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2 flex items-start justify-between gap-2">
               <div>
-                <div style={styles.panelTitle}>Patient Search</div>
-                <div style={styles.panelSub}>Select profile quickly</div>
+                <div className="text-[15px] font-extrabold">Patient Search</div>
+                <div className="mt-0.5 text-[12px] text-white/55">
+                  Select profile quickly
+                </div>
+              </div>
+              <div className="inline-flex h-7 items-center rounded-full bg-emerald-500/15 px-3 text-[11px] font-extrabold text-emerald-300">
+                {filteredPatients.length} shown
               </div>
             </div>
 
-            <div style={styles.filterSection}>
-              <div style={styles.filterLabel}>Search</div>
+            <div className="mb-2">
               <input
-                style={styles.input}
+                className={inputClass}
                 placeholder="MRN, patient ID, name..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
 
-            <div style={styles.patientList}>
+            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
               {filteredPatients.map((patient) => (
-                <div
+                <button
                   key={patient.id}
+                  type="button"
                   onClick={() => setSelectedId(patient.id)}
-                  style={
+                  className={`w-full rounded-[20px] border px-3 py-3 text-left ${
                     selectedId === patient.id
-                      ? styles.patientItemActive
-                      : styles.patientItem
-                  }
+                      ? "border-sky-500/45 bg-[#0b213f]"
+                      : "border-[#143a5c] bg-[#071427]"
+                  }`}
                 >
-                  <div style={styles.patientName}>
+                  <div className="text-[14px] font-extrabold">
                     {patient.firstName} {patient.lastName}
                   </div>
-                  <div style={styles.patientMeta}>{patient.patientId}</div>
-                  <div style={styles.patientMeta}>{patient.mrn}</div>
-                  <div style={styles.patientMeta}>{patient.phone}</div>
+                  <div className="mt-1 text-[12px] text-white/62">{patient.patientId}</div>
+                  <div className="mt-0.5 text-[12px] text-white/55">{patient.mrn}</div>
+                  <div className="mt-0.5 text-[12px] text-white/55">{patient.phone}</div>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-2 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+              <div className="mb-2 text-[14px] font-extrabold">Overview</div>
+              <div className="mb-2 flex items-center gap-2 text-[13px] text-white/75">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#2d8f52]" />
+                <span>{activeCount} Active Patients</span>
+              </div>
+              <div className="mb-2 flex items-center gap-2 text-[13px] text-white/75">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#d24d57]" />
+                <span>{inactiveCount} Inactive Patients</span>
+              </div>
+              <div className="flex items-center gap-2 text-[13px] text-white/75">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#56a8ff]" />
+                <span>{patientAudits.length} Audit Entries</span>
+              </div>
+            </div>
+          </section>
+
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2 flex items-start justify-between gap-2">
+              <div>
+                <div className="text-[15px] font-extrabold">Selected Patient</div>
+                <div className="mt-0.5 text-[12px] text-white/55">
+                  Demographics, referral, Medicare, and onboarding details
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-full border border-[#284a73] bg-[#0d1d35] px-3 py-1.5 text-[11px] font-bold text-white/85">
+                  MRN: {selectedPatient.mrn}
+                </span>
+                <span className="rounded-full border border-[#284a73] bg-[#0d1d35] px-3 py-1.5 text-[11px] font-bold text-white/85">
+                  Updated: {selectedPatient.lastUpdated}
+                </span>
+              </div>
+            </div>
+
+            <form
+              id="patient-profile-form"
+              onSubmit={handleSave}
+              className="min-h-0 flex-1 overflow-y-auto pr-1"
+            >
+              <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+                <div>
+                  <label className={labelClass}>First Name</label>
+                  <input
+                    className={inputClass}
+                    value={form.firstName}
+                    onChange={(e) => handleChange("firstName", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Last Name</label>
+                  <input
+                    className={inputClass}
+                    value={form.lastName}
+                    onChange={(e) => handleChange("lastName", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Patient ID</label>
+                  <input className={inputClass} value={form.patientId} disabled />
+                </div>
+
+                <div>
+                  <label className={labelClass}>MRN</label>
+                  <input className={inputClass} value={form.mrn} disabled />
+                </div>
+
+                <div>
+                  <label className={labelClass}>DOB</label>
+                  <input
+                    className={inputClass}
+                    value={form.dob}
+                    onChange={(e) => handleChange("dob", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Gender</label>
+                  <select
+                    className={selectClass}
+                    value={form.gender}
+                    onChange={(e) => handleChange("gender", e.target.value as Gender)}
+                  >
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Phone</label>
+                  <input
+                    className={inputClass}
+                    value={form.phone}
+                    onChange={(e) => handleChange("phone", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Email</label>
+                  <input
+                    className={inputClass}
+                    value={form.email}
+                    onChange={(e) => handleChange("email", e.target.value)}
+                  />
+                </div>
+
+                <div className="xl:col-span-2">
+                  <label className={labelClass}>Address</label>
+                  <input
+                    className={inputClass}
+                    value={form.address}
+                    onChange={(e) => handleChange("address", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Emergency Contact</label>
+                  <input
+                    className={inputClass}
+                    value={form.emergencyContact}
+                    onChange={(e) => handleChange("emergencyContact", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Emergency Phone</label>
+                  <input
+                    className={inputClass}
+                    value={form.emergencyPhone}
+                    onChange={(e) => handleChange("emergencyPhone", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Status</label>
+                  <select
+                    className={selectClass}
+                    value={form.status}
+                    onChange={(e) => handleChange("status", e.target.value as PatientStatus)}
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Medicare Number</label>
+                  <input
+                    className={inputClass}
+                    value={form.medicareNumber}
+                    onChange={(e) => handleChange("medicareNumber", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Medicare Expiry</label>
+                  <input
+                    className={inputClass}
+                    value={form.medicareExpiry}
+                    onChange={(e) => handleChange("medicareExpiry", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Medicare Status</label>
+                  <select
+                    className={selectClass}
+                    value={form.medicareStatus}
+                    onChange={(e) =>
+                      handleChange("medicareStatus", e.target.value as MedicareStatus)
+                    }
+                  >
+                    <option value="Verified">Verified</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Failed">Failed</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Referral Linked</label>
+                  <select
+                    className={selectClass}
+                    value={form.referralLinked}
+                    onChange={(e) => handleChange("referralLinked", e.target.value as YesNo)}
+                  >
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Referral Source</label>
+                  <input
+                    className={inputClass}
+                    value={form.referralSource}
+                    onChange={(e) => handleChange("referralSource", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Pre-Study Form</label>
+                  <select
+                    className={selectClass}
+                    value={form.preStudyFormStatus}
+                    onChange={(e) =>
+                      handleChange(
+                        "preStudyFormStatus",
+                        e.target.value as PreStudyFormStatus
+                      )
+                    }
+                  >
+                    <option value="Completed">Completed</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Not Sent">Not Sent</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass}>SMS Notification</label>
+                  <select
+                    className={selectClass}
+                    value={form.smsNotification}
+                    onChange={(e) =>
+                      handleChange("smsNotification", e.target.value as SmsNotification)
+                    }
+                  >
+                    <option value="Enabled">Enabled</option>
+                    <option value="Disabled">Disabled</option>
+                  </select>
+                </div>
+
+                <div className="xl:col-span-2">
+                  <label className={labelClass}>Notes</label>
+                  <textarea
+                    className="min-h-[84px] w-full resize-y rounded-2xl border border-[#284a73] bg-[#0d1830] p-3 text-[14px] text-white outline-none"
+                    value={form.notes}
+                    onChange={(e) => handleChange("notes", e.target.value)}
+                  />
+                </div>
+              </div>
+            </form>
+          </section>
+
+          <section className={`${panelClass} flex min-h-0 flex-col p-3`}>
+            <div className="mb-2 flex items-start justify-between gap-2">
+              <div>
+                <div className="text-[15px] font-extrabold">Profile Summary</div>
+                <div className="mt-0.5 text-[12px] text-white/55">
+                  Current identity and audit visibility
+                </div>
+              </div>
+              <div className="flex h-8 min-w-8 items-center justify-center rounded-full bg-emerald-500/15 text-[12px] font-extrabold text-emerald-300">
+                {patientAudits.length}
+              </div>
+            </div>
+
+            <div className="mb-3 rounded-[20px] border border-[#143a5c] bg-[#071427] p-3">
+              {[
+                ["Selected", `${selectedPatient.firstName} ${selectedPatient.lastName}`],
+                ["Patient ID", selectedPatient.patientId],
+                ["MRN", selectedPatient.mrn],
+                ["DOB", selectedPatient.dob],
+                ["Gender", selectedPatient.gender],
+                ["Medicare", selectedPatient.medicareStatus],
+                ["Referral", selectedPatient.referralLinked],
+                ["Pre-Study Form", selectedPatient.preStudyFormStatus],
+                ["SMS", selectedPatient.smsNotification]
+              ].map(([label, value]) => (
+                <div
+                  key={label}
+                  className="flex justify-between gap-2 border-b border-[#143a5c] py-2 text-[13px] text-white/80"
+                >
+                  <span>{label}</span>
+                  <strong>{value}</strong>
                 </div>
               ))}
             </div>
 
-            <div style={styles.statusCard}>
-              <div style={styles.statusTitle}>Overview</div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotGreen} />
-                <span>{activeCount} Active Patients</span>
-              </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotRed} />
-                <span>{inactiveCount} Inactive Patients</span>
-              </div>
-              <div style={styles.statusRow}>
-                <span style={styles.dotBlue} />
-                <span>{patientAudits.length} Audit Entries</span>
-              </div>
-            </div>
-          </aside>
+            <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+              <div className="mb-2 text-[14px] font-extrabold">Audit Visibility</div>
 
-          <section style={styles.centerArea}>
-            <div style={styles.compactStack}>
-              <form onSubmit={handleSave} style={styles.panelCompact}>
-                <div style={styles.panelHeaderRow}>
-                  <div>
-                    <div style={styles.panelTitle}>Patient Profile</div>
-                    <div style={styles.panelSub}>
-                      Demographic, referral, Medicare, and onboarding details
-                    </div>
-                  </div>
-                </div>
-
-                <div style={styles.formGrid4}>
-                  <div>
-                    <label style={styles.label}>First Name</label>
-                    <input
-                      style={styles.input}
-                      value={form.firstName}
-                      onChange={(e) => handleChange("firstName", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Last Name</label>
-                    <input
-                      style={styles.input}
-                      value={form.lastName}
-                      onChange={(e) => handleChange("lastName", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Patient ID</label>
-                    <input style={styles.input} value={form.patientId} disabled />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>MRN</label>
-                    <input style={styles.input} value={form.mrn} disabled />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>DOB</label>
-                    <input
-                      style={styles.input}
-                      value={form.dob}
-                      onChange={(e) => handleChange("dob", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Gender</label>
-                    <select
-                      style={styles.select}
-                      value={form.gender}
-                      onChange={(e) => handleChange("gender", e.target.value as Gender)}
-                    >
-                      <option value="Female">Female</option>
-                      <option value="Male">Male</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Phone</label>
-                    <input
-                      style={styles.input}
-                      value={form.phone}
-                      onChange={(e) => handleChange("phone", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Email</label>
-                    <input
-                      style={styles.input}
-                      value={form.email}
-                      onChange={(e) => handleChange("email", e.target.value)}
-                    />
-                  </div>
-
-                  <div style={{ gridColumn: "span 2" }}>
-                    <label style={styles.label}>Address</label>
-                    <input
-                      style={styles.input}
-                      value={form.address}
-                      onChange={(e) => handleChange("address", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Emergency Contact</label>
-                    <input
-                      style={styles.input}
-                      value={form.emergencyContact}
-                      onChange={(e) => handleChange("emergencyContact", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Emergency Phone</label>
-                    <input
-                      style={styles.input}
-                      value={form.emergencyPhone}
-                      onChange={(e) => handleChange("emergencyPhone", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Status</label>
-                    <select
-                      style={styles.select}
-                      value={form.status}
-                      onChange={(e) => handleChange("status", e.target.value as PatientStatus)}
-                    >
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Medicare Number</label>
-                    <input
-                      style={styles.input}
-                      value={form.medicareNumber}
-                      onChange={(e) => handleChange("medicareNumber", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Medicare Expiry</label>
-                    <input
-                      style={styles.input}
-                      value={form.medicareExpiry}
-                      onChange={(e) => handleChange("medicareExpiry", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Medicare Status</label>
-                    <select
-                      style={styles.select}
-                      value={form.medicareStatus}
-                      onChange={(e) =>
-                        handleChange("medicareStatus", e.target.value as MedicareStatus)
-                      }
-                    >
-                      <option value="Verified">Verified</option>
-                      <option value="Pending">Pending</option>
-                      <option value="Failed">Failed</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Referral Linked</label>
-                    <select
-                      style={styles.select}
-                      value={form.referralLinked}
-                      onChange={(e) => handleChange("referralLinked", e.target.value as YesNo)}
-                    >
-                      <option value="Yes">Yes</option>
-                      <option value="No">No</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Referral Source</label>
-                    <input
-                      style={styles.input}
-                      value={form.referralSource}
-                      onChange={(e) => handleChange("referralSource", e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>Pre-Study Form</label>
-                    <select
-                      style={styles.select}
-                      value={form.preStudyFormStatus}
-                      onChange={(e) =>
-                        handleChange(
-                          "preStudyFormStatus",
-                          e.target.value as PreStudyFormStatus
-                        )
-                      }
-                    >
-                      <option value="Completed">Completed</option>
-                      <option value="Pending">Pending</option>
-                      <option value="Not Sent">Not Sent</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={styles.label}>SMS Notification</label>
-                    <select
-                      style={styles.select}
-                      value={form.smsNotification}
-                      onChange={(e) =>
-                        handleChange(
-                          "smsNotification",
-                          e.target.value as SmsNotification
-                        )
-                      }
-                    >
-                      <option value="Enabled">Enabled</option>
-                      <option value="Disabled">Disabled</option>
-                    </select>
-                  </div>
-
-                  <div style={{ gridColumn: "span 4" }}>
-                    <label style={styles.label}>Notes</label>
-                    <textarea
-                      style={styles.textarea}
-                      value={form.notes}
-                      onChange={(e) => handleChange("notes", e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div style={styles.formActions}>
-                  <button type="button" style={styles.ghostButton}>
-                    Cancel
-                  </button>
-                  <button type="submit" style={styles.primaryButton}>
-                    Save Profile
-                  </button>
-                </div>
-              </form>
-
-              <section style={styles.panelCompact}>
-                <div style={styles.panelHeaderRow}>
-                  <div>
-                    <div style={styles.panelTitle}>Audit Visibility</div>
-                    <div style={styles.panelSub}>
-                      Field-level profile change history
-                    </div>
-                  </div>
-                </div>
-
-                <div style={styles.tableWrap}>
-                  <table style={styles.table}>
-                    <thead>
+              <div className="overflow-x-auto rounded-[18px] border border-[#143a5c] bg-[#071427]">
+                <table className="min-w-[760px] w-full border-collapse">
+                  <thead>
+                    <tr className="border-b border-[#143a5c] bg-[#091427]">
+                      <th className="px-3 py-2 text-left text-[11px] font-extrabold text-white/85">Timestamp</th>
+                      <th className="px-3 py-2 text-left text-[11px] font-extrabold text-white/85">User</th>
+                      <th className="px-3 py-2 text-left text-[11px] font-extrabold text-white/85">Action</th>
+                      <th className="px-3 py-2 text-left text-[11px] font-extrabold text-white/85">Field</th>
+                      <th className="px-3 py-2 text-left text-[11px] font-extrabold text-white/85">Before</th>
+                      <th className="px-3 py-2 text-left text-[11px] font-extrabold text-white/85">After</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {patientAudits.length === 0 ? (
                       <tr>
-                        <th style={styles.th}>Timestamp</th>
-                        <th style={styles.th}>User</th>
-                        <th style={styles.th}>Action</th>
-                        <th style={styles.th}>Field</th>
-                        <th style={styles.th}>Before</th>
-                        <th style={styles.th}>After</th>
+                        <td
+                          colSpan={6}
+                          className="px-4 py-6 text-center text-[12px] text-white/45"
+                        >
+                          No audit entries available.
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {patientAudits.length === 0 ? (
-                        <tr>
-                          <td colSpan={6} style={styles.emptyCell}>
-                            No audit entries available.
+                    ) : (
+                      patientAudits.map((entry) => (
+                        <tr key={entry.id} className="border-b border-[#143a5c]">
+                          <td className="px-3 py-2 text-[12px] text-white/60">{entry.timestamp}</td>
+                          <td className="px-3 py-2 text-[12px] text-white">{entry.user}</td>
+                          <td className="px-3 py-2 text-[12px] text-white">{entry.action}</td>
+                          <td className="px-3 py-2 text-[12px] text-white">
+                            <span className="rounded-full bg-sky-500/15 px-3 py-1 text-[11px] font-bold text-sky-300">
+                              {entry.field}
+                            </span>
                           </td>
+                          <td className="px-3 py-2 text-[12px] text-white/60">{entry.before}</td>
+                          <td className="px-3 py-2 text-[12px] text-white">{entry.after}</td>
                         </tr>
-                      ) : (
-                        patientAudits.map((entry) => (
-                          <tr key={entry.id} style={styles.tr}>
-                            <td style={styles.tdMuted}>{entry.timestamp}</td>
-                            <td style={styles.td}>{entry.user}</td>
-                            <td style={styles.td}>{entry.action}</td>
-                            <td style={styles.td}>
-                              <span style={styles.badgeField}>{entry.field}</span>
-                            </td>
-                            <td style={styles.tdMuted}>{entry.before}</td>
-                            <td style={styles.td}>{entry.after}</td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </section>
-
-          <aside style={styles.rightRail}>
-            <section style={styles.panelCompact}>
-              <div style={styles.panelHeaderRow}>
-                <div>
-                  <div style={styles.panelTitle}>Profile Summary</div>
-                  <div style={styles.panelSub}>
-                    Current patient identity and onboarding visibility
-                  </div>
-                </div>
-              </div>
-
-              <div style={styles.summaryBoxCompact}>
-                <div style={styles.summaryRowMini}>
-                  <span>Full Name</span>
-                  <strong>
-                    {selectedPatient.firstName} {selectedPatient.lastName}
-                  </strong>
-                </div>
-                <div style={styles.summaryRowMini}>
-                  <span>Patient ID</span>
-                  <strong>{selectedPatient.patientId}</strong>
-                </div>
-                <div style={styles.summaryRowMini}>
-                  <span>MRN</span>
-                  <strong>{selectedPatient.mrn}</strong>
-                </div>
-                <div style={styles.summaryRowMini}>
-                  <span>DOB</span>
-                  <strong>{selectedPatient.dob}</strong>
-                </div>
-                <div style={styles.summaryRowMini}>
-                  <span>Gender</span>
-                  <strong>{selectedPatient.gender}</strong>
-                </div>
-                <div style={styles.summaryRowMini}>
-                  <span>Medicare</span>
-                  <strong>{selectedPatient.medicareStatus}</strong>
-                </div>
-                <div style={styles.summaryRowMini}>
-                  <span>Referral</span>
-                  <strong>{selectedPatient.referralLinked}</strong>
-                </div>
-                <div style={styles.summaryRowMini}>
-                  <span>Pre-Study Form</span>
-                  <strong>{selectedPatient.preStudyFormStatus}</strong>
-                </div>
-                <div style={styles.summaryRowMini}>
-                  <span>SMS</span>
-                  <strong>{selectedPatient.smsNotification}</strong>
-                </div>
-              </div>
-            </section>
-          </aside>
         </div>
       </div>
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: "100vh",
-    background: "#030a16",
-    color: "#ffffff",
-    fontFamily: "Inter, Segoe UI, Arial, sans-serif",
-    overflowX: "hidden",
-    overflowY: "auto"
-  },
-
-  topStrip: {
-    height: 28,
-    background: "#8d0d46",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 8px",
-    position: "sticky",
-    top: 0,
-    zIndex: 20
-  },
-
-  topStripText: {
-    fontSize: 9,
-    fontWeight: 700,
-    whiteSpace: "nowrap"
-  },
-
-  collapseButton: {
-    height: 20,
-    minWidth: 20,
-    borderRadius: 999,
-    border: "none",
-    background: "#d9d9d9",
-    color: "#222",
-    cursor: "pointer",
-    fontSize: 11,
-    fontWeight: 700,
-    lineHeight: 1
-  },
-
-  appShell: {
-    padding: 8,
-    boxSizing: "border-box"
-  },
-
-  titleBar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-    border: "1px solid rgba(54,112,190,0.28)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: "8px 12px",
-    marginBottom: 8,
-    position: "sticky",
-    top: 36,
-    zIndex: 15
-  },
-
-  titleLeft: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8
-  },
-
-  logo: {
-    width: 24,
-    height: 24,
-    borderRadius: 5,
-    objectFit: "cover"
-  },
-
-  eyebrow: {
-    fontSize: 9,
-    color: "#1da4ff",
-    fontWeight: 800,
-    letterSpacing: "1.2px"
-  },
-
-  title: {
-    fontSize: 14,
-    fontWeight: 800,
-    marginTop: 1
-  },
-
-  titleActions: {
-    display: "flex",
-    gap: 6,
-    alignItems: "center",
-    flexWrap: "wrap"
-  },
-
-  ghostButton: {
-    height: 26,
-    padding: "0 10px",
-    borderRadius: 9,
-    border: "1px solid rgba(54,112,190,0.32)",
-    background: "#0d1d35",
-    color: "#59b7ff",
-    fontSize: 11,
-    fontWeight: 700,
-    cursor: "pointer"
-  },
-
-  primaryButton: {
-    height: 26,
-    padding: "0 12px",
-    borderRadius: 9,
-    border: "none",
-    background: "#00a96e",
-    color: "#fff",
-    fontSize: 11,
-    fontWeight: 800,
-    cursor: "pointer"
-  },
-
-  topInfoPill: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 999,
-    background: "#0d1d35",
-    border: "1px solid rgba(54,112,190,0.28)",
-    color: "#59b7ff",
-    fontSize: 10,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  topInfoSuccess: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 999,
-    background: "rgba(45,143,82,0.16)",
-    border: "1px solid rgba(45,143,82,0.28)",
-    color: "#7fd19a",
-    fontSize: 10,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  topInfoWarning: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 999,
-    background: "rgba(196,145,49,0.16)",
-    border: "1px solid rgba(196,145,49,0.28)",
-    color: "#f2cb74",
-    fontSize: 10,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  topInfoDanger: {
-    height: 24,
-    padding: "0 10px",
-    borderRadius: 999,
-    background: "rgba(210,77,87,0.16)",
-    border: "1px solid rgba(210,77,87,0.28)",
-    color: "#f08b8b",
-    fontSize: 10,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center"
-  },
-
-  messageBanner: {
-    marginBottom: 8,
-    padding: "8px 10px",
-    borderRadius: 10,
-    fontSize: 10,
-    fontWeight: 700
-  },
-
-  metricsRow: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-    gap: 8,
-    marginBottom: 8
-  },
-
-  metricCard: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 12,
-    background: "#020d1f",
-    padding: "8px 10px"
-  },
-
-  metricLabel: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.56)",
-    marginBottom: 3
-  },
-
-  metricValueSmall: {
-    fontSize: 12,
-    fontWeight: 800
-  },
-
-  mainGrid: {
-    display: "grid",
-    gridTemplateColumns: "0.75fr 1.8fr 0.85fr",
-    gap: 8,
-    alignItems: "start"
-  },
-
-  leftRail: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: 8,
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    alignSelf: "start",
-    position: "sticky",
-    top: 88
-  },
-
-  centerArea: {
-    minWidth: 0
-  },
-
-  rightRail: {
-    minWidth: 0
-  },
-
-  compactStack: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8
-  },
-
-  panelCompact: {
-    border: "1px solid rgba(54,112,190,0.24)",
-    borderRadius: 14,
-    background: "#020d1f",
-    padding: 8
-  },
-
-  panelHeaderRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 6,
-    marginBottom: 6
-  },
-
-  panelTitle: {
-    fontSize: 11,
-    fontWeight: 800
-  },
-
-  panelSub: {
-    fontSize: 9,
-    color: "rgba(255,255,255,0.56)",
-    marginTop: 1
-  },
-
-  filterSection: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 4
-  },
-
-  filterLabel: {
-    fontSize: 9,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.72)"
-  },
-
-  patientList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 5
-  },
-
-  patientItem: {
-    padding: "7px 8px",
-    background: "#071427",
-    borderRadius: 10,
-    cursor: "pointer",
-    border: "1px solid rgba(54,112,190,0.18)"
-  },
-
-  patientItemActive: {
-    padding: "7px 8px",
-    background: "#0b213f",
-    borderRadius: 10,
-    cursor: "pointer",
-    border: "1px solid rgba(26,154,255,0.45)"
-  },
-
-  patientName: {
-    fontSize: 11,
-    fontWeight: 800,
-    color: "#ffffff"
-  },
-
-  patientMeta: {
-    marginTop: 2,
-    fontSize: 9,
-    color: "rgba(255,255,255,0.58)"
-  },
-
-  input: {
-    width: "100%",
-    height: 26,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "0 8px",
-    fontSize: 11,
-    outline: "none",
-    boxSizing: "border-box"
-  },
-
-  select: {
-    width: "100%",
-    height: 26,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "0 8px",
-    fontSize: 11,
-    outline: "none",
-    boxSizing: "border-box"
-  },
-
-  textarea: {
-    width: "100%",
-    minHeight: 56,
-    borderRadius: 9,
-    border: "1px solid rgba(92,118,166,0.35)",
-    background: "#0d1830",
-    color: "#fff",
-    padding: "8px",
-    fontSize: 11,
-    outline: "none",
-    resize: "vertical",
-    boxSizing: "border-box",
-    fontFamily: "inherit"
-  },
-
-  formGrid4: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr 1fr",
-    gap: 6
-  },
-
-  formActions: {
-    display: "flex",
-    justifyContent: "flex-end",
-    gap: 6,
-    marginTop: 8
-  },
-
-  statusCard: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8
-  },
-
-  statusTitle: {
-    fontSize: 10,
-    fontWeight: 800,
-    marginBottom: 4
-  },
-
-  statusRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    fontSize: 10,
-    color: "rgba(255,255,255,0.68)",
-    marginBottom: 7
-  },
-
-  dotGreen: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#2d8f52",
-    display: "inline-block"
-  },
-
-  dotRed: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#d24d57",
-    display: "inline-block"
-  },
-
-  dotBlue: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#56a8ff",
-    display: "inline-block"
-  },
-
-  label: {
-    display: "block",
-    fontSize: 9,
-    fontWeight: 700,
-    color: "rgba(255,255,255,0.66)",
-    marginBottom: 3
-  },
-
-  summaryBoxCompact: {
-    border: "1px solid rgba(54,112,190,0.18)",
-    borderRadius: 10,
-    background: "#071427",
-    padding: 8
-  },
-
-  summaryRowMini: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 6,
-    padding: "5px 0",
-    borderBottom: "1px solid rgba(54,112,190,0.12)",
-    fontSize: 10,
-    color: "rgba(255,255,255,0.75)"
-  },
-
-  tableWrap: {
-    overflowX: "auto"
-  },
-
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    minWidth: 760
-  },
-
-  th: {
-    textAlign: "left",
-    padding: "8px 10px",
-    fontSize: 10,
-    fontWeight: 800,
-    color: "rgba(255,255,255,0.82)",
-    background: "#071427",
-    borderBottom: "1px solid rgba(54,112,190,0.18)"
-  },
-
-  tr: {
-    borderBottom: "1px solid rgba(54,112,190,0.12)"
-  },
-
-  td: {
-    padding: "8px 10px",
-    fontSize: 10,
-    color: "#ffffff",
-    verticalAlign: "middle"
-  },
-
-  tdMuted: {
-    padding: "8px 10px",
-    fontSize: 10,
-    color: "rgba(255,255,255,0.62)",
-    verticalAlign: "middle"
-  },
-
-  emptyCell: {
-    padding: 16,
-    textAlign: "center",
-    color: "rgba(255,255,255,0.45)",
-    fontSize: 10
-  },
-
-  badgeField: {
-    display: "inline-block",
-    padding: "3px 8px",
-    borderRadius: 999,
-    background: "rgba(86,168,255,0.14)",
-    color: "#56a8ff",
-    fontSize: 9,
-    fontWeight: 700
-  }
-};
