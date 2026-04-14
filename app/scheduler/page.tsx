@@ -794,85 +794,91 @@ export default function SchedulerPage() {
               ))}
             </div>
 
-            <div className="min-h-0 flex-1 overflow-auto rounded-[18px] border border-[#143a5c] bg-[#071427]">
-              <div className="grid min-w-[760px] grid-cols-[72px_repeat(5,minmax(120px,1fr))]">
-                <div className="border-b border-r border-[#143a5c] bg-[#091427] px-2 py-2 text-[11px] font-extrabold">
-                  Time
-                </div>
-                {days.map((day) => (
-                  <div
-                    key={day.key}
-                    className="border-b border-r border-[#143a5c] bg-[#091427] px-2 py-2 text-[11px] font-extrabold"
-                  >
-                    {day.label}
+            <div className="rounded-[18px] border border-[#143a5c] bg-[#071427] p-3">
+              <div className="rounded-[16px] border border-[#143a5c] bg-[#081321] overflow-hidden">
+                <div className="grid min-w-[760px] grid-cols-[72px_repeat(5,minmax(120px,1fr))] border-b border-[#143a5c] bg-[#091427]">
+                  <div className="border-r border-[#143a5c] px-2 py-2 text-[11px] font-extrabold">
+                    Time
                   </div>
-                ))}
-
-                {timeSlots.map((time) => (
-                  <React.Fragment key={time}>
-                    <div className="min-h-[46px] border-b border-r border-[#143a5c] bg-[#071427] px-2 py-2 text-[11px] text-white/65">
-                      {time}
+                  {days.map((day) => (
+                    <div
+                      key={day.key}
+                      className="border-r border-[#143a5c] px-2 py-2 text-[11px] font-extrabold"
+                    >
+                      {day.label}
                     </div>
+                  ))}
+                </div>
 
-                    {days.map((day) => {
-                      const slot = getSlotData(day.key, time);
-
-                      if (!shouldShowSlot(slot.state)) {
-                        return (
-                          <div
-                            key={`${day.key}-${time}`}
-                            className="flex min-h-[46px] flex-col justify-center border-b border-r border-[#143a5c] bg-[#0a1120] px-2 py-2 opacity-70"
-                          >
-                            <div className="text-[10px] text-white/40">Filtered</div>
-                          </div>
-                        );
-                      }
-
-                      if (slot.state === "booked") {
-                        return (
-                          <div
-                            key={`${day.key}-${time}`}
-                            className="flex min-h-[46px] flex-col justify-center border-b border-r border-[#143a5c] bg-sky-500/10 px-2 py-2"
-                          >
-                            <div className="text-[11px] font-extrabold">{slot.data.patient}</div>
-                            <div className="mt-1 text-[10px] text-white/65">
-                              {slot.data.type} • {slot.data.resource}
-                            </div>
-                            <div className="mt-1 text-[9px] text-white/45">
-                              {slot.data.clinician}
-                            </div>
-                          </div>
-                        );
-                      }
-
-                      if (slot.state === "blocked") {
-                        return (
-                          <div
-                            key={`${day.key}-${time}`}
-                            className="flex min-h-[46px] flex-col justify-center border-b border-r border-[#143a5c] bg-rose-500/10 px-2 py-2"
-                          >
-                            <div className="text-[11px] font-extrabold">Blocked</div>
-                            <div className="mt-1 text-[10px] text-white/65">
-                              {slot.data.resource}
-                            </div>
-                          </div>
-                        );
-                      }
-
-                      return (
-                        <div
-                          key={`${day.key}-${time}`}
-                          className="flex min-h-[46px] flex-col justify-center border-b border-r border-[#143a5c] bg-emerald-500/10 px-2 py-2"
-                        >
-                          <div className="text-[11px] font-extrabold">Available</div>
-                          <div className="mt-1 text-[10px] text-white/65">
-                            {selectedResource === "All" ? "Open Slot" : selectedResource}
-                          </div>
+                <div className="h-[420px] overflow-auto">
+                  <div className="grid min-w-[760px] grid-cols-[72px_repeat(5,minmax(120px,1fr))]">
+                    {timeSlots.map((time) => (
+                      <React.Fragment key={time}>
+                        <div className="min-h-[46px] border-b border-r border-[#143a5c] bg-[#071427] px-2 py-2 text-[11px] text-white/65">
+                          {time}
                         </div>
-                      );
-                    })}
-                  </React.Fragment>
-                ))}
+
+                        {days.map((day) => {
+                          const slot = getSlotData(day.key, time);
+
+                          if (!shouldShowSlot(slot.state)) {
+                            return (
+                              <div
+                                key={`${day.key}-${time}`}
+                                className="flex min-h-[46px] flex-col justify-center border-b border-r border-[#143a5c] bg-[#0a1120] px-2 py-2 opacity-70"
+                              >
+                                <div className="text-[10px] text-white/40">Filtered</div>
+                              </div>
+                            );
+                          }
+
+                          if (slot.state === "booked") {
+                            return (
+                              <div
+                                key={`${day.key}-${time}`}
+                                className="flex min-h-[46px] flex-col justify-center border-b border-r border-[#143a5c] bg-sky-500/10 px-2 py-2"
+                              >
+                                <div className="text-[11px] font-extrabold">{slot.data.patient}</div>
+                                <div className="mt-1 text-[10px] text-white/65">
+                                  {slot.data.type} • {slot.data.resource}
+                                </div>
+                                <div className="mt-1 text-[9px] text-white/45">
+                                  {slot.data.clinician}
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          if (slot.state === "blocked") {
+                            return (
+                              <div
+                                key={`${day.key}-${time}`}
+                                className="flex min-h-[46px] flex-col justify-center border-b border-r border-[#143a5c] bg-rose-500/10 px-2 py-2"
+                              >
+                                <div className="text-[11px] font-extrabold">Blocked</div>
+                                <div className="mt-1 text-[10px] text-white/65">
+                                  {slot.data.resource}
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <div
+                              key={`${day.key}-${time}`}
+                              className="flex min-h-[46px] flex-col justify-center border-b border-r border-[#143a5c] bg-emerald-500/10 px-2 py-2"
+                            >
+                              <div className="text-[11px] font-extrabold">Available</div>
+                              <div className="mt-1 text-[10px] text-white/65">
+                                {selectedResource === "All" ? "Open Slot" : selectedResource}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
 
