@@ -25,6 +25,20 @@ type TemplateRecord = {
   author: string;
 };
 
+type MacroRecord = {
+  id: number;
+  label: string;
+  content: string;
+  modality: Modality | "General";
+};
+
+type ReferenceRecord = {
+  id: number;
+  title: string;
+  content: string;
+  category: string;
+};
+
 const templateSeed: TemplateRecord[] = [
   {
     id: 1,
@@ -132,25 +146,55 @@ const templateSeed: TemplateRecord[] = [
     lowConfidenceThreshold: 80,
     lastUpdated: "2026-03-23 08:55",
     author: "Dr Amy Song"
+  }
+];
+
+const macroSeed: MacroRecord[] = [
+  {
+    id: 1,
+    label: "Normal abdominal study",
+    content:
+      "Liver, gallbladder, pancreas, spleen and kidneys are unremarkable. No focal abnormality identified.",
+    modality: "Ultrasound"
   },
   {
-    id: 6,
-    name: "Chest X-ray",
-    modality: "X-Ray",
-    examType: "Chest X-ray",
-    status: "Archived",
-    mappedExaminations: ["Chest X-ray"],
-    comparison: "Previous chest radiograph if available.",
-    technique: ["PA erect", "Lateral view"],
-    findings: "Cardiomediastinal silhouette within normal size limits.",
-    conclusion: "No acute cardiopulmonary abnormality.",
-    impressions: "Archived CXR template.",
-    autoLoad: false,
-    allowTemplateOverride: true,
-    lateralityHighlighting: true,
-    lowConfidenceThreshold: 70,
-    lastUpdated: "2026-03-20 17:00",
-    author: "Dr Patel"
+    id: 2,
+    label: "No hydronephrosis",
+    content: "No hydronephrosis is seen in either kidney.",
+    modality: "Ultrasound"
+  },
+  {
+    id: 3,
+    label: "No significant stenosis",
+    content: "No hemodynamically significant stenosis is identified.",
+    modality: "Ultrasound"
+  },
+  {
+    id: 4,
+    label: "Degenerative changes",
+    content: "Degenerative changes are present without acute osseous abnormality.",
+    modality: "General"
+  }
+];
+
+const referenceSeed: ReferenceRecord[] = [
+  {
+    id: 1,
+    title: "Laterality Check",
+    content: "Verify right / left consistency before saving or authorizing.",
+    category: "Proofing"
+  },
+  {
+    id: 2,
+    title: "Template Override Rule",
+    content: "Radiologist may select a different template when clinically appropriate.",
+    category: "Workflow"
+  },
+  {
+    id: 3,
+    title: "Confidence Highlighting",
+    content: "Directional words and low-confidence dictated words can be visually highlighted.",
+    category: "Editor"
   }
 ];
 
@@ -212,8 +256,13 @@ function highlightDirectionalWords(text: string) {
 
 export default function TemplateManagementPage() {
   const [templates, setTemplates] = useState<TemplateRecord[]>(templateSeed);
+  const [macros, setMacros] = useState<MacroRecord[]>(macroSeed);
+  const [references, setReferences] = useState<ReferenceRecord[]>(referenceSeed);
+
   const [selectedId, setSelectedId] = useState<number>(1);
   const [search, setSearch] = useState("");
+  const [macroSearch, setMacroSearch] = useState("");
+  const [referenceSearch, setReferenceSearch] = useState("");
   const [message, setMessage] = useState("");
   const [examToAdd, setExamToAdd] = useState("Renal Ultrasound");
 
@@ -236,6 +285,22 @@ export default function TemplateManagementPage() {
     });
   }, [templates, search]);
 
+  const filteredMacros = useMemo(() => {
+    const q = macroSearch.trim().toLowerCase();
+    if (!q) return macros;
+    return macros.filter((item) =>
+      `${item.label} ${item.content} ${item.modality}`.toLowerCase().includes(q)
+    );
+  }, [macros, macroSearch]);
+
+  const filteredReferences = useMemo(() => {
+    const q = referenceSearch.trim().toLowerCase();
+    if (!q) return references;
+    return references.filter((item) =>
+      `${item.title} ${item.content} ${item.category}`.toLowerCase().includes(q)
+    );
+  }, [references, referenceSearch]);
+
   const activeCount = templates.filter((t) => t.status === "Active").length;
   const draftCount = templates.filter((t) => t.status === "Draft").length;
   const autoLoadCount = templates.filter((t) => t.autoLoad).length;
@@ -244,7 +309,7 @@ export default function TemplateManagementPage() {
     (item) => !form.mappedExaminations.includes(item)
   );
 
-  const handleFieldChange = <K extends keyof TemplateRecord>(
+  const updateField = <K extends keyof TemplateRecord>(
     field: K,
     value: TemplateRecord[K]
   ) => {
@@ -291,6 +356,14 @@ export default function TemplateManagementPage() {
       mappedExaminations: [...prev.mappedExaminations, examToAdd]
     }));
     setMessage(`Added ${examToAdd} to template mapping.`);
+  };
+
+  const insertMacro = (content: string) => {
+    setForm((prev) => ({
+      ...prev,
+      findings: prev.findings ? `${prev.findings}\n${content}` : content
+    }));
+    setMessage("Macro inserted into findings.");
   };
 
   const createNewTemplate = () => {
@@ -398,7 +471,7 @@ export default function TemplateManagementPage() {
           </div>
         ) : null}
 
-        <div className="grid gap-3 xl:grid-cols-[320px_minmax(0,1fr)_300px]">
+        <div className="grid gap-3 xl:grid-cols-[320px_minmax(0,1fr)_320px]">
           <aside className={`${panelClass} min-h-[860px] p-3`}>
             <div className="mb-3">
               <input
@@ -416,7 +489,7 @@ export default function TemplateManagementPage() {
               </div>
             </div>
 
-            <div className="max-h-[640px] space-y-2 overflow-y-auto pr-1">
+            <div className="max-h-[250px] space-y-2 overflow-y-auto pr-1">
               {filteredTemplates.map((template) => {
                 const selected = template.id === selectedId;
                 return (
@@ -445,6 +518,62 @@ export default function TemplateManagementPage() {
                 );
               })}
             </div>
+
+            <div className={`${subPanelClass} mt-3 p-3`}>
+              <div className="mb-2 flex items-center justify-between">
+                <div className="text-[13px] font-extrabold">Macros</div>
+                <div className="text-[11px] text-sky-300">({macros.length})</div>
+              </div>
+              <input
+                className={`${inputClass} mb-2`}
+                placeholder="Search macros..."
+                value={macroSearch}
+                onChange={(e) => setMacroSearch(e.target.value)}
+              />
+              <div className="max-h-[180px] space-y-2 overflow-y-auto pr-1">
+                {filteredMacros.map((macro) => (
+                  <button
+                    key={macro.id}
+                    onClick={() => insertMacro(macro.content)}
+                    className="w-full rounded-xl border border-[#29446d] bg-[#102349]/70 px-3 py-2 text-left"
+                  >
+                    <div className="text-[12px] font-bold">{macro.label}</div>
+                    <div className="mt-1 text-[10px] text-white/50">
+                      {macro.modality}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className={`${subPanelClass} mt-3 p-3`}>
+              <div className="mb-2 flex items-center justify-between">
+                <div className="text-[13px] font-extrabold">References</div>
+                <div className="text-[11px] text-sky-300">({references.length})</div>
+              </div>
+              <input
+                className={`${inputClass} mb-2`}
+                placeholder="Search references..."
+                value={referenceSearch}
+                onChange={(e) => setReferenceSearch(e.target.value)}
+              />
+              <div className="max-h-[180px] space-y-2 overflow-y-auto pr-1">
+                {filteredReferences.map((ref) => (
+                  <div
+                    key={ref.id}
+                    className="rounded-xl border border-[#29446d] bg-[#102349]/70 px-3 py-2"
+                  >
+                    <div className="text-[12px] font-bold">{ref.title}</div>
+                    <div className="mt-1 text-[10px] text-white/50">
+                      {ref.category}
+                    </div>
+                    <div className="mt-2 text-[11px] text-white/75">
+                      {ref.content}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </aside>
 
           <main className={`${panelClass} min-h-[860px] p-4`}>
@@ -455,7 +584,7 @@ export default function TemplateManagementPage() {
                   <input
                     className={`${inputClass} pr-12 text-[16px]`}
                     value={form.name}
-                    onChange={(e) => handleFieldChange("name", e.target.value)}
+                    onChange={(e) => updateField("name", e.target.value)}
                   />
                   <button className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60">
                     ✎
@@ -465,13 +594,11 @@ export default function TemplateManagementPage() {
 
               <div className="grid gap-3 xl:grid-cols-2">
                 <div>
-                  <label className={labelClass}>Examination</label>
+                  <label className={labelClass}>Examinations</label>
                   <select
                     className={selectClass}
                     value={form.examType}
-                    onChange={(e) =>
-                      handleFieldChange("examType", e.target.value)
-                    }
+                    onChange={(e) => updateField("examType", e.target.value)}
                   >
                     {examLibrary.map((exam) => (
                       <option key={exam}>{exam}</option>
@@ -485,7 +612,7 @@ export default function TemplateManagementPage() {
                     className={selectClass}
                     value={form.modality}
                     onChange={(e) =>
-                      handleFieldChange("modality", e.target.value as Modality)
+                      updateField("modality", e.target.value as Modality)
                     }
                   >
                     <option>Ultrasound</option>
@@ -503,10 +630,7 @@ export default function TemplateManagementPage() {
                     className={selectClass}
                     value={form.status}
                     onChange={(e) =>
-                      handleFieldChange(
-                        "status",
-                        e.target.value as TemplateStatus
-                      )
+                      updateField("status", e.target.value as TemplateStatus)
                     }
                   >
                     <option>Active</option>
@@ -520,9 +644,7 @@ export default function TemplateManagementPage() {
                     <input
                       type="checkbox"
                       checked={form.autoLoad}
-                      onChange={(e) =>
-                        handleFieldChange("autoLoad", e.target.checked)
-                      }
+                      onChange={(e) => updateField("autoLoad", e.target.checked)}
                     />
                     <span>Auto-load template</span>
                   </label>
@@ -534,13 +656,10 @@ export default function TemplateManagementPage() {
                       type="checkbox"
                       checked={form.allowTemplateOverride}
                       onChange={(e) =>
-                        handleFieldChange(
-                          "allowTemplateOverride",
-                          e.target.checked
-                        )
+                        updateField("allowTemplateOverride", e.target.checked)
                       }
                     />
-                    <span>Allow radiologist override</span>
+                    <span>Allow override</span>
                   </label>
                 </div>
               </div>
@@ -550,9 +669,7 @@ export default function TemplateManagementPage() {
                 <input
                   className={inputClass}
                   value={form.comparison}
-                  onChange={(e) =>
-                    handleFieldChange("comparison", e.target.value)
-                  }
+                  onChange={(e) => updateField("comparison", e.target.value)}
                 />
               </div>
 
@@ -606,9 +723,7 @@ export default function TemplateManagementPage() {
                   <textarea
                     className="min-h-[170px] w-full resize-none bg-transparent p-4 text-[14px] leading-7 text-white outline-none"
                     value={form.findings}
-                    onChange={(e) =>
-                      handleFieldChange("findings", e.target.value)
-                    }
+                    onChange={(e) => updateField("findings", e.target.value)}
                   />
                 </div>
               </div>
@@ -618,9 +733,7 @@ export default function TemplateManagementPage() {
                 <textarea
                   className="min-h-[90px] w-full rounded-2xl border border-[#29446d] bg-[#0c1830] p-4 text-[14px] text-white outline-none"
                   value={form.conclusion}
-                  onChange={(e) =>
-                    handleFieldChange("conclusion", e.target.value)
-                  }
+                  onChange={(e) => updateField("conclusion", e.target.value)}
                 />
               </div>
 
@@ -657,7 +770,7 @@ export default function TemplateManagementPage() {
                 Template Mapping
               </div>
               <div className="mb-3 text-[11px] text-white/55">
-                Exam-specific templates auto-load at reporting start, with override support where configured.
+                Exam-specific templates auto-load at reporting start, with override support.
               </div>
 
               <div className="mb-3 flex flex-wrap gap-2">
@@ -730,13 +843,10 @@ export default function TemplateManagementPage() {
                     type="checkbox"
                     checked={form.lateralityHighlighting}
                     onChange={(e) =>
-                      handleFieldChange(
-                        "lateralityHighlighting",
-                        e.target.checked
-                      )
+                      updateField("lateralityHighlighting", e.target.checked)
                     }
                   />
-                  <span>Enable laterality / directional highlighting</span>
+                  <span>Enable directional highlighting</span>
                 </label>
 
                 <div>
@@ -750,10 +860,7 @@ export default function TemplateManagementPage() {
                     className={inputClass}
                     value={form.lowConfidenceThreshold}
                     onChange={(e) =>
-                      handleFieldChange(
-                        "lowConfidenceThreshold",
-                        Number(e.target.value)
-                      )
+                      updateField("lowConfidenceThreshold", Number(e.target.value))
                     }
                   />
                 </div>
@@ -761,13 +868,9 @@ export default function TemplateManagementPage() {
             </div>
 
             <div className={`${subPanelClass} mb-3 p-3`}>
-              <div className="mb-2 text-[13px] font-extrabold">
-                Preview
-              </div>
+              <div className="mb-2 text-[13px] font-extrabold">Preview</div>
               <div className="rounded-xl border border-[#29446d] bg-[#0c1830] p-3 text-[12px] leading-6">
-                <div className="mb-2 font-bold text-sky-200">
-                  {form.name}
-                </div>
+                <div className="mb-2 font-bold text-sky-200">{form.name}</div>
                 <div className="mb-2 text-white/60">Findings</div>
                 <div>{highlightDirectionalWords(form.findings)}</div>
                 <div className="mt-4 mb-2 text-white/60">Conclusion</div>
